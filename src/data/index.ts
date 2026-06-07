@@ -86,9 +86,9 @@ export function getPrevTopic(topicId: string): TopicContent | null {
 export const importantQuestions: ImportantQuestion[] = [
   { topic: "u1-encapsulation", marks: 13, question: "Explain encapsulation with a real-world example and a Java program." },
   { topic: "u1-abstraction", marks: 13, question: "Compare abstraction and encapsulation. How is abstraction achieved in Java?" },
-  { topic: "u1-platform-independence", marks: 13, question: "Explain why Java is platform-independent. Describe bytecode and JVM." },
-  { topic: "u1-constructors", marks: 13, question: "What are constructors? Explain types with examples." },
-  { topic: "u1-constructor-overloading", marks: 13, question: "Explain constructor overloading with a Java program and use of this()." },
+  { topic: "u1-class-object", marks: 13, question: "Explain class vs object, object lifecycle, memory allocation, and the this reference." },
+  { topic: "u1-constructors", marks: 13, question: "What are constructors? Explain default, parameterized, and copy constructors with examples." },
+  { topic: "u1-method-overloading", marks: 13, question: "Explain method overloading (compile-time polymorphism) with autoboxing and varargs rules." },
   { topic: "u2-inheritance", marks: 16, question: "Explain inheritance. Discuss types with a Java program demonstrating single and multilevel inheritance." },
   { topic: "u2-abstract-class", marks: 13, question: "Explain abstract classes and methods with an example." },
   { topic: "u2-interfaces", marks: 16, question: "Explain interfaces in Java. Compare with abstract classes." },

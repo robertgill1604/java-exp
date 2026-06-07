@@ -7,22 +7,31 @@ import type { CodeBlock as CodeBlockType } from "@/data/types";
 function highlightJava(code: string): string {
   const keywords = ["public", "private", "protected", "static", "final", "class", "interface", "extends", "implements", "void", "int", "double", "float", "char", "boolean", "long", "short", "byte", "return", "if", "else", "for", "while", "do", "switch", "case", "break", "continue", "new", "this", "super", "try", "catch", "finally", "throw", "throws", "import", "package", "abstract", "synchronized", "volatile", "transient", "instanceof", "enum", "null", "true", "false"];
   const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  let html = escape(code);
-  // strings first
-  html = html.replace(/("([^"\\]|\\.)*")/g, '<span class="str">$1</span>');
-  // comments
-  html = html.replace(/(\/\/[^\n]*)/g, '<span class="com">$1</span>');
-  html = html.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="com">$1</span>');
-  // numbers
-  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
-  // annotations
-  html = html.replace(/(@\w+)/g, '<span class="ann">$1</span>');
-  // types (capitalized)
-  html = html.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g, '<span class="type">$1</span>');
-  // keywords
-  const kwRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, "g");
-  html = html.replace(kwRegex, '<span class="kw">$1</span>');
-  return html;
+
+  // Single-pass regex with alternation: each alternative captures one token type.
+  // Replacer dispatches based on which group matched, so later tokens
+  // never re-match inside already-replaced content.
+  const tokenRegex = new RegExp(
+    [
+      '"(?:[^"\\\\]|\\\\.)*"',     // 1: string
+      "//[^\\n]*",                  // 2: line comment
+      "/\\*[\\s\\S]*?\\*/",         // 3: block comment
+      "\\b\\d+\\.?\\d*\\b",         // 4: number
+      "@\\w+",                      // 5: annotation
+      "\\b[A-Z][A-Za-z0-9_]*\\b",   // 6: type
+      `\\b(?:${keywords.join("|")})\\b`, // 7: keyword
+    ].join("|"),
+    "g"
+  );
+
+  return escape(code).replace(tokenRegex, (match) => {
+    if (match.startsWith("//") || match.startsWith("/*")) return `<span class="com">${match}</span>`;
+    if (match.startsWith("\"") || match.startsWith("&quot;")) return `<span class="str">${match}</span>`;
+    if (match.startsWith("@")) return `<span class="ann">${match}</span>`;
+    if (/^\d/.test(match)) return `<span class="num">${match}</span>`;
+    if (/^[A-Z]/.test(match)) return `<span class="type">${match}</span>`;
+    return `<span class="kw">${match}</span>`;
+  });
 }
 
 export function CodeBlock({ block }: { block: CodeBlockType }) {

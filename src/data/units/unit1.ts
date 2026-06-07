@@ -2,15 +2,137 @@ import type { TopicContent } from "../types";
 
 export const unit1Topics: TopicContent[] = [
   {
-    id: "u1-encapsulation",
+    id: "u1-object-oriented-programming",
     unitId: 1,
     index: 1,
+    title: "Object-Oriented Programming",
+    tagline: "Modeling the world with objects",
+    oneLiner: "Object-Oriented Programming (OOP) is a paradigm that organizes software around objects — each bundling data (state) and behavior (methods) — instead of functions and procedures.",
+    analogy: "Imagine a factory assembly line. The blueprint for a station is the class; the actual station on the floor, doing work, is the object. Each station has inputs (state) and a job (behavior).",
+    whyExists: "To manage complexity in large software by modeling it after real-world entities, enabling reuse, modularity, and clear separation of concerns.",
+    whereUsed: ["Java, C++, Python, C#", "GUI frameworks", "Enterprise systems", "Game engines", "Domain modeling (DDD)"],
+    visualCue: "🧩",
+    code: {
+      language: "java",
+      code: `class Car {
+    String model;
+    int speed;
+
+    Car(String model) { this.model = model; speed = 0; }
+
+    void accelerate() { speed += 10; }
+
+    void display() {
+        System.out.println(model + " is at " + speed + " km/h");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car c = new Car("Tesla");
+        c.accelerate();
+        c.display();
+    }
+}`,
+      caption: "A Car class with state (model, speed) and behavior (accelerate, display)."
+    },
+    internalWorking: {
+      steps: [
+        "Source is compiled by javac into .class bytecode files.",
+        "At runtime, the ClassLoader loads classes into the JVM method area.",
+        "When 'new Car(...)' executes, the JVM allocates memory on the heap for the object.",
+        "The constructor initializes fields; methods are stored in the method area.",
+        "Method calls use stack frames; the program counter drives bytecode execution."
+      ],
+      memory: "Method area: class metadata + static fields. Heap: per-object instance fields. Stack: per-thread method call frames."
+    },
+    examAnswer: {
+      twoMark: "Object-Oriented Programming is a paradigm that organizes software around objects, each combining data (fields) and behavior (methods). Java is built on four OOP pillars: Encapsulation, Abstraction, Inheritance, and Polymorphism.",
+      thirteenMark: {
+        intro: "Object-Oriented Programming is the dominant paradigm for building large, maintainable software systems. Java is one of the most widely used OOP languages.",
+        definition: "OOP is a programming approach that models a system as a collection of cooperating objects. An object is an instance of a class that bundles attributes (fields) and methods (functions that operate on the data).",
+        explanation: "The four pillars of OOP are:\n1. Encapsulation — bundling data and methods that operate on it inside a class, with controlled access via access modifiers.\n2. Abstraction — hiding implementation details and exposing only essential features through abstract classes and interfaces.\n3. Inheritance — allowing one class (child) to inherit fields and methods of another (parent), promoting code reuse.\n4. Polymorphism — the same interface (method name) representing different underlying forms via overloading (compile-time) or overriding (runtime).\n\nJava supports all four pillars. It is sometimes called 'pure OOP' because almost everything is an object, though primitive types (int, double, char, etc.) are not objects — they have wrapper classes (Integer, Double) for OOP-style use.",
+        diagram: "      OOP Paradigm\n            |\n   +--------+--------+\n   |                 |\n  Class           Object\n (Blueprint)     (Instance)\n   |                 |\n   +--- 4 Pillars ---+\n   |   Encapsulation |\n   |   Abstraction   |\n   |   Inheritance   |\n   |   Polymorphism  |\n   +-----------------+",
+        example: "class Animal { String name; void speak() { System.out.println(name + \" makes a sound\"); } } class Dog extends Animal { @Override void speak() { System.out.println(name + \" barks\"); } } // Animal is a parent class; Dog inherits and overrides speak() — illustrating inheritance and polymorphism.",
+        conclusion: "OOP manages software complexity by mirroring real-world entities. Java's strong OOP support makes it a top choice for building modular, reusable, and scalable systems."
+      },
+      sixteenMark: {
+        intro: "Object-Oriented Programming is a foundational paradigm in modern software engineering. Java was designed from the ground up as an OOP language, and understanding its principles is essential to writing good Java code.",
+        definition: "Object-Oriented Programming is a paradigm that uses 'objects' — instances of classes — as the basic unit of organization. Each object combines data (attributes) and behavior (methods) and interacts with other objects via well-defined interfaces. OOP emphasizes reusability, modularity, and modeling real-world entities.",
+        explanation: "OOP rests on four pillars:\n1. Encapsulation: Data and methods are bundled in a class. Fields are usually private and accessed via public getters/setters, hiding internal state.\n2. Abstraction: Complex reality is modeled through abstract classes and interfaces. The caller sees only what an object does, not how it does it.\n3. Inheritance: A subclass extends a parent class, inheriting its fields and methods using the 'extends' keyword. It enables hierarchical classification and code reuse. Java supports single inheritance of classes but multiple inheritance of type through interfaces.\n4. Polymorphism: The same method name can represent different behaviors. Overloading (compile-time, same class, different parameter lists) and overriding (runtime, subclass changes parent's method) are the two forms.\n\nJava supports OOP with: access modifiers (public, private, protected, default), packages for namespacing, abstract classes and interfaces, and a single root class (Object) for the entire class hierarchy.",
+        working: "OOP works at two levels:\n- Compile time: javac checks type safety, resolves overloaded methods, and verifies that abstract methods are implemented.\n- Runtime: the JVM allocates objects on the heap, uses dynamic dispatch to select the correct overridden method at runtime, and uses reflection for runtime type inspection.",
+        diagram: "+--------------------------+\n|     OOP in Java          |\n+--------------------------+\n|  4 Pillars:              |\n|   - Encapsulation        |\n|   - Abstraction          |\n|   - Inheritance          |\n|   - Polymorphism         |\n+--------------------------+\n            |\n            v\n+--------------------------+\n|   Java class             |\n|   - fields (state)       |\n|   - methods (behavior)   |\n+--------------------------+",
+        example: "// Demonstrating all 4 pillars\nclass Vehicle {                              // 1. Encapsulation\n    private int speed;\n    public void setSpeed(int s) { if (s >= 0) speed = s; }\n    public int getSpeed() { return speed; }\n    void start() { System.out.println(\"Vehicle starts\"); }  // 2. Abstraction\n}\nclass Car extends Vehicle {                  // 3. Inheritance\n    @Override\n    void start() { System.out.println(\"Car starts with key\"); } // 4. Polymorphism\n}",
+        output: "Car starts with key",
+        advantages: [
+          "Models real-world entities naturally",
+          "Encourages code reuse via inheritance and composition",
+          "Improves maintainability and extensibility",
+          "Supports modular, parallel development",
+          "Enables polymorphism for flexible, decoupled code"
+        ],
+        applications: [
+          "GUI applications (Swing, JavaFX)",
+          "Enterprise software (Spring, EJB)",
+          "Game development",
+          "Domain-driven design (DDD)",
+          "Banking, e-commerce, and ERP systems"
+        ],
+        conclusion: "OOP is the dominant paradigm for building large, maintainable software. Java, designed as a strongly-typed OOP language, leverages these four pillars to provide a robust, scalable, and widely adopted programming platform."
+      }
+    },
+    viva: [
+      { q: "What is OOP?", a: "A programming paradigm based on objects that combine data and behavior, organized around classes and four pillars: Encapsulation, Abstraction, Inheritance, Polymorphism." },
+      { q: "Name the four pillars of OOP.", a: "Encapsulation, Abstraction, Inheritance, Polymorphism." },
+      { q: "Is Java a 100% pure OOP language?", a: "Almost. Primitives (int, double, char, etc.) are not objects, but they have wrapper classes (Integer, Double) for OOP-style use." },
+      { q: "Difference between class and object?", a: "A class is a blueprint/template; an object is a runtime instance of that class created with the 'new' keyword." },
+      { q: "How is OOP different from procedural programming?", a: "Procedural focuses on functions and top-down flow; OOP organizes around objects that combine state and behavior." }
+    ],
+    quiz: {
+      mcqs: [
+        { question: "Which of the following is NOT a pillar of OOP?", options: ["Encapsulation", "Abstraction", "Compilation", "Polymorphism"], answer: 2, explanation: "Compilation is a build step, not a pillar." },
+        { question: "OOP stands for:", options: ["Object-Oriented Programming", "Open-source Programming", "Object-Oriented Process", "Optimal Object Programming"], answer: 0, explanation: "Object-Oriented Programming." },
+        { question: "An object is an instance of:", options: ["Method", "Class", "Variable", "Package"], answer: 1, explanation: "Objects are instances of classes." },
+        { question: "Which OOP concept hides internal state?", options: ["Inheritance", "Polymorphism", "Encapsulation", "Abstraction"], answer: 2, explanation: "Encapsulation binds state and controls access." }
+      ],
+      trueFalse: [
+        { statement: "Java supports multiple inheritance of classes.", answer: false, explanation: "Java supports single inheritance of classes; multiple inheritance is achieved via interfaces." },
+        { statement: "In OOP, methods and data are bundled together.", answer: true, explanation: "That is the core idea of encapsulation." }
+      ]
+    },
+    revision: {
+      oneMin: "OOP = 4 pillars: Encapsulation, Abstraction, Inheritance, Polymorphism.",
+      fiveMin: [
+        "Class = blueprint, Object = instance",
+        "Encapsulation = private + getters/setters",
+        "Abstraction = abstract class or interface",
+        "Inheritance = extends (is-a)",
+        "Polymorphism = overloading + overriding"
+      ],
+      examDay: [
+        "Define OOP in 1-2 lines",
+        "List and briefly explain all 4 pillars",
+        "Give a real-world example of each pillar",
+        "Write a small class demonstrating OOP"
+      ],
+      memoryTrick: "EAIP — Encapsulation, Abstraction, Inheritance, Polymorphism.",
+      faq: [
+        { q: "Is Java 100% object-oriented?", a: "Almost. Primitives (int, char) are not objects, but wrapper classes (Integer, Character) make them usable in OOP contexts." },
+        { q: "Which came first, OOP or procedural programming?", a: "Procedural came first (C, Fortran). OOP emerged with Simula (1960s) and Smalltalk (1970s)." }
+      ]
+    },
+    simulator: { type: "none" }
+  },
+  {
+    id: "u1-encapsulation",
+    unitId: 1,
+    index: 2,
     title: "Encapsulation",
-    tagline: "Wrapping data & methods into a single unit",
-    oneLiner: "Encapsulation is the binding of data and the methods that operate on that data into a single unit (class), and restricting direct access to some of the object's components.",
-    analogy: "Think of a capsule (medicine). The powder inside is the data; the outer shell protects it. You cannot directly touch the powder; you interact with the capsule from outside.",
-    whyExists: "To protect an object's internal state from unwanted modifications and to enforce controlled access through methods.",
-    whereUsed: ["Java Beans", "POJOs", "API design", "DTOs", "Service layer classes"],
+    tagline: "Wrapping data and methods into a single unit",
+    oneLiner: "Encapsulation is the binding of data and the methods that operate on that data into a single unit (class), and restricting direct access to some of the object's components using access modifiers.",
+    analogy: "Think of a medicine capsule. The powder (data) is enclosed in the outer shell (class). You cannot touch the powder directly; you interact with the capsule's surface (public methods).",
+    whyExists: "To protect an object's internal state from unwanted modifications and to enforce controlled, validated access through methods.",
+    whereUsed: ["JavaBeans", "POJOs", "API design", "DTOs", "Service-layer classes", "JPA entities"],
     visualCue: "🔒",
     code: {
       language: "java",
@@ -18,80 +140,98 @@ export const unit1Topics: TopicContent[] = [
     private String name;
     private int age;
 
+    public void setName(String name) {
+        if (name != null && !name.isBlank()) this.name = name;
+    }
+    public String getName() { return name; }
+
     public void setAge(int age) {
-        if (age > 0) this.age = age;
+        if (age > 0 && age < 130) this.age = age;
     }
     public int getAge() { return age; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s = new Student();
+        s.setName("Alice");
+        s.setAge(20);
+        System.out.println(s.getName() + " is " + s.getAge());
+    }
 }`,
-      caption: "Encapsulation using private fields and public getters/setters."
+      caption: "Encapsulation: private fields with validated public getters/setters."
     },
     internalWorking: {
       steps: [
-        "Variables are declared as private → hidden from outside world.",
-        "Public getter/setter methods provide controlled read/write access.",
-        "Compiler enforces access modifiers at class loading time.",
-        "At runtime, JVM uses access flags in the class file to enforce visibility."
+        "Fields are declared private → hidden from outside the class.",
+        "Public getter and setter methods provide controlled read/write access.",
+        "Validation logic in setters enforces business rules.",
+        "The compiler enforces access modifiers at compile time.",
+        "At runtime, the JVM uses access flags in the .class file to check visibility."
       ],
-      memory: "Each object stores its private fields in heap memory. Even though hidden, they exist in the same object on heap."
+      memory: "Each object stores its private fields in heap memory. Even though hidden, the fields exist inside the same object on the heap."
     },
     examAnswer: {
-      twoMark: "Encapsulation is the process of binding data and methods that manipulate the data into a single unit (class) and restricting direct access to some of the object's components using access modifiers like private. It improves security, maintainability, and flexibility.",
+      twoMark: "Encapsulation is the process of binding data and the methods that manipulate that data into a single unit (class) and restricting direct access to some of the object's components using access modifiers like private. It improves security, maintainability, and flexibility.",
       thirteenMark: {
-        intro: "Encapsulation is one of the four fundamental OOP concepts in Java that focuses on data hiding and controlled access.",
-        definition: "Encapsulation is the wrapping of data (variables) and the code acting on that data (methods) into a single unit. It also restricts direct access to some of the object's components, which is a means of preventing unintended interference and misuse of the data.",
-        explanation: "In Java, encapsulation is implemented using access modifiers: private, default, protected, and public. The data members are usually declared private and accessed through public getter and setter methods. This allows the class to control how the data is modified—for example, validating values in setters. It also makes the class independent—its internal representation can change without affecting external code that uses the class.",
-        diagram: "Class: Student\n  - private name : String\n  - private age  : int\n  + setName()\n  + getName()\n  + setAge(int)\n  + getAge()",
-        example: "class Account { private double balance; public void deposit(double amt) { if (amt > 0) balance += amt; } public double getBalance() { return balance; } }",
-        conclusion: "Encapsulation provides data hiding, increases flexibility, reusability, and makes code easier to test and maintain."
+        intro: "Encapsulation is one of the four fundamental OOP concepts in Java, focused on data hiding and controlled access.",
+        definition: "Encapsulation is the wrapping of data (variables) and the code that operates on that data (methods) into a single unit. It restricts direct access to some of the object's components, preventing unintended interference and misuse of the data.",
+        explanation: "In Java, encapsulation is implemented using access modifiers: private, default (package-private), protected, and public. Data members are usually declared private and accessed through public getter and setter methods. This allows the class to control how its data is modified — for example, validating values in setters. It also makes the class independent — its internal representation can change without affecting external code that uses the class. A class can expose read-only access by providing only a getter, or write-only access by providing only a setter.",
+        diagram: "  +----------------------+\n  |     Student          |\n  +----------------------+\n  | - name : String      |\n  | - age  : int         |\n  +----------------------+\n  | + setName(String)    |\n  | + getName() : String |\n  | + setAge(int)        |\n  | + getAge() : int     |\n  +----------------------+",
+        example: "class Account { private double balance; public void deposit(double amt) { if (amt > 0) balance += amt; } public double getBalance() { return balance; } } // balance is hidden; only validated deposit and read access are exposed.",
+        conclusion: "Encapsulation provides data hiding, increases flexibility, reusability, and makes code easier to test and maintain. Combined with abstraction, it forms the foundation of well-designed Java applications."
       },
       sixteenMark: {
-        intro: "Encapsulation is a core principle of OOP that combines data and behavior into a single entity while hiding internal details from the outside world.",
+        intro: "Encapsulation is a core OOP principle that combines data and behavior into a single entity while hiding internal details from the outside world.",
         definition: "Encapsulation is the mechanism of bundling data with the methods that operate on that data, and restricting direct access to some of the object's components to enforce controlled interaction.",
-        explanation: "In Java, encapsulation is realized by declaring fields as private and exposing them through public accessor (getters) and mutator (setters) methods. This not only hides the internal representation but also enables validation, lazy initialization, and notification of changes. The class can also control read-only or write-only access by exposing only getter or only setter. Encapsulation is also a foundation for designing robust APIs.",
-        working: "At compile time, the compiler checks access modifiers and generates accessor methods. At runtime, the JVM uses access flags stored in the .class file to enforce visibility between classes. Reflection can bypass encapsulation but should be used carefully.",
-        diagram: "+----------------------+\n|        Class         |\n+----------------------+\n| - data1 : Type       |\n| - data2 : Type       |\n+----------------------+\n| + getData1() : Type  |\n| + setData1(Type)     |\n| + operation()        |\n+----------------------+",
-        example: "class Employee { private String name; private double salary; public void setSalary(double s) { if (s >= 0) salary = s; } public String getName() { return name; } public void setName(String n) { this.name = n; } }",
-        output: "Internal data is protected; external code can only read/modify via getters/setters. Invalid values are rejected in setters.",
+        explanation: "In Java, encapsulation is realized by declaring fields as private and exposing them through public accessor (getter) and mutator (setter) methods. This hides the internal representation and enables validation, lazy initialization, change notification, and read-only or write-only access (by exposing only getter or only setter). Encapsulation is also the foundation for designing robust, evolving APIs: clients depend on the public methods, not on internal fields, so internal implementation can change freely.\n\nThree benefits follow: (1) data protection — invalid values are rejected in setters; (2) flexibility — the class can change internally without breaking callers; (3) testability — controlled inputs and outputs make unit testing straightforward.",
+        working: "At compile time, the compiler checks access modifiers and generates accessor methods where required. At runtime, the JVM uses access flags stored in the .class file to enforce visibility between classes. Reflection can bypass encapsulation, but doing so is risky and should be avoided in production code.",
+        diagram: "+----------------------+\n|        Class         |\n+----------------------+\n| - data1 : Type       |\n| - data2 : Type       |\n+----------------------+\n| + getData1() : Type  |\n| + setData1(Type)     |\n| + operation()        |\n+----------------------+\n         ^\n         |  access only through public methods\n         |\n      Caller",
+        example: "class Employee {\n    private String name;\n    private double salary;\n\n    public void setSalary(double s) {\n        if (s >= 0) salary = s;\n    }\n    public String getName() { return name; }\n    public void setName(String n) { this.name = n; }\n    public double getSalary() { return salary; }\n}",
+        output: "External code cannot read or modify name/salary directly. They are only accessed via getters/setters, and invalid salaries are rejected.",
         advantages: [
           "Data hiding and protection from unauthorized access",
-          "Increased flexibility—internal implementation can change freely",
-          "Reusability—encapsulated classes can be reused in different contexts",
-          "Maintainability—changes inside class don't affect external code",
-          "Easier testing—controlled inputs and outputs"
+          "Increased flexibility — internal implementation can change freely",
+          "Reusability — encapsulated classes can be reused in different contexts",
+          "Maintainability — internal changes don't affect external code",
+          "Easier testing — controlled inputs and outputs",
+          "Validation and invariants enforced in setters"
         ],
         applications: [
           "JavaBeans specification",
           "Spring framework beans",
-          "Hibernate entity classes",
-          "REST API DTOs",
+          "Hibernate/JPA entity classes",
+          "REST API DTOs and request/response models",
           "Microservices and domain models"
         ],
-        conclusion: "Encapsulation is the cornerstone of modular, secure, and maintainable object-oriented software. Combined with abstraction, it forms the basis of well-designed Java applications."
+        conclusion: "Encapsulation is the cornerstone of modular, secure, and maintainable object-oriented software. Combined with abstraction, it forms the basis of well-designed Java applications and is heavily used in frameworks like Spring and Hibernate."
       }
     },
     viva: [
       { q: "What is encapsulation?", a: "Wrapping data and methods that operate on that data into a single unit and restricting direct access to some components." },
-      { q: "How is encapsulation implemented in Java?", a: "Using private fields with public getter and setter methods." },
-      { q: "Can we achieve encapsulation without access modifiers?", a: "Access modifiers are the standard way; without them, you can simulate it via conventions but not enforce it." },
-      { q: "What is the difference between encapsulation and abstraction?", a: "Encapsulation is data hiding (how); abstraction is implementation hiding (what)." },
-      { q: "Is encapsulation the same as data hiding?", a: "Data hiding is a subset/aspect of encapsulation. Encapsulation also includes bundling." }
+      { q: "How is encapsulation implemented in Java?", a: "By declaring fields private and exposing public getter and setter methods." },
+      { q: "Can we achieve encapsulation without access modifiers?", a: "Access modifiers are the standard way. Without them you can simulate it via conventions but not enforce it." },
+      { q: "What is the difference between encapsulation and abstraction?", a: "Encapsulation is data hiding (how it is hidden); abstraction is implementation hiding (what is exposed)." },
+      { q: "Is encapsulation the same as data hiding?", a: "Data hiding is an aspect of encapsulation. Encapsulation also includes bundling data and behavior in a class." },
+      { q: "Can a class be read-only via encapsulation?", a: "Yes — provide only getters (and no public setters) to make fields read-only from outside." }
     ],
     quiz: {
       mcqs: [
-        { question: "Which access modifier is most commonly used to achieve encapsulation?", options: ["public", "private", "protected", "default"], answer: 1, explanation: "private hides the field from outside the class; access is given via getters/setters." },
+        { question: "Which access modifier is most commonly used to achieve encapsulation?", options: ["public", "private", "protected", "default"], answer: 1, explanation: "private hides the field from outside; access is given via getters/setters." },
         { question: "Encapsulation primarily provides:", options: ["Performance", "Data hiding", "Multiple inheritance", "Polymorphism"], answer: 1, explanation: "Encapsulation hides the internal state." },
-        { question: "Which of the following is NOT a benefit of encapsulation?", options: ["Security", "Maintainability", "Faster execution", "Flexibility"], answer: 2, explanation: "Encapsulation does not directly affect execution speed." }
+        { question: "Which of the following is NOT a benefit of encapsulation?", options: ["Security", "Maintainability", "Faster execution", "Flexibility"], answer: 2, explanation: "Encapsulation does not directly affect execution speed." },
+        { question: "A class with all private fields and public getters/setters is an example of:", options: ["Inheritance", "Encapsulation", "Polymorphism", "Abstraction"], answer: 1, explanation: "Private fields + public accessors = encapsulation." }
       ],
       trueFalse: [
         { statement: "Encapsulation can be achieved using private variables and public methods.", answer: true, explanation: "This is the standard pattern." },
-        { statement: "Encapsulation means exposing all data as public.", answer: false, explanation: "Encapsulation is the opposite—hiding data." }
+        { statement: "Encapsulation means exposing all data as public.", answer: false, explanation: "Encapsulation is the opposite — it hides data." }
       ]
     },
     revision: {
-      oneMin: "Encapsulation = private data + public methods.",
+      oneMin: "Encapsulation = private data + public methods (with validation).",
       fiveMin: [
         "Declare fields private.",
-        "Provide public getters/setters.",
+        "Provide public getters and setters.",
         "Validate inputs in setters.",
         "Hide internal representation.",
         "Improves modularity and testability."
@@ -99,13 +239,13 @@ export const unit1Topics: TopicContent[] = [
       examDay: [
         "Write 'data binding + data hiding' definition.",
         "Mention private + public getter/setter.",
-        "Give one real-world analogy.",
-        "Draw class diagram with - and +."
+        "Give a real-world analogy (capsule, ATM, account).",
+        "Draw a class diagram with - and + symbols."
       ],
       memoryTrick: "Encapsulation = Capsule (medicine) — outer shell protects the powder inside.",
       faq: [
-        { q: "Is encapsulation only about access modifiers?", a: "Mostly yes, but it also includes bundling data and methods into one class." },
-        { q: "Can a class without getters be encapsulated?", a: "Yes, if all data is private and access is via methods, even without getters." }
+        { q: "Is encapsulation only about access modifiers?", a: "Mostly yes, but it also includes bundling data and methods into a single class." },
+        { q: "Can a class without getters be encapsulated?", a: "Yes, if all data is private and access is only via methods, even without explicit getters." }
       ]
     },
     simulator: { type: "none" }
@@ -113,82 +253,96 @@ export const unit1Topics: TopicContent[] = [
   {
     id: "u1-abstraction",
     unitId: 1,
-    index: 2,
+    index: 3,
     title: "Data Abstraction",
-    tagline: "Showing only essential features, hiding background details",
-    oneLiner: "Abstraction is the process of hiding implementation details and exposing only the functionality to the user.",
+    tagline: "Showing only the essentials, hiding the rest",
+    oneLiner: "Abstraction is the process of hiding implementation details and exposing only the essential features of an object to the user.",
     analogy: "When you drive a car, you use the steering wheel, accelerator, and brake. You don't need to know how the engine, gearbox, or fuel injection work. That is abstraction.",
     whyExists: "To reduce complexity by exposing only relevant features and to decouple what an object does from how it does it.",
-    whereUsed: ["Abstract classes", "Interfaces", "API design", "Service layers", "Design patterns (Template, Strategy)"],
+    whereUsed: ["Abstract classes", "Interfaces", "API design", "Service layers", "Design patterns (Template, Strategy, Factory)"],
     visualCue: "🎭",
     code: {
       language: "java",
       code: `abstract class Shape {
     abstract double area();
-    void display() { System.out.println("Shape"); }
+    void display() { System.out.println("A shape"); }
 }
+
 class Circle extends Shape {
     double r;
     Circle(double r) { this.r = r; }
+    @Override
     double area() { return Math.PI * r * r; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Shape s = new Circle(5);
+        System.out.println(\"Area = \" + s.area());
+        s.display();
+    }
 }`,
-      caption: "Abstraction using abstract class and overriding area()."
+      caption: "Abstraction via abstract class; Circle provides concrete area()."
     },
     internalWorking: {
       steps: [
-        "abstract keyword prevents direct instantiation.",
-        "Subclasses must provide concrete implementations of abstract methods.",
-        "JVM checks abstract method coverage at class verification time.",
-        "Method dispatch resolves to subclass implementation at runtime."
+        "abstract keyword prevents direct instantiation of the class.",
+        "Subclasses must implement all abstract methods, or be declared abstract too.",
+        "The compiler checks abstract method coverage at compile time.",
+        "At runtime, dynamic dispatch resolves the call to the subclass implementation.",
+        "Abstract classes still occupy method tables; abstract methods are placeholders in the vtable."
       ],
-      memory: "Abstract classes still occupy method tables; abstract methods are placeholders in vtable."
+      memory: "An abstract class can hold instance variables and constants that subclasses inherit, just like a regular class."
     },
     examAnswer: {
       twoMark: "Data abstraction is the process of hiding implementation details and showing only the essential features of an object. In Java, it is achieved using abstract classes and interfaces.",
       thirteenMark: {
-        intro: "Abstraction is one of the four pillars of OOP that allows programmers to manage complexity by focusing on what an object does, not how.",
-        definition: "Abstraction is the concept of exposing only the required characteristics of an entity and hiding the implementation details. In Java, it is implemented using abstract classes (0 to 100% abstraction) and interfaces (100% abstraction).",
-        explanation: "An abstract class may contain abstract methods (declared but not implemented) and concrete methods. A class that extends an abstract class must implement all abstract methods, otherwise it must also be declared abstract. Interfaces (pre-Java 8) only had abstract methods; from Java 8, they can have default and static methods. Abstraction enables loose coupling and easier maintenance.",
-        diagram: "Shape (abstract)\n  + area() : double   <-- abstract\n  + display() : void   <-- concrete\n        |\n        +-- Circle\n        |     + area()\n        +-- Rectangle\n              + area()",
-        example: "abstract class Animal { abstract void sound(); } class Dog extends Animal { void sound() { System.out.println(\"Bark\"); } }",
+        intro: "Abstraction is one of the four pillars of OOP. It allows programmers to manage complexity by focusing on what an object does, not how.",
+        definition: "Abstraction is the concept of exposing only the required characteristics of an entity and hiding the implementation details. In Java, it is implemented using abstract classes (0 to 100% abstraction) and interfaces (100% abstraction, with allowances for default methods in Java 8+).",
+        explanation: "An abstract class may contain abstract methods (declared but not implemented) and concrete methods. A class that extends an abstract class must implement all abstract methods, otherwise it must also be declared abstract. Interfaces (pre-Java 8) only had abstract methods; from Java 8, they can have default and static methods, and from Java 9, private methods as well. Abstraction enables loose coupling and easier maintenance.",
+        diagram: "         <<abstract>> Shape\n        +-----------------+\n        | + area() : dbl  | <-- abstract\n        | + display()     | <-- concrete\n        +-----------------+\n            ^\n            |\n     +------+------+\n     |             |\n   Circle       Rectangle\n     |             |\n     +-- area() override in each",
+        example: "abstract class Animal { abstract void sound(); } class Dog extends Animal { @Override void sound() { System.out.println(\"Bark\"); } } // Animal defines the contract; Dog provides concrete behavior.",
         conclusion: "Abstraction simplifies complex systems by exposing only the relevant parts and is key to designing scalable, maintainable systems."
       },
       sixteenMark: {
         intro: "Data abstraction is a fundamental OOP principle that separates interface from implementation, allowing programmers to work with high-level concepts without worrying about low-level details.",
         definition: "Abstraction is the process of identifying the essential features of an object and ignoring the irrelevant details. In Java, abstraction is achieved through abstract classes and interfaces, both of which can define a contract without specifying the underlying implementation.",
-        explanation: "Abstract classes can have constructors, instance variables, abstract methods, and concrete methods. They are used when classes share code. Interfaces (before Java 8) were pure abstract; from Java 8 onwards, they can have default and static methods with bodies. From Java 9, they can also have private methods. A class can implement multiple interfaces, providing Java's way of supporting multiple inheritance of type. Abstract data types (ADTs) like List, Map, etc., are practical examples.",
-        working: "The compiler ensures that any non-abstract subclass provides implementations for all inherited abstract methods. The JVM resolves method calls through dynamic dispatch based on the actual object type at runtime.",
-        diagram: "<<interface>> Drawable\n   + draw()\n       |\n   +----+----+\n   |         |\nCircle    Square\n   |         |\n   +-- area() override in each",
-        example: "interface Vehicle { void start(); void stop(); } class Car implements Vehicle { public void start() { System.out.println(\"Car start\"); } public void stop() { System.out.println(\"Car stop\"); } }",
+        explanation: "Abstract classes can have constructors, instance variables, abstract methods, and concrete methods. They are used when classes share code. Interfaces (before Java 8) were pure abstract; from Java 8, they can have default and static methods with bodies. From Java 9, they can also have private methods. A class can implement multiple interfaces, providing Java's way of supporting multiple inheritance of type. Abstract data types (ADTs) like List, Set, Map are practical examples.\n\nChoosing between an abstract class and an interface: use an abstract class when classes share code (state + behavior); use an interface to define a contract that many unrelated classes can implement, or to mix in capabilities.",
+        working: "The compiler ensures that any non-abstract subclass provides implementations for all inherited abstract methods. At runtime, the JVM uses dynamic dispatch (vtable lookup) to call the correct overridden method on the actual object type.",
+        diagram: "      <<interface>> Drawable\n      +-----------------+\n      | + draw()        |\n      +-----------------+\n             ^\n      +------+------+\n      |             |\n   Circle        Square\n      |             |\n      +-- draw() override in each",
+        example: "interface Vehicle { void start(); void stop(); }\nclass Car implements Vehicle {\n    @Override public void start() { System.out.println(\"Car start\"); }\n    @Override public void stop()  { System.out.println(\"Car stop\"); }\n}\nclass Bike implements Vehicle {\n    @Override public void start() { System.out.println(\"Bike start\"); }\n    @Override public void stop()  { System.out.println(\"Bike stop\"); }\n}",
         output: "Car start\nCar stop",
         advantages: [
-          "Reduces complexity",
+          "Reduces complexity by hiding implementation",
           "Enables loose coupling between components",
-          "Improves code reusability",
+          "Improves code reusability and modularity",
           "Simplifies maintenance and future extensions",
-          "Facilitates parallel development"
+          "Facilitates parallel development by team members",
+          "Allows swapping implementations without changing callers"
         ],
         applications: [
           "Collections framework (List, Set, Map interfaces)",
-          "JDBC API (Connection, Statement interfaces)",
+          "JDBC API (Connection, Statement, ResultSet interfaces)",
           "Design patterns (Template Method, Strategy, Factory)",
           "GUI frameworks (ActionListener, EventHandler)",
           "Web services and REST APIs"
         ],
-        conclusion: "Abstraction, combined with encapsulation, inheritance, and polymorphism, makes Java a powerful language for building modular and scalable systems."
+        conclusion: "Abstraction, combined with encapsulation, inheritance, and polymorphism, makes Java a powerful language for building modular and scalable systems. It is the foundation of contract-based design and modern API development."
       }
     },
     viva: [
       { q: "How do you achieve abstraction in Java?", a: "Using abstract classes and interfaces." },
       { q: "Can we have an abstract class without any abstract method?", a: "Yes. Marking a class abstract is allowed even with no abstract methods." },
-      { q: "What is the difference between abstract class and interface?", a: "Abstract class can have state and constructors; interface (pre-Java 8) is pure abstraction." },
-      { q: "Why cannot we instantiate an abstract class?", a: "Because it may contain unimplemented methods; instantiation would lead to undefined behavior." }
+      { q: "What is the difference between an abstract class and an interface?", a: "An abstract class can have state and constructors; an interface (pre-Java 8) is pure abstraction. From Java 8, interfaces can also have default and static methods." },
+      { q: "Why cannot we instantiate an abstract class?", a: "Because it may contain unimplemented methods; instantiation would lead to undefined behavior." },
+      { q: "What is a pure abstract class?", a: "An interface — it has no concrete methods and only declares behavior." }
     ],
     quiz: {
       mcqs: [
         { question: "Which keyword is used to declare an abstract class?", options: ["interface", "abstract", "virtual", "sealed"], answer: 1, explanation: "abstract keyword is used." },
         { question: "An abstract class can have:", options: ["Only abstract methods", "Only concrete methods", "Both abstract and concrete", "None of the above"], answer: 2, explanation: "Abstract classes can mix both." },
-        { question: "Which of these supports 100% abstraction?", options: ["Concrete class", "Abstract class", "Interface (pre-Java 8)", "Final class"], answer: 2, explanation: "Interfaces had only abstract methods before Java 8." }
+        { question: "Which of these supports 100% abstraction?", options: ["Concrete class", "Abstract class", "Interface (pre-Java 8)", "Final class"], answer: 2, explanation: "Interfaces had only abstract methods before Java 8." },
+        { question: "Can an abstract class have a constructor?", options: ["Yes", "No", "Only default", "Only private"], answer: 0, explanation: "Yes — it is invoked by subclass constructors via super()." }
       ],
       trueFalse: [
         { statement: "Abstract classes can have constructors.", answer: true, explanation: "Yes, they can; constructors are used by subclasses." },
@@ -196,655 +350,406 @@ class Circle extends Shape {
       ]
     },
     revision: {
-      oneMin: "Abstraction = show what, hide how.",
+      oneMin: "Abstraction = show what, hide how. Use abstract class or interface.",
       fiveMin: [
         "Use abstract class for partial abstraction.",
         "Use interface for full abstraction / multiple inheritance.",
         "Subclass must implement all abstract methods.",
         "Abstract class can have constructors and state.",
-        "Interface methods are public abstract by default."
+        "Interface methods are public abstract by default (until Java 8)."
       ],
       examDay: [
         "Define abstraction in one line.",
         "Differentiate abstract class vs interface.",
-        "Give a real-life example (TV remote, car).",
+        "Give a real-life example (TV remote, car, ATM).",
         "Write a small program demonstrating abstraction."
       ],
-      memoryTrick: "Abstraction = ATM machine — you press buttons, the inner cash mechanism is hidden.",
+      memoryTrick: "Abstraction = ATM machine — you press buttons; the cash mechanism inside is hidden.",
       faq: [
-        { q: "Can abstract class have main method?", a: "Yes, it can have main and you can run it." },
-        { q: "Can interface have variables?", a: "Yes, but they are implicitly public static final." }
+        { q: "Can an abstract class have a main method?", a: "Yes, it can have main and you can run it." },
+        { q: "Can an interface have variables?", a: "Yes, but they are implicitly public static final." }
       ]
     },
     simulator: { type: "none" }
   },
   {
-    id: "u1-static-vs-instance",
-    unitId: 1,
-    index: 3,
-    title: "Static vs Instance Variables",
-    tagline: "Class-level vs object-level data",
-    oneLiner: "Static variables belong to the class and are shared by all instances; instance variables belong to each individual object.",
-    analogy: "A static variable is like the school's name — common to every student. An instance variable is like a student's roll number — unique to each.",
-    whyExists: "To share common data across all objects of a class (static) and to maintain unique state per object (instance).",
-    whereUsed: ["Counters", "Configuration values", "Constants (final static)", "Caches", "Utility classes"],
-    visualCue: "📊",
-    code: {
-      language: "java",
-      code: `class Counter {
-    static int count = 0;   // class variable
-    int id;                 // instance variable
-    Counter() { id = ++count; }
-}
-Counter a = new Counter();
-Counter b = new Counter();
-System.out.println(a.id + " " + b.id + " " + Counter.count);`,
-      caption: "Counter increments static count and assigns unique id to each object."
-    },
-    internalWorking: {
-      steps: [
-        "Static variables are stored in the method area (or metaspace in Java 8+).",
-        "Instance variables are stored in the heap inside the object.",
-        "Static variables are initialized when the class is loaded.",
-        "Instance variables are initialized when an object is created via 'new'."
-      ],
-      memory: "Method area: class metadata + static fields. Heap: per-object instance fields."
-    },
-    examAnswer: {
-      twoMark: "Static variables belong to the class and have a single copy shared by all objects. Instance variables belong to individual objects, with each object having its own copy. Static variables are accessed using the class name; instance variables are accessed using object references.",
-      thirteenMark: {
-        intro: "Variables in Java classes can be either class-level (static) or object-level (instance), each with distinct memory and lifetime characteristics.",
-        definition: "A static variable is declared with the static keyword inside a class but outside any method, constructor, or block. There is exactly one copy per class, regardless of the number of objects. An instance variable is a non-static variable declared inside a class; each object has its own separate copy.",
-        explanation: "Static variables are loaded into the method area when the class is loaded by the ClassLoader. They are initialized before any object is created. Instance variables are created in the heap memory when 'new' is invoked. Static variables can be accessed without creating an instance of the class (ClassName.variable), while instance variables require an object. Final static variables are treated as constants.",
-        diagram: "Method Area           Heap\n+----------+    +-------------------+\n| Counter  |    | a: id=1           |\n| count=2  |    | b: id=2           |\n+----------+    +-------------------+",
-        example: "class Employee { static String company = \"ABC\"; String name; Employee(String n) { name = n; } } Employee e1 = new Employee(\"John\"); Employee e2 = new Employee(\"Jane\");",
-        conclusion: "Static variables provide shared state across all instances, while instance variables provide unique state per object. Choosing the right kind is essential for correct program behavior."
-      },
-      sixteenMark: {
-        intro: "Java provides two primary scopes for variables inside a class: class-level (static) and object-level (instance). Understanding their differences is critical for designing robust Java programs.",
-        definition: "A static variable is associated with the class itself, not with any instance. It is created once when the class is loaded and shared among all objects. An instance variable is associated with each object and is created when the object is instantiated.",
-        explanation: "Static variables are useful for representing properties common to all objects (e.g., a counter, a constant, a configuration). They are stored in the method area (or metaspace in Java 8+) and live as long as the class is loaded. Instance variables are stored in the heap, inside each object, and are eligible for garbage collection when the object is no longer referenced. Static methods can only directly access static members, while instance methods can access both. Static blocks can be used to initialize static variables.",
-        working: "When a class is loaded, the JVM allocates memory for static fields and runs static initializers. When 'new' is executed, the JVM allocates memory for the new object on the heap, including all instance fields, and runs instance initializers and constructors.",
-        diagram: "ClassLoader loads class\n        ↓\nMethod area: <Class>\n  - static fields\n  - method bytecode\n        ↓\nnew Object()\n        ↓\nHeap: object1 { instance fields }\nHeap: object2 { instance fields }",
-        example: "class Ticket { static int nextNumber = 1000; int number; Ticket() { number = nextNumber++; } } Ticket t1 = new Ticket(); Ticket t2 = new Ticket(); System.out.println(t1.number + \" \" + t2.number);",
-        output: "1000 1001",
-        advantages: [
-          "Static: shared state, memory efficient (one copy)",
-          "Static: easy to use constants (final static)",
-          "Instance: encapsulates object-specific state",
-          "Instance: supports polymorphism and per-object behavior"
-        ],
-        applications: [
-          "Counters and ID generators",
-          "Configuration constants (Math.PI)",
-          "Caches shared across instances",
-          "Utility classes (Collections, Math)",
-          "Logging frameworks (private static Logger)"
-        ],
-        conclusion: "Static and instance variables serve different purposes. A clear understanding of their lifetimes, scope, and memory behavior is essential for writing correct and efficient Java programs."
-      }
-    },
-    viva: [
-      { q: "What is the default value of an int static variable?", a: "0, because static variables are automatically initialized to default values." },
-      { q: "Can we access an instance variable from a static method?", a: "Not directly — instance variables require an object reference." },
-      { q: "Where are static variables stored in memory?", a: "In the method area (or metaspace since Java 8)." },
-      { q: "What is a static block?", a: "A block of code with 'static' keyword used to initialize static variables, executed once when the class is loaded." }
-    ],
-    quiz: {
-      mcqs: [
-        { question: "Static variables are stored in:", options: ["Stack", "Heap", "Method area", "Cache"], answer: 2, explanation: "Static fields are stored in the method area/metaspace." },
-        { question: "How many copies of a static variable exist per class?", options: ["One per object", "One per class", "One per method", "None"], answer: 1, explanation: "One copy shared across all instances." },
-        { question: "Which is true about instance variables?", options: ["Declared with static", "One per object", "Accessed by class name", "Stored in method area"], answer: 1, explanation: "Each object has its own copy." }
-      ],
-      trueFalse: [
-        { statement: "Static variables can be accessed without creating an object.", answer: true, explanation: "Yes, using ClassName.variable." },
-        { statement: "Instance variables are initialized before static variables.", answer: false, explanation: "Static variables are initialized first, when the class loads." }
-      ]
-    },
-    revision: {
-      oneMin: "Static = class-level (shared). Instance = object-level (unique).",
-      fiveMin: [
-        "Static: one copy per class, in method area.",
-        "Instance: one per object, in heap.",
-        "Static accessed via ClassName.var.",
-        "Instance accessed via object.var.",
-        "Static methods cannot access instance members directly."
-      ],
-      examDay: [
-        "Memory diagram (method area + heap).",
-        "Write a Counter class as example.",
-        "Mention static block initialization.",
-        "Discuss thread-safety briefly."
-      ],
-      memoryTrick: "Static = 'Stationery' for the whole school. Instance = 'Personal bag' for each student.",
-      faq: [
-        { q: "Can a static variable be local?", a: "No, static can only be a class member, not local." },
-        { q: "Are static variables thread-safe by default?", a: "No. They need synchronization or Atomic classes." }
-      ]
-    },
-    simulator: { type: "none" }
-  },
-  {
-    id: "u1-platform-independence",
+    id: "u1-inheritance",
     unitId: 1,
     index: 4,
-    title: "Platform Independence",
-    tagline: "Write once, run anywhere",
-    oneLiner: "Java programs are compiled into bytecode that can run on any device with a JVM, regardless of underlying hardware or OS.",
-    analogy: "A universal power adapter. The same charger (Java program) works in any country (OS) because the JVM translates it locally.",
-    whyExists: "To allow developers to write code once and deploy it across Windows, macOS, Linux, and other platforms without modification.",
-    whereUsed: ["Enterprise applications", "Android apps", "Web backends", "Embedded systems"],
-    visualCue: "🌐",
+    title: "Inheritance",
+    tagline: "Building hierarchies of classes",
+    oneLiner: "Inheritance is the OOP mechanism that allows a class (subclass/child) to acquire the fields and methods of another class (superclass/parent) using the extends keyword, enabling code reuse and hierarchical classification.",
+    analogy: "Like a child inheriting traits from parents — eye color, language — but adding their own personality. A 'Car' inherits from 'Vehicle' but adds car-specific features.",
+    whyExists: "To enable code reuse, model hierarchical 'is-a' relationships, support polymorphism, and reduce duplication.",
+    whereUsed: ["Frameworks (Spring, Hibernate)", "GUI component libraries", "Domain models", "Design patterns", "Test hierarchies (JUnit)"],
+    visualCue: "🌳",
     code: {
       language: "java",
-      code: `// Source: Hello.java
-public class Hello {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
+      code: `class Vehicle {
+    String brand;
+    int year;
+
+    Vehicle(String brand, int year) {
+        this.brand = brand;
+        this.year = year;
+    }
+
+    void honk() {
+        System.out.println("Beep!");
     }
 }
-// Compile: javac Hello.java  -> Hello.class (bytecode)
-// Run:     java Hello       -> works on any OS with a JVM`,
-      caption: "Java source compiles to platform-neutral bytecode."
-    },
-    internalWorking: {
-      steps: [
-        "Java source (.java) is compiled by javac into bytecode (.class).",
-        "Bytecode is platform-neutral — instructions are for an abstract machine (JVM).",
-        "Each platform provides a JVM that translates bytecode into native instructions.",
-        "The JVM abstracts differences in OS, CPU architecture, and memory."
-      ]
-    },
-    examAnswer: {
-      twoMark: "Java is platform-independent because its compiler generates bytecode, not native machine code. This bytecode can run on any operating system that has a Java Virtual Machine (JVM), enabling 'write once, run anywhere'.",
-      thirteenMark: {
-        intro: "Java's platform independence is one of its most celebrated features, made possible by its compilation model and the JVM.",
-        definition: "Platform independence in Java means that a compiled Java program (.class file) can run on any machine that has a compatible JVM, irrespective of the underlying operating system or hardware architecture.",
-        explanation: "The Java compiler does not produce native machine code. Instead, it produces bytecode, which is a set of instructions for an abstract processor — the JVM. Each operating system has its own implementation of the JVM, which interprets or JIT-compiles the bytecode into native instructions for that platform. This means the same .class file works on Windows, Linux, macOS, etc., without recompilation.",
-        diagram: "Hello.java  --javac-->  Hello.class (bytecode)\n                                        |\n                +-----------------------+---------------------+\n                |                       |                     |\n        Windows JVM               Linux JVM            macOS JVM\n                |                       |                     |\n         Windows native          Linux native         macOS native",
-        example: "Compile on Windows: javac Hello.java → Hello.class. Copy Hello.class to Linux. Run: java Hello → same output.",
-        conclusion: "Platform independence reduces development and deployment cost and is a key reason for Java's adoption in cross-platform enterprise software."
-      },
-      sixteenMark: {
-        intro: "Java's 'write once, run anywhere' philosophy is rooted in its compilation pipeline and the abstraction provided by the Java Virtual Machine.",
-        definition: "Platform independence is the ability of a compiled Java program to execute on any operating system or hardware platform that provides a Java Virtual Machine, without requiring recompilation or modification.",
-        explanation: "The Java compiler (javac) converts source code into bytecode stored in .class files. Bytecode is a low-level, stack-based instruction set designed for the abstract JVM. Each platform's JVM implementation (Windows, Linux, macOS, etc.) is responsible for interpreting or just-in-time compiling this bytecode into native machine instructions. JIT compilation further improves performance by optimizing hot code paths. Note that the JVM itself is platform-specific — only the bytecode is portable. Native libraries (e.g., JNI) can break portability if used incorrectly.",
-        working: "1. javac compiles .java → .class (bytecode).\n2. ClassLoader loads .class into JVM memory.\n3. Bytecode verifier checks for safety.\n4. Interpreter executes line by line.\n5. JIT compiler optimizes hot methods to native code.\n6. Native OS calls happen through JNI/JNA.",
-        diagram: "Source (.java) → javac → Bytecode (.class) → JVM → Native Code (Windows/Linux/macOS)",
-        example: "// Hello.java\npublic class Hello { public static void main(String[] a) { System.out.println(\"Hi\"); } }\n// On any platform with JDK:\njavac Hello.java\njava Hello\n// Output: Hi (same on all OS)",
-        output: "Hi",
-        advantages: [
-          "Single codebase for all platforms",
-          "Reduced testing and maintenance effort",
-          "Easier deployment in heterogeneous environments",
-          "Strong security through bytecode verification"
-        ],
-        applications: [
-          "Enterprise backend services",
-          "Android applications (custom JVM, Dalvik/ART)",
-          "Cross-platform desktop apps (Swing, JavaFX)",
-          "Web applets (historical)",
-          "Embedded and IoT devices (Java ME)"
-        ],
-        conclusion: "Java's platform independence, achieved through bytecode and the JVM, is a foundational design choice that distinguishes it from languages that compile to native machine code."
-      }
-    },
-    viva: [
-      { q: "What is platform independence?", a: "The ability of compiled Java bytecode to run on any OS that has a JVM." },
-      { q: "Is the JVM platform-independent?", a: "No, the JVM is platform-specific. The bytecode is platform-independent." },
-      { q: "What is JIT?", a: "Just-In-Time compiler — converts hot bytecode into native code at runtime for performance." },
-      { q: "What is the difference between compiler and interpreter in Java?", a: "javac compiles to bytecode; JVM interprets or JIT-compiles bytecode." }
-    ],
-    quiz: {
-      mcqs: [
-        { question: "What is the file extension of Java bytecode?", options: [".java", ".class", ".jar", ".exe"], answer: 1, explanation: ".class files contain bytecode." },
-        { question: "Which component makes Java platform-independent?", options: ["JDK", "JRE", "JVM", "JIT"], answer: 2, explanation: "JVM abstracts the platform." },
-        { question: "Write Once Run Anywhere is achieved by:", options: ["Compiler", "JVM", "Linker", "Loader"], answer: 1, explanation: "JVM provides portability." }
-      ],
-      trueFalse: [
-        { statement: "The JVM is platform-independent.", answer: false, explanation: "The JVM is platform-specific. The bytecode is portable." },
-        { statement: "Bytecode is executed by the JVM.", answer: true, explanation: "Yes." }
-      ]
-    },
-    revision: {
-      oneMin: "Java source → bytecode → JVM → native code.",
-      fiveMin: [
-        "javac → .class",
-        "ClassLoader loads",
-        "Verifier checks",
-        "Interpreter / JIT runs",
-        "Output on any OS"
-      ],
-      examDay: [
-        "Draw .java → .class → JVM diagram.",
-        "Mention WORA (Write Once Run Anywhere).",
-        "Distinguish compile-time vs runtime."
-      ],
-      memoryTrick: "JVM is the universal translator that speaks every OS language.",
-      faq: [
-        { q: "Is JVM platform-independent?", a: "No, the JVM is platform-specific. The bytecode (.class) is platform-independent." },
-        { q: "Can bytecode run without a JVM?", a: "No, bytecode needs a JVM to execute." }
-      ]
-    },
-    simulator: { type: "jvm-execution" }
-  },
-  {
-    id: "u1-bytecode",
-    unitId: 1,
-    index: 5,
-    title: "Bytecode",
-    tagline: "The intermediate language of Java",
-    oneLiner: "Bytecode is the low-level instruction set generated by the Java compiler, designed to be executed by the JVM.",
-    analogy: "Bytecode is like a recipe written in a universal kitchen language. Any chef (JVM) anywhere in the world can follow it to produce the same dish.",
-    whyExists: "To allow Java programs to be portable across platforms and to provide a stable target for the compiler.",
-    whereUsed: ["Java programs", "Kotlin (compiles to JVM bytecode)", "Scala", "Groovy", "Clojure"],
-    visualCue: "🧬",
-    code: {
-      language: "java",
-      code: `// Source
-public int add(int a, int b) { return a + b; }
 
-// Bytecode (illustrative)
-iload_1
-iload_2
-iadd
-ireturn`,
-      caption: "Bytecode for adding two integers."
-    },
-    internalWorking: {
-      steps: [
-        "javac parses Java source into an abstract syntax tree (AST).",
-        "Compiler generates bytecode instructions for the JVM.",
-        "Bytecode is stored in .class files, each method as a list of instructions.",
-        "JVM verifier checks bytecode for type safety and stack consistency.",
-        "Interpreter or JIT executes instructions."
-      ]
-    },
-    examAnswer: {
-      twoMark: "Bytecode is the intermediate, platform-independent instruction set generated by the Java compiler (javac). It is stored in .class files and executed by the JVM. Bytecode makes Java portable and provides security through bytecode verification.",
-      thirteenMark: {
-        intro: "Bytecode is a key concept in Java that bridges source code and machine execution.",
-        definition: "Bytecode is a set of instructions for a stack-based virtual machine (the JVM). It is the output of the Java compiler and the input to the JVM.",
-        explanation: "Bytecode is a compact, low-level representation of Java source code. It uses an abstract stack-based architecture: instructions push values onto an operand stack and pop them for operations. Each .class file contains bytecode for one class, including method bodies, field declarations, and constant pool entries. Bytecode is verified by the class verifier to ensure type safety, no stack overflow/underflow, and proper access. Tools like javap can disassemble bytecode back into a human-readable form.",
-        diagram: "Source (.java)\n   ↓ javac\nBytecode (.class)\n   ↓ JVM\nNative Machine Code",
-        example: "Source: a + b → Bytecode: iload_1, iload_2, iadd, ireturn",
-        conclusion: "Bytecode is the cornerstone of Java's portability and security model."
-      },
-      sixteenMark: {
-        intro: "Java's compilation model produces bytecode, an intermediate language that enables portability, security, and tooling.",
-        definition: "Bytecode is a platform-neutral instruction set designed for the Java Virtual Machine. Each instruction is a single byte (or a few bytes) representing operations like loading values, arithmetic, control flow, and method invocation.",
-        explanation: "When you compile a .java file, javac generates one or more .class files, each containing bytecode for that class. The .class file format is well-defined: it includes a magic number, version, constant pool, access flags, fields, methods, and attributes. Methods store their bytecode as a sequence of instructions with operand stack semantics. The class loader reads .class files, the verifier checks them for safety, and the execution engine runs them via interpretation or JIT compilation.",
-        working: "1. Compiler converts source to AST.\n2. Bytecode generator emits JVM instructions.\n3. ClassLoader loads .class into method area.\n4. Verifier checks type and stack safety.\n5. Interpreter or JIT executes the instructions.",
-        diagram: "[0xCAFEBABE] Header\n[Constant Pool]\n[Fields]\n[Methods]\n[Attributes]",
-        example: "javap -c Hello.class\npublic static void main(java.lang.String[]);\n  Code:\n   0: getstatic #2  // Field java/lang/System.out:Ljava/io/PrintStream;\n   3: ldc           #3  // String Hello\n   5: invokevirtual #4 // Method java/io/PrintStream.println(Ljava/lang/String;)V\n   8: return",
-        output: "Bytecode of Hello.main shown.",
-        advantages: [
-          "Platform-independent representation",
-          "Compact and fast to interpret",
-          "Easily verifiable for safety",
-          "Supports runtime metadata (reflection, annotations)"
-        ],
-        applications: [
-          "Java program execution",
-          "JVM-based languages (Kotlin, Scala)",
-          "Android (DEX is similar concept)",
-          "Program analysis and instrumentation tools",
-          "Hotspot JIT optimization"
-        ],
-        conclusion: "Bytecode is the universal language of the JVM ecosystem, providing a stable, secure, and portable foundation for all JVM-based languages."
-      }
-    },
-    viva: [
-      { q: "Who generates bytecode?", a: "The Java compiler (javac)." },
-      { q: "How to view bytecode?", a: "Using javap -c ClassName." },
-      { q: "What is the magic number in a .class file?", a: "0xCAFEBABE." },
-      { q: "Is bytecode machine code?", a: "No, it is intermediate code for the JVM." }
-    ],
-    quiz: {
-      mcqs: [
-        { question: "Bytecode is generated by:", options: ["JVM", "JRE", "javac", "JIT"], answer: 2, explanation: "javac compiles .java to .class (bytecode)." },
-        { question: "Magic number of a .class file:", options: ["0xCAFEBABE", "0xDEADBEEF", "0xFEED", "0xBABE"], answer: 0, explanation: "0xCAFEBABE is the magic number." },
-        { question: "Which tool can show bytecode?", options: ["java", "javac", "javap", "jar"], answer: 2, explanation: "javap disassembles .class files." }
-      ],
-      trueFalse: [
-        { statement: "Bytecode is platform-specific.", answer: false, explanation: "Bytecode is platform-independent; the JVM is platform-specific." },
-        { statement: "Bytecode uses a stack-based architecture.", answer: true, explanation: "JVM is stack-based." }
-      ]
-    },
-    revision: {
-      oneMin: "Bytecode = .class file = JVM instructions.",
-      fiveMin: [
-        "Stack-based instructions",
-        "Generated by javac",
-        "Verified by class verifier",
-        "Interpreted or JIT compiled",
-        "View with javap -c"
-      ],
-      examDay: [
-        "Mention 0xCAFEBABE magic number.",
-        "Stack-based vs register-based.",
-        "javap -c example."
-      ],
-      memoryTrick: "Bytecode = Java's Esperanto — same for all platforms.",
-      faq: [
-        { q: "Can two languages share bytecode?", a: "Yes, any JVM language can compile to bytecode." }
-      ]
-    },
-    simulator: { type: "bytecode-viewer", code: `public class Hello {\n  public static void main(String[] args) {\n    System.out.println("Hello");\n  }\n}` }
-  },
-  {
-    id: "u1-jvm",
-    unitId: 1,
-    index: 6,
-    title: "JVM (Java Virtual Machine)",
-    tagline: "The runtime engine for Java",
-    oneLiner: "The JVM is an abstract computing machine that enables a computer to run Java programs by interpreting compiled bytecode.",
-    analogy: "The JVM is like a multilingual interpreter sitting between your Java program and the operating system. It translates your program's requests into the local machine's language.",
-    whyExists: "To provide a runtime environment that abstracts away hardware and OS differences, manages memory, and enforces security.",
-    whereUsed: ["Every Java program", "JVM-based languages (Kotlin, Scala)", "Big data (Hadoop, Spark)", "Android (customized)"],
-    visualCue: "⚙️",
-    code: {
-      language: "java",
-      code: `// JVM is a process that runs on the host OS.
-// When you type 'java MyClass', it:
-//   1. Loads MyClass.class via ClassLoader
-//   2. Verifies bytecode
-//   3. Allocates memory in heap & method area
-//   4. Interprets / JIT-compiles bytecode
-//   5. Calls OS via JNI for I/O, threads, etc.`,
-      caption: "JVM responsibilities at runtime."
-    },
-    internalWorking: {
-      steps: [
-        "ClassLoader subsystem loads .class files.",
-        "Bytecode verifier checks for safety.",
-        "Method area stores class-level data (metadata, static fields, method code).",
-        "Heap stores objects; stack stores frames per method call.",
-        "Garbage collector reclaims unused heap memory.",
-        "Execution engine interprets bytecode; JIT compiles hot code.",
-        "JNI bridges to native libraries."
-      ],
-      memory: "Method area, Heap, Stack, PC registers, Native method stacks."
-    },
-    examAnswer: {
-      twoMark: "The JVM (Java Virtual Machine) is an abstract computing machine that provides the runtime environment necessary to execute Java bytecode. It performs tasks like class loading, bytecode verification, memory management, garbage collection, and execution of bytecode via interpreter or JIT compiler.",
-      thirteenMark: {
-        intro: "The JVM is the cornerstone of Java's portability and runtime management.",
-        definition: "The JVM is a specification that provides a runtime environment in which Java bytecode can be executed. It abstracts the underlying hardware and OS, providing consistent behavior across platforms.",
-        explanation: "The JVM consists of three main subsystems: ClassLoader, Runtime Data Areas, and Execution Engine. The ClassLoader loads, links, and initializes classes. The Runtime Data Areas include the method area, heap, stack, PC register, and native method stack. The Execution Engine has an interpreter, JIT compiler, and garbage collector. The JVM also provides a native method interface (JNI) for interacting with OS-specific libraries.",
-        diagram: "JVM\n ├── ClassLoader\n ├── Runtime Data Areas\n │     ├── Method Area\n │     ├── Heap\n │     ├── Stack\n │     ├── PC Register\n │     └── Native Method Stack\n └── Execution Engine\n       ├── Interpreter\n       ├── JIT Compiler\n       └── Garbage Collector",
-        example: "When you run 'java Hello':\n1. JVM is started.\n2. ClassLoader loads Hello.class.\n3. main() is invoked.\n4. JVM manages memory and GC.\n5. Program prints 'Hello' and exits.",
-        conclusion: "The JVM is a powerful runtime engine that provides memory management, security, and platform independence, making Java a robust language for diverse applications."
-      },
-      sixteenMark: {
-        intro: "The JVM is the abstract machine that executes Java bytecode. It is the heart of Java's runtime and provides a uniform environment across all platforms.",
-        definition: "The Java Virtual Machine is a runtime engine that loads, verifies, and executes Java bytecode. It manages program memory, performs garbage collection, and provides a consistent execution environment for all JVM-based languages.",
-        explanation: "The JVM has three primary components: the ClassLoader subsystem, the Runtime Data Areas, and the Execution Engine. The ClassLoader subsystem loads .class files using a delegation model: Bootstrap (rt.jar / core Java) → Platform / Extension (JDK extensions; renamed from Extension in Java 9) → Application / System (classpath). It then links (verify, prepare, resolve) and initializes them. The Runtime Data Areas consist of the method area (class metadata, static fields, constant pool), heap (objects), stack (per-thread method frames), PC register (current instruction), and native method stack. The Execution Engine interprets bytecode, JIT-compiles hot methods to native code, and runs a garbage collector to reclaim memory. The JNI allows interaction with native (C/C++) code.",
-        working: "1. java command starts the JVM.\n2. ClassLoader loads main class.\n3. Verifier checks bytecode safety.\n4. Interpreter executes bytecode line by line.\n5. JIT compiles hot methods to native code for speed.\n6. Garbage collector reclaims unreachable objects.\n7. JNI handles native calls.",
-        diagram: "                +-------------+\n                |   Class     |\n                |   Loader    |\n                +-------------+\n                        |\n                +-------------+\n                |  Runtime    |\n                |  Data Areas |\n                +-------------+\n                        |\n                +-------------+\n                | Execution   |\n                |  Engine     |\n                +-------------+\n                | Interpreter |\n                | JIT         |\n                | GC          |\n                | JNI         |\n                +-------------+",
-        example: "JVM specs are defined by JSR-924 (Java SE 7), JSR-376 (Java 9 modules), and others. Implementations include HotSpot (Oracle), OpenJ9 (IBM/Eclipse), and GraalVM.",
-        output: "HotSpot is the most widely used JVM implementation.",
-        advantages: [
-          "Platform independence",
-          "Automatic memory management (GC)",
-          "Strong security via bytecode verification",
-          "High performance through JIT compilation",
-          "Multithreading and synchronization support"
-        ],
-        applications: [
-          "Server-side applications (Spring, JBoss)",
-          "Big data frameworks (Hadoop, Spark, Flink)",
-          "Mobile (Android with ART)",
-          "Reactive systems (Akka, Vert.x)",
-          "Microservices and cloud-native backends"
-        ],
-        conclusion: "The JVM is a sophisticated, performant, and secure runtime engine that has made Java one of the most successful programming platforms in history."
-      }
-    },
-    viva: [
-      { q: "What are the main components of JVM?", a: "ClassLoader, Runtime Data Areas, Execution Engine." },
-      { q: "What is the difference between JDK, JRE, and JVM?", a: "JDK = JRE + development tools. JRE = JVM + libraries. JVM = runtime engine." },
-      { q: "What is JIT?", a: "Just-In-Time compiler — converts hot bytecode to native machine code at runtime." },
-      { q: "What is GC?", a: "Garbage Collector — automatically reclaims unused heap memory." }
-    ],
-    quiz: {
-      mcqs: [
-        { question: "JVM stands for:", options: ["Java Visual Machine", "Java Virtual Machine", "Joint Version Manager", "Java Verified Mode"], answer: 1, explanation: "JVM = Java Virtual Machine." },
-        { question: "Which memory area stores objects?", options: ["Stack", "Heap", "PC", "Cache"], answer: 1, explanation: "Objects are allocated on the heap." },
-        { question: "JIT stands for:", options: ["Java In Time", "Just In Time", "Joint Interpreter Translator", "Java Integrated Tool"], answer: 1, explanation: "JIT = Just-In-Time compiler." }
-      ],
-      trueFalse: [
-        { statement: "JVM is platform-independent.", answer: false, explanation: "JVM is platform-specific; bytecode is portable." },
-        { statement: "Garbage collector runs automatically.", answer: true, explanation: "Yes, GC reclaims unreachable objects." }
-      ]
-    },
-    revision: {
-      oneMin: "JVM = ClassLoader + Memory + Execution Engine.",
-      fiveMin: [
-        "ClassLoader loads .class",
-        "Method area: class metadata",
-        "Heap: objects",
-        "Stack: method frames",
-        "JIT compiles hot code"
-      ],
-      examDay: [
-        "Draw JVM architecture diagram.",
-        "Differentiate JDK / JRE / JVM.",
-        "Mention JIT and GC."
-      ],
-      memoryTrick: "JVM is the 'engine room' of Java — hidden but does all the work.",
-      faq: [
-        { q: "Is JVM a physical machine?", a: "No, it's a software abstraction." },
-        { q: "Can we write our own JVM?", a: "Yes, several exist (HotSpot, OpenJ9, GraalVM)." }
-      ]
-    },
-    simulator: { type: "jvm-execution" }
-  },
-  {
-    id: "u1-javadoc",
-    unitId: 1,
-    index: 7,
-    title: "JavaDoc Comments",
-    tagline: "Documentation built into the source",
-    oneLiner: "JavaDoc is a tool that generates HTML documentation from special /** ... */ comments in Java source code.",
-    analogy: "JavaDoc is like a film's behind-the-scenes documentary. The main code is the movie; JavaDoc is the rich commentary that explains everything for future viewers.",
-    whyExists: "To keep documentation close to the code and auto-generate API documentation.",
-    whereUsed: ["API documentation", "Library docs", "Open-source projects", "Java standard library"],
-    visualCue: "📖",
-    code: {
-      language: "java",
-      code: `/**
- * Calculates the area of a circle.
- * @param radius the radius (must be > 0)
- * @return the area
- * @throws IllegalArgumentException if radius <= 0
- */
-public double area(double radius) {
-    if (radius <= 0) throw new IllegalArgumentException();
-    return Math.PI * radius * radius;
-}`,
-      caption: "JavaDoc comment with @param, @return, @throws tags."
-    },
-    internalWorking: {
-      steps: [
-        "JavaDoc comments start with /** and end with */.",
-        "Tags like @param, @return, @throws, @author, @version are recognized.",
-        "javadoc tool reads .java files and produces HTML documentation.",
-        "Generated docs are used in IDEs (hover help) and on the web."
-      ]
-    },
-    examAnswer: {
-      twoMark: "JavaDoc is a documentation tool that generates HTML API documentation from special /** ... */ comments in Java source code. Tags like @param, @return, @throws, @author, and @version provide structured information.",
-      thirteenMark: {
-        intro: "JavaDoc is a documentation generation system built into the Java ecosystem.",
-        definition: "JavaDoc comments are special multi-line comments that begin with /** and end with */. They are placed above classes, interfaces, methods, and fields to describe their behavior. The javadoc tool reads these comments and produces HTML documentation.",
-        explanation: "JavaDoc supports tags like @param (parameter description), @return (return value), @throws (exception), @author (author info), @version, @since, @deprecated, and {@code ...} for inline code. HTML tags can be used inside the comment for formatting. The generated documentation is widely used: the official Java API docs are produced using JavaDoc.",
-        diagram: "Source File (with /** ... */)\n   ↓ javadoc tool\nHTML documentation (index.html, package pages, class pages)",
-        example: "/**\n * Adds two integers.\n * @param a first number\n * @param b second number\n * @return sum of a and b\n */\npublic int add(int a, int b) { return a + b; }",
-        conclusion: "JavaDoc comments and the javadoc tool provide a standard, automated way to maintain rich API documentation alongside source code."
-      },
-      sixteenMark: {
-        intro: "JavaDoc is a structured documentation system that is part of the Java platform from day one.",
-        definition: "JavaDoc is a documentation generator that creates HTML pages from specially formatted comments in Java source code. It is the standard way to document Java APIs.",
-        explanation: "JavaDoc comments are written as /** ... */ and are placed immediately before declarations. They can include free-form text and structured tags. Common tags: @author, @version, @param, @return, @throws, @exception, @see, @since, @deprecated, @link, @code. The javadoc tool scans .java files, extracts these comments, and produces a tree of HTML files describing each package, class, and member. IDEs (Eclipse, IntelliJ, VS Code) read JavaDoc comments to show inline help on hover.",
-        working: "1. javadoc reads source files.\n2. Extracts /** ... */ blocks and tags.\n3. Generates HTML files (e.g., index.html, package-summary.html, class-use, etc.).\n4. Optionally creates a search index and frame-based navigation.",
-        diagram: "/** comment */ in .java\n        |\njavadoc command\n        |\nHTML files (docs/)\n  ├── index.html\n  ├── package-summary.html\n  └── class-summary.html",
-        example: "javadoc -d doc MyClass.java\nGenerates 'doc' folder with HTML documentation.",
-        output: "A browsable HTML API reference.",
-        advantages: [
-          "Documentation stays close to code",
-          "Auto-generated, always up-to-date",
-          "IDE integration (hover help)",
-          "Industry standard for Java APIs"
-        ],
-        applications: [
-          "Java standard library documentation",
-          "Open-source library docs (Apache, Google Guava)",
-          "Internal enterprise API documentation",
-          "Generated help in IDEs"
-        ],
-        conclusion: "JavaDoc is an essential tool for any serious Java developer. It promotes the practice of documenting code at the source and produces professional, navigable API documentation."
-      }
-    },
-    viva: [
-      { q: "How is a JavaDoc comment different from a regular comment?", a: "JavaDoc starts with /** and is parsed by the javadoc tool to produce documentation." },
-      { q: "Which tool generates JavaDoc HTML?", a: "The javadoc tool (part of JDK)." },
-      { q: "Name three common JavaDoc tags.", a: "@param, @return, @throws." }
-    ],
-    quiz: {
-      mcqs: [
-        { question: "JavaDoc comments start with:", options: ["//", "/*", "/**", "<!--"], answer: 2, explanation: "/** opens a JavaDoc comment." },
-        { question: "Which tag describes a method parameter?", options: ["@param", "@return", "@throws", "@author"], answer: 0, explanation: "@param is for parameters." },
-        { question: "Tool used to generate JavaDoc:", options: ["javac", "javadoc", "java", "jar"], answer: 1, explanation: "javadoc tool." }
-      ],
-      trueFalse: [
-        { statement: "JavaDoc comments are required for compilation.", answer: false, explanation: "They are optional and ignored by javac." },
-        { statement: "JavaDoc can include HTML tags.", answer: true, explanation: "Yes, for formatting." }
-      ]
-    },
-    revision: {
-      oneMin: "/** comment */ + javadoc tool = HTML docs.",
-      fiveMin: [
-        "/** opens a JavaDoc",
-        "@param, @return, @throws",
-        "javadoc command",
-        "Generates HTML",
-        "IDE hover uses it"
-      ],
-      examDay: [
-        "Syntax /** ... */",
-        "List common tags",
-        "Mention javadoc tool"
-      ],
-      memoryTrick: "JavaDoc = Just Another DOCumentation tool, with a J twist.",
-      faq: [
-        { q: "Can JavaDoc include links?", a: "Yes, using {@link ClassName#method}." }
-      ]
-    },
-    simulator: { type: "none" }
-  },
-  {
-    id: "u1-buzzwords",
-    unitId: 1,
-    index: 8,
-    title: "Java Buzzwords",
-    tagline: "The defining features of Java",
-    oneLiner: "Java Buzzwords are a set of features/qualities that make Java a unique and powerful programming language.",
-    analogy: "Buzzwords are the highlights on a product's box. They tell you why Java is special.",
-    whyExists: "To describe Java's design goals and key features in marketing-friendly language.",
-    whereUsed: ["University exam questions", "Java interviews", "Marketing material"],
-    visualCue: "✨",
-    code: {
-      language: "java",
-      code: `// Java buzzwords in action:
-public class Demo {
-    public static void main(String[] args) {     // Simple
-        System.out.println("Hello");              // Secure, Portable
+class Car extends Vehicle {
+    int doors;
+
+    Car(String brand, int year, int doors) {
+        super(brand, year);
+        this.doors = doors;
+    }
+
+    @Override
+    void honk() {
+        System.out.println("Car horn: Beep beep!");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car c = new Car("Honda", 2022, 4);
+        System.out.println(c.brand + " " + c.year + " doors=" + c.doors);
+        c.honk();
     }
 }`,
-      caption: "A small program demonstrating many Java buzzwords."
+      caption: "Car inherits from Vehicle; calls super() and overrides honk()."
     },
     internalWorking: {
       steps: [
-        "Each buzzword maps to a JVM or compiler feature.",
-        "Simple: syntax is cleaner than C++.",
-        "Portable: bytecode runs on any JVM.",
-        "Secure: bytecode verifier, SecurityManager (legacy), sandboxing.",
-        "Robust: strong typing, exception handling, GC.",
-        "Multithreaded: java.lang.Thread built in.",
-        "Architecture-neutral: fixed-size data types.",
-        "Interpreted + JIT: hybrid execution.",
-        "High Performance: JIT and optimized GC.",
-        "Distributed: java.net supports network programming.",
-        "Dynamic: reflection, dynamic class loading."
-      ]
+        "JVM loads the subclass .class; it includes a reference to its superclass .class.",
+        "When 'new Car(...)' runs, the superclass fields are allocated as part of the object.",
+        "The subclass constructor calls super(...) to initialize inherited fields.",
+        "Inherited methods are stored in the parent's method area; the subclass can call them via super.method().",
+        "At runtime, instanceof and dynamic dispatch use the inheritance chain to resolve type and behavior."
+      ],
+      memory: "A subclass object contains a 'super' view: it is also an instance of the parent class, holding the parent's fields within the same heap block."
     },
     examAnswer: {
-      twoMark: "Java Buzzwords (also called Java features) are a list of qualities that define Java: Simple, Secure, Portable, Object-Oriented, Robust, Multithreaded, Architecture-Neutral, Interpreted, High Performance, Distributed, and Dynamic.",
+      twoMark: "Inheritance is the OOP mechanism that allows a class to inherit properties and behavior from another class using the extends keyword. It supports the 'is-a' relationship, enables code reuse, and is a prerequisite for runtime polymorphism in Java.",
       thirteenMark: {
-        intro: "When Java was introduced by Sun Microsystems, a set of features was promoted to describe its strengths. These are known as Java Buzzwords.",
-        definition: "Java Buzzwords are a set of design goals and features that distinguish Java from other programming languages. The original buzzwords are: Simple, Secure, Portable, Object-Oriented, Robust, Multithreaded, Architecture-Neutral, Interpreted, High Performance, Distributed, and Dynamic.",
-        explanation: "1. Simple: easier than C++ (no pointers, no multiple inheritance via classes).\n2. Secure: runs inside JVM, bytecode verifier, no direct memory access.\n3. Portable: bytecode is platform-independent.\n4. Object-Oriented: everything is an object (except primitives).\n5. Robust: strong typing, exception handling, automatic garbage collection.\n6. Multithreaded: built-in Thread class, synchronized keyword.\n7. Architecture-Neutral: int is always 32 bits, etc.\n8. Interpreted: bytecode is interpreted line by line, with JIT for speed.\n9. High Performance: JIT and efficient GC.\n10. Distributed: java.net for network programming, RMI.\n11. Dynamic: reflection, dynamic class loading.",
-        diagram: "Java Buzzwords\n ├── Simple\n ├── Secure\n ├── Portable\n ├── Object-Oriented\n ├── Robust\n ├── Multithreaded\n ├── Architecture-Neutral\n ├── Interpreted\n ├── High Performance\n ├── Distributed\n └── Dynamic",
-        example: "A small program can be compiled to bytecode, verified for safety, run on any platform with a JVM, garbage-collected, and multithreaded — all buzzwords in action.",
-        conclusion: "Java's buzzwords explain why it became one of the most widely used programming languages for enterprise, web, mobile, and embedded systems."
+        intro: "Inheritance is a cornerstone of OOP that enables hierarchical classification and code reuse.",
+        definition: "Inheritance is the mechanism by which one class (subclass/child) acquires the fields and methods of another class (superclass/parent). In Java, it is expressed using the 'extends' keyword and represents an 'is-a' relationship.",
+        explanation: "Java supports several types of inheritance:\n1. Single inheritance — a class extends one parent (Java allows only this for classes).\n2. Multilevel inheritance — a chain: A -> B -> C.\n3. Hierarchical inheritance — multiple subclasses share one parent.\n4. Multiple inheritance (of type) — a class implements multiple interfaces.\n\nJava does NOT support multiple inheritance of classes (to avoid the diamond problem). Constructors are not inherited, but the subclass constructor must call super(...) as its first statement (explicitly or implicitly). Private members of the parent are not directly accessible in the child, but they are inherited as part of the object. The 'super' keyword refers to the parent class.",
+        diagram: "           Vehicle\n          +--------+\n          | honk() |\n          +--------+\n              ^  extends\n              |\n            Car\n        +--------+\n        | doors  |\n        | honk() | (overridden)\n        +--------+",
+        example: "class Animal { String name; void eat() { System.out.println(name + \" eats\"); } } class Dog extends Animal { void bark() { System.out.println(name + \" barks\"); } } Dog d = new Dog(); d.name = \"Rex\"; d.eat(); d.bark();",
+        conclusion: "Inheritance enables code reuse and polymorphism, but it should be used only when there is a true 'is-a' relationship. Overuse leads to fragile hierarchies; many modern designs prefer composition over inheritance."
       },
       sixteenMark: {
-        intro: "The Java Buzzwords are a marketing and educational summary of Java's key design features, originally published by Sun Microsystems when Java was released.",
-        definition: "The Java Buzzwords are: Simple, Secure, Portable, Object-Oriented, Robust, Multithreaded, Architecture-Neutral, Interpreted, High Performance, Distributed, and Dynamic. Each represents a key design goal or feature of the language and its runtime.",
-        explanation: "Simple — Java omits complex C++ features like pointers, operator overloading, and multiple inheritance of classes. Secure — Programs run inside a JVM sandbox; the bytecode verifier prevents illegal operations. Portable — Java's strict specification of primitive sizes (e.g., int = 32 bits) and the bytecode format ensure consistent behavior across platforms. Object-Oriented — Code is organized around classes and objects, supporting inheritance, polymorphism, and encapsulation. Robust — Strong typing, checked exceptions, and garbage collection eliminate many common bugs. Multithreaded — Built-in support for concurrent execution via java.lang.Thread. Architecture-Neutral — Same data type sizes everywhere. Interpreted — Bytecode is interpreted; combined with JIT, this offers both flexibility and speed. High Performance — JIT compiler optimizes hot code paths. Distributed — java.net and RMI enable network applications. Dynamic — Reflection and dynamic class loading let programs inspect and adapt at runtime.",
-        working: "Each buzzword corresponds to a real language feature or runtime capability. For example, 'Secure' is enforced by the bytecode verifier and class loader; 'Portable' is achieved by the bytecode and JVM abstraction; 'Multithreaded' is supported by the Thread class and synchronized keyword.",
-        diagram: "Compiler  --bytecode-->  JVM  --native-->  OS\n   ↑            ↑\nSimple     Portable/Secure\n  ...         ...",
-        example: "class Hello { public static void main(String[] args) { new Thread(() -> System.out.println(\"Hello\")).start(); } } // Simple + Multithreaded + Secure (sandboxed) + Portable (any JVM)",
-        output: "Hello",
+        intro: "Inheritance is a foundational OOP concept that allows a class to inherit state and behavior from another, supporting reuse, extensibility, and polymorphism.",
+        definition: "Inheritance is the mechanism by which a new class (subclass) is created from an existing class (superclass), inheriting its non-private fields and methods. The subclass can add new members, override inherited methods, and reuse the parent's code. In Java, inheritance is expressed with the 'extends' keyword (for classes) and 'implements' (for interfaces).",
+        explanation: "Types of inheritance in Java:\n1. Single — class B extends A.\n2. Multilevel — A -> B -> C.\n3. Hierarchical — B and C both extend A.\n4. Multiple (of type) — class C implements I1, I2; or class C extends A implements I1, I2.\n5. Hybrid — a combination of the above using interfaces.\n\nKey rules:\n- Java does NOT support multiple inheritance of classes (no 'extends A, B') to avoid the diamond ambiguity.\n- Constructors are NOT inherited. The subclass constructor must invoke super(...) as the first statement; if omitted, the compiler inserts super() (no-arg call to parent).\n- Private members are not directly accessible in the subclass (though they exist in the object). Use protected or package-private for accessible inheritance.\n- The Object class is the implicit superclass of every class.\n- Use the 'final' keyword to prevent a class from being extended.",
+        working: "1. When a subclass object is created, the JVM allocates memory for the combined object (parent fields + child fields).\n2. The subclass constructor's first action is to call a parent constructor (super(...) or the implicit no-arg one).\n3. Inherited methods are looked up in the parent's vtable unless overridden; the JVM uses dynamic dispatch to call the most specific version.\n4. The 'instanceof' operator checks the inheritance chain at runtime.",
+        diagram: "        +-------------+\n        |   Vehicle   |\n        +-------------+\n        | brand       |\n        | year        |\n        | honk()      |\n        +-------------+\n              ^  extends\n              |\n        +-------------+\n        |     Car     |\n        +-------------+\n        | doors       |\n        | honk() { ... }  <-- overridden\n        +-------------+",
+        example: "class Employee {\n    String name;\n    double salary;\n    Employee(String name, double salary) {\n        this.name = name; this.salary = salary;\n    }\n    double computeBonus() { return salary * 0.10; }\n}\nclass Manager extends Employee {\n    Manager(String n, double s) { super(n, s); }\n    @Override\n    double computeBonus() { return salary * 0.20 + 5000; }\n}",
+        output: "Manager gets a higher bonus than a regular Employee due to the overridden computeBonus().",
         advantages: [
-          "Industry-standard summary of Java's strengths",
-          "Useful in exam answers and interviews",
-          "Highlights the design philosophy",
-          "Helps in comparing Java with other languages"
+          "Promotes code reuse — common code lives in the parent",
+          "Models real-world hierarchical relationships (is-a)",
+          "Supports polymorphism through method overriding",
+          "Reduces redundancy and improves maintainability",
+          "Enables framework design (template methods, hooks)"
         ],
         applications: [
-          "University exam answers",
-          "Job interviews",
-          "Marketing and documentation",
-          "Comparing languages"
+          "GUI frameworks (JButton extends AbstractButton)",
+          "Servlet API (HttpServlet extends GenericServlet)",
+          "Exception hierarchy (RuntimeException extends Exception)",
+          "JUnit test classes",
+          "Domain modeling (Manager is-a Employee)"
         ],
-        conclusion: "The Java Buzzwords remain the canonical description of Java's design principles and are a must-know for any Java learner or exam aspirant."
+        conclusion: "Inheritance is a powerful OOP feature that enables reuse, hierarchy, and polymorphism. In Java, single class inheritance plus multiple interface implementation provide clarity without the diamond problem. Use it judiciously — prefer composition for 'has-a' relationships and use inheritance only for genuine 'is-a' cases."
       }
     },
     viva: [
-      { q: "Name any 5 Java Buzzwords.", a: "Simple, Secure, Portable, Robust, Multithreaded." },
-      { q: "Why is Java considered robust?", a: "Because of strong typing, exception handling, and automatic garbage collection." },
-      { q: "What makes Java portable?", a: "Bytecode runs on any platform with a JVM." }
+      { q: "What keyword is used for inheritance in Java?", a: "extends (for classes); implements (for interfaces)." },
+      { q: "Does Java support multiple inheritance of classes?", a: "No. Java supports only single inheritance of classes. Multiple inheritance is achieved via interfaces." },
+      { q: "What does super(...) do?", a: "Calls a constructor of the parent class. It must be the first statement in a constructor." },
+      { q: "Are constructors inherited?", a: "No. They are not inherited, but the subclass constructor can call them via super()." },
+      { q: "What is the difference between 'is-a' and 'has-a'?", a: "'is-a' suggests inheritance (Car is-a Vehicle). 'has-a' suggests composition (Car has-a Engine)." },
+      { q: "What is the root class of all Java classes?", a: "java.lang.Object." }
     ],
     quiz: {
       mcqs: [
-        { question: "Which is NOT a Java buzzword?", options: ["Robust", "Secure", "Compiled-only", "Portable"], answer: 2, explanation: "Java is both interpreted and compiled." },
-        { question: "Multithreading in Java is provided by:", options: ["java.util", "java.lang.Thread", "java.io", "java.net"], answer: 1, explanation: "Thread is in java.lang." },
-        { question: "Java's portability is due to:", options: ["Compiler", "Bytecode + JVM", "OS", "Hardware"], answer: 1, explanation: "Bytecode runs on any JVM." }
+        { question: "Which keyword is used to inherit a class in Java?", options: ["inherits", "extends", "implements", "super"], answer: 1, explanation: "extends is used for class inheritance." },
+        { question: "Can a class extend multiple classes in Java?", options: ["Yes", "No", "Only abstract ones", "Only if they are final"], answer: 1, explanation: "Java allows single inheritance of classes to avoid the diamond problem." },
+        { question: "What is the result of 'class C extends A, B' in Java?", options: ["Compiles", "Runtime error", "Compile error", "Works only with interfaces"], answer: 2, explanation: "Java does not allow extending multiple classes." },
+        { question: "Which members are NOT inherited?", options: ["Public methods", "Protected fields", "Private fields", "Constructors"], answer: 3, explanation: "Constructors are not inherited. Private fields are inherited but not directly accessible." }
       ],
       trueFalse: [
-        { statement: "Java supports multiple inheritance via classes.", answer: false, explanation: "Java supports multiple inheritance of type via interfaces, not via classes." },
-        { statement: "Java has built-in garbage collection.", answer: true, explanation: "Yes, automatic memory management." }
+        { statement: "A subclass can access private fields of its superclass directly.", answer: false, explanation: "Private members are not directly accessible, even in subclasses. Use protected or getters." },
+        { statement: "Java supports multiple inheritance of type via interfaces.", answer: true, explanation: "A class can implement multiple interfaces." }
       ]
     },
     revision: {
-      oneMin: "Simple, Secure, Portable, OO, Robust, Multithreaded, Architecture-Neutral, Interpreted, High-Performance, Distributed, Dynamic.",
+      oneMin: "Inheritance = subclass extends parent. Single class inheritance + multiple interfaces.",
       fiveMin: [
-        "Simple = no pointers, no operator overloading",
-        "Secure = sandboxed JVM",
-        "Portable = bytecode + JVM",
-        "Robust = strong typing + GC",
-        "Multithreaded = Thread class"
+        "Use 'is-a' to decide",
+        "extends for class, implements for interface",
+        "super(...) calls parent constructor",
+        "Constructors are not inherited",
+        "Object is the root superclass"
       ],
       examDay: [
-        "List all 11 buzzwords",
-        "Explain any 5 in 2 lines each",
-        "Give one-line example for each"
+        "Draw an inheritance hierarchy",
+        "Show super() in constructor",
+        "Mention Object as root class",
+        "Differentiate is-a vs has-a"
       ],
-      memoryTrick: "S²POR²MA²I²H²D — Simple, Secure, Portable, OO, Robust, Multithreaded, Architecture-neutral, Interpreted, JIT, High-perf, Distributed, Dynamic.",
+      memoryTrick: "Inheritance = is-a relationship. Car IS-A Vehicle.",
       faq: [
-        { q: "Is 'Object-Oriented' an official buzzword?", a: "Yes, sometimes listed as a feature." }
+        { q: "Can a final class be inherited?", a: "No. Marking a class 'final' prevents inheritance." },
+        { q: "Can I prevent method overriding?", a: "Yes, mark the method as final." }
+      ]
+    },
+    simulator: { type: "inheritance-tree", root: "Animal", nodes: [
+      { name: "Animal", methods: ["eat()", "sleep()", "sound()"] },
+      { name: "Dog", parent: "Animal", methods: ["sound()", "fetch()"] },
+      { name: "Cat", parent: "Animal", methods: ["sound()", "scratch()"] },
+      { name: "Puppy", parent: "Dog", methods: ["weep()"] }
+    ] }
+  },
+  {
+    id: "u1-polymorphism",
+    unitId: 1,
+    index: 5,
+    title: "Polymorphism",
+    tagline: "One interface, many implementations",
+    oneLiner: "Polymorphism is the ability of an object to take many forms — the same interface (method call) can represent different underlying behaviors depending on the actual object type.",
+    analogy: "A person behaves differently in different roles — as an employee, parent, friend. The 'you' is one person, but the behavior depends on context. That is polymorphism.",
+    whyExists: "To write flexible, decoupled code that works uniformly with objects of different types through a common interface.",
+    whereUsed: ["Frameworks (Spring DI)", "Design patterns (Strategy, Template, State)", "Plugin systems", "GUI event handling", "Collections"],
+    visualCue: "🔄",
+    code: {
+      language: "java",
+      code: `class Animal {
+    void sound() { System.out.println("Some sound"); }
+}
+class Dog extends Animal {
+    @Override
+    void sound() { System.out.println("Bark"); }
+}
+class Cat extends Animal {
+    @Override
+    void sound() { System.out.println("Meow"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a;
+        a = new Dog(); a.sound();
+        a = new Cat(); a.sound();
+    }
+}`,
+      caption: "Same call a.sound() prints different output based on actual object type."
+    },
+    internalWorking: {
+      steps: [
+        "Compiler checks the call against the static type of the reference (here, Animal).",
+        "At runtime, the JVM looks up the actual object's class in the vtable.",
+        "The most specific overridden method is invoked — this is dynamic dispatch.",
+        "For overloading (compile-time), the compiler picks the matching method by signature, not by runtime type."
+      ],
+      memory: "Each class has a vtable mapping method names to actual implementations. Dynamic dispatch walks the vtable of the actual object's class."
+    },
+    examAnswer: {
+      twoMark: "Polymorphism is the ability of an object to take many forms. In Java, it appears as compile-time polymorphism (method overloading — same name, different parameters) and runtime polymorphism (method overriding — subclass redefines parent's method via dynamic dispatch).",
+      thirteenMark: {
+        intro: "Polymorphism is one of the four pillars of OOP, enabling flexible and extensible designs.",
+        definition: "Polymorphism allows the same interface (method call or reference type) to represent different underlying forms (behaviors). In Java, polymorphism comes in two forms: compile-time (overloading, by signature) and run-time (overriding, by dynamic dispatch).",
+        explanation: "1. Compile-time (static) polymorphism — achieved through method overloading. The compiler picks the correct method based on argument types at compile time. Return type alone does not disambiguate.\n\n2. Run-time (dynamic) polymorphism — achieved through method overriding. A subclass provides a specific implementation of a method already defined in its parent. The JVM uses dynamic dispatch to call the most specific version based on the actual object type at runtime.\n\nPolymorphism enables code like: Animal a = new Dog(); a.sound(); — the same call behaves differently based on the actual object. This is the foundation of flexible, extensible design.",
+        diagram: "Compile-time                 Run-time\n(overloading)               (overriding)\n   |                            |\n   v                            v\nadd(int, int)              Animal a;\nadd(double, double)        a = new Dog();   // a.sound() -> \"Bark\"\nadd(int, int, int)         a = new Cat();   // a.sound() -> \"Meow\"",
+        example: "class Shape { void draw() { System.out.println(\"Drawing shape\"); } } class Circle extends Shape { @Override void draw() { System.out.println(\"Drawing circle\"); } } Shape s = new Circle(); s.draw(); // Output: Drawing circle",
+        conclusion: "Polymorphism is the key to flexible, decoupled systems. Compile-time polymorphism is resolved by the compiler; runtime polymorphism is resolved by the JVM via dynamic dispatch. Together they make Java a powerful language for extensibility."
+      },
+      sixteenMark: {
+        intro: "Polymorphism is a core OOP concept that lets the same interface drive different behaviors, enabling extensibility and loose coupling.",
+        definition: "Polymorphism is the ability of a single interface (method name, reference type) to represent different underlying forms. In Java, polymorphism has two forms: compile-time (method overloading) and run-time (method overriding with dynamic dispatch).",
+        explanation: "1. Compile-time polymorphism (overloading):\n   - Multiple methods share the same name but have different parameter lists (number, type, or order of parameters).\n   - The compiler selects the correct method at compile time based on argument types.\n   - Return type alone does NOT disambiguate; it must differ in parameters.\n   - Can occur within a class or across a parent-child class.\n\n2. Run-time polymorphism (overriding):\n   - A subclass provides a specific implementation of a method already defined in its parent.\n   - The method must have the same name, parameter list, and return type (or a covariant return).\n   - Access level cannot be more restrictive.\n   - Resolved at runtime via dynamic dispatch using the actual object type.\n   - The @Override annotation helps the compiler verify correctness.\n\n3. Polymorphic references:\n   - A reference of type Parent can hold an object of type Child.\n   - Method calls are resolved against the reference type for overloading, but against the actual object for overriding.",
+        working: "Compile time: javac binds overloading by argument types.\nRun time: the JVM uses the object's vtable to find the most specific override. Each class loaded into the JVM has a vtable mapping method names to actual code. For an interface or abstract method, the JVM looks up the concrete method in the actual class's vtable.",
+        diagram: "Compile-time (overloading)         Run-time (overriding)\n+-------------------+             +-------------------+\n| print(int)        |             |   Animal          |\n| print(String)     |             |   sound()         |\n| print(double)     |             +-------------------+\n+-------------------+                       ^\n   Selected at compile time             +-----+-----+\n                                        |           |\n                                      Dog         Cat\n                                   sound()=B   sound()=M\n                                        |           |\n                                Selected at run time",
+        example: "class Bank { double rate() { return 5.0; } }\nclass SBI extends Bank { @Override double rate() { return 6.5; } }\nclass HDFC extends Bank { @Override double rate() { return 7.0; } }\n\npublic static void main(String[] args) {\n    Bank b;\n    b = new SBI();   System.out.println(\"SBI rate: \" + b.rate() + \"%\");\n    b = new HDFC();  System.out.println(\"HDFC rate: \" + b.rate() + \"%\");\n}",
+        output: "SBI rate: 6.5%\nHDFC rate: 7.0%",
+        advantages: [
+          "Single interface for multiple types",
+          "Easy to extend — add new subclasses without changing existing code",
+          "Supports loose coupling between components",
+          "Enables dynamic method dispatch",
+          "Foundation of many design patterns (Strategy, State, Template)"
+        ],
+        applications: [
+          "Plugin architectures",
+          "GUI frameworks (component hierarchies)",
+          "Strategy and Template Method patterns",
+          "Collections and generic algorithms",
+          "Hibernate and JPA (polymorphic queries)"
+        ],
+        conclusion: "Polymorphism is the most powerful of the OOP pillars for writing extensible code. Compile-time polymorphism (overloading) is convenient; runtime polymorphism (overriding) is what enables truly flexible, decoupled systems in Java."
+      }
+    },
+    viva: [
+      { q: "What is polymorphism?", a: "The ability of a single interface to represent different underlying forms. In Java: overloading (compile-time) and overriding (run-time)." },
+      { q: "Difference between compile-time and run-time polymorphism?", a: "Compile-time = method overloading (resolved by compiler). Run-time = method overriding (resolved by JVM via dynamic dispatch)." },
+      { q: "Can return type alone differentiate overloaded methods?", a: "No. Overloaded methods must differ in parameter list." },
+      { q: "What is dynamic dispatch?", a: "The mechanism by which the JVM selects the actual method to invoke at runtime based on the object's class, not the reference type." },
+      { q: "What is the role of the @Override annotation?", a: "It is a compile-time check that the method actually overrides a method from a superclass or interface." }
+    ],
+    quiz: {
+      mcqs: [
+        { question: "Method overloading is an example of:", options: ["Run-time polymorphism", "Compile-time polymorphism", "Encapsulation", "Inheritance"], answer: 1, explanation: "Overloading is resolved at compile time." },
+        { question: "Method overriding is resolved at:", options: ["Compile time", "Run time", "Link time", "Loading time"], answer: 1, explanation: "The JVM uses dynamic dispatch." },
+        { question: "Which can differ in two overloaded methods?", options: ["Return type only", "Parameter list", "Access modifier only", "Method name"], answer: 1, explanation: "Parameter list (number, type, order) must differ." },
+        { question: "Animal a = new Dog(); a.sound() — which sound() runs?", options: ["Animal's", "Dog's", "Compile error", "Both"], answer: 1, explanation: "JVM calls the actual object's overridden method." }
+      ],
+      trueFalse: [
+        { statement: "Overloading is resolved at runtime.", answer: false, explanation: "Overloading is resolved at compile time by argument types." },
+        { statement: "Overriding requires the same method signature.", answer: true, explanation: "Name + parameter list must match (return type can be covariant)." }
+      ]
+    },
+    revision: {
+      oneMin: "Polymorphism = overloading (compile) + overriding (runtime).",
+      fiveMin: [
+        "Overloading: same name, different params",
+        "Overriding: same signature in subclass",
+        "Reference type vs actual type",
+        "Dynamic dispatch via vtable",
+        "Use @Override for safety"
+      ],
+      examDay: [
+        "Define polymorphism in 1-2 lines",
+        "Differentiate overloading vs overriding",
+        "Give a runtime polymorphism example",
+        "Mention dynamic dispatch"
+      ],
+      memoryTrick: "Overloading = One name, MANY signatures (compile). Overriding = One signature, MANY implementations (runtime).",
+      faq: [
+        { q: "Can a static method be overridden?", a: "No. Static methods are hidden, not overridden." },
+        { q: "Can a constructor be overridden?", a: "No. Constructors are not inherited and cannot be overridden." }
+      ]
+    },
+    simulator: { type: "dynamic-dispatch", classes: [
+      { name: "Animal", methods: [{ name: "sound", impl: "Some sound" }] },
+      { name: "Dog", methods: [{ name: "sound", impl: "Bark" }] },
+      { name: "Cat", methods: [{ name: "sound", impl: "Meow" }] }
+    ] }
+  },
+  {
+    id: "u1-class-object",
+    unitId: 1,
+    index: 6,
+    title: "Classes and Objects",
+    tagline: "Blueprints and instances",
+    oneLiner: "A class is a blueprint that defines the data and behavior of a type; an object is a runtime instance of a class, created with the new keyword, occupying memory in the heap.",
+    analogy: "A class is an architectural plan for a house. An object is the actual house built from that plan. You can build many houses (objects) from the same plan (class).",
+    whyExists: "To model real-world entities as data structures with associated behavior, enabling modular and reusable code.",
+    whereUsed: ["Every Java program", "Domain modeling", "GUI components", "Collections of items", "Data transfer"],
+    visualCue: "📦",
+    code: {
+      language: "java",
+      code: `class Student {
+    String name;
+    int rollNo;
+
+    Student(String name, int rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+    }
+
+    void introduce() {
+        System.out.println(\"Hi, I am \" + name + \" (Roll \" + rollNo + \")\");\n    }
+}\n\npublic class Main {\n    public static void main(String[] args) {\n        Student s1 = new Student(\"Alice\", 101);\n        Student s2 = new Student(\"Bob\", 102);\n        s1.introduce();\n        s2.introduce();\n    }\n}`,
+      caption: "A Student class with two distinct objects s1 and s2."
+    },
+    internalWorking: {
+      steps: [
+        "The .class file is loaded by the ClassLoader when first referenced.",
+        "'new Student(...)' triggers a multi-step process: memory allocation, default initialization, constructor call, and reference return.",
+        "Each object gets its own copy of instance fields on the heap.",
+        "Methods are stored once in the method area; each call uses a new stack frame.",
+        "The 'this' keyword inside a method refers to the current object — the receiver of the method call."
+      ],
+      memory: "Class metadata (method code, static fields) lives in the method area. Each object lives in the heap with its own instance fields. The reference variable (s1, s2) lives on the stack."
+    },
+    examAnswer: {
+      twoMark: "A class is a user-defined blueprint that defines the fields and methods its objects will have. An object is a runtime instance of a class, created with the 'new' keyword, with its own copy of instance fields stored on the heap.",
+      thirteenMark: {
+        intro: "Classes and objects are the basic units of OOP in Java. Every Java program is built from one or more classes, and execution happens through their objects.",
+        definition: "A class is a template that declares the fields (state) and methods (behavior) its instances will have. An object is a concrete instance of a class, created with 'new', occupying memory in the heap and accessed via a reference variable.",
+        explanation: "Key points about classes and objects:\n1. Class declaration: contains fields, methods, constructors, and possibly nested classes.\n2. Object creation: 'new ClassName(args)' allocates memory, calls a constructor, and returns a reference.\n3. Reference variables: hold the address of an object, not the object itself. Stored on the stack.\n4. Anonymous objects: 'new Student(...)' used immediately without assigning to a variable.\n5. The 'this' keyword: refers to the current object inside instance methods/constructors.\n6. Memory: class metadata goes to the method area; each object goes to the heap.\n7. Multiple references can point to the same object; modifying it via one reference is visible to all.\n8. Garbage collection reclaims objects when no live references remain.",
+        diagram: "      Class: Student              Heap\n     +----------------+      +-------------------+\n     | name : String  |      | s1 -> name=Alice  |\n     | rollNo : int   |      |      rollNo=101   |\n     | introduce()    |      +-------------------+\n     +----------------+      +-------------------+\n                             | s2 -> name=Bob    |\n     s1 = new Student(...)   |      rollNo=102   |\n     s2 = new Student(...)   +-------------------+\n                             (two distinct objects)",
+        example: "class Box { int length, width; Box(int l, int w) { length = l; width = w; } int area() { return length * width; } } Box b1 = new Box(5, 3); Box b2 = new Box(7, 2); System.out.println(b1.area()); // 15",
+        conclusion: "Classes are blueprints; objects are the concrete things built from them. Java programs create objects dynamically, call methods on them, and the JVM manages their lifetime in the heap."
+      },
+      sixteenMark: {
+        intro: "Classes and objects are the foundational building blocks of Java. A class is a template; an object is a runtime instance that occupies heap memory and is manipulated via references.",
+        definition: "A class is a user-defined type that declares fields (attributes) and methods (functions). An object is a runtime instance of a class, created with the 'new' keyword, with its own state stored on the heap. Multiple objects of the same class are independent of each other.",
+        explanation: "Anatomy of a class:\n- Fields (instance variables) — each object gets its own copy.\n- Methods — shared across all instances; executed via a stack frame.\n- Constructors — initialize new objects.\n- Static members — belong to the class, not objects.\n- Access modifiers — control visibility.\n\nAnatomy of an object:\n- Identity — the memory address (hidden from Java code).\n- State — current values of its fields.\n- Behavior — the methods it can respond to.\n\nObject creation steps:\n1. Class loading (if not already loaded).\n2. Memory allocation on the heap.\n3. Default initialization of fields (0, false, null).\n4. Constructor execution (with 'this' bound to the new object).\n5. Reference returned to the caller.\n\n'this' reference — points to the current object; resolves field shadowing, passes the current object, or invokes another constructor (this()).",
+        working: "1. Class metadata (fields, method bytecode) is loaded into the method area on first use.\n2. 'new ClassName(args)' allocates heap memory, defaults fields, runs the constructor, and returns a reference.\n3. The reference is stored in a local variable (on the stack) or in another object.\n4. Method calls push a new stack frame; 'this' is the receiver.\n5. When no references remain, the object becomes eligible for garbage collection.",
+        diagram: "+---------------------------+\n|  Stack                   |\n|  +---------------------+ |\n|  | s1 (ref)            | |\n|  | s2 (ref)            | |\n|  +---------------------+ |\n+-------------|-----------+\n              v\n+---------------------------+\n|  Heap                     |\n|  +-----------+ +---------+|\n|  | Object s1 | | Object s2||\n|  | name=A   | | name=B   ||\n|  | roll=101 | | roll=102 ||\n|  +-----------+ +---------+|\n+---------------------------+\n              ^\n              |\n+---------------------------+\n|  Method Area              |\n|  Class: Student           |\n|  - field signatures       |\n|  - method bytecode        |\n+---------------------------+",
+        example: "class Point {\n    int x, y;\n    Point(int x, int y) {\n        this.x = x;     // 'this.x' refers to the field, x refers to the parameter\n        this.y = y;\n    }\n    void print() {\n        System.out.println(\"(\" + x + \", \" + y + \")\");\n    }\n}\nPoint p = new Point(3, 4);\np.print();",
+        output: "(3, 4)",
+        advantages: [
+          "Classes provide reusability — one class, many objects",
+          "Objects model real-world entities naturally",
+          "Encapsulation of state and behavior",
+          "Easy to maintain and extend",
+          "Support for polymorphism and dynamic dispatch"
+        ],
+        applications: [
+          "Every Java program uses classes and objects",
+          "Domain modeling (User, Order, Product, etc.)",
+          "Data structures (List, Map, Set)",
+          "GUI components (Button, Window, Panel)",
+          "Service layer and DTOs in enterprise apps"
+        ],
+        conclusion: "Classes and objects are the heart of Java. A class defines the structure; objects are the runtime entities that hold state and respond to messages. Mastering class design and object lifecycle is the first step toward writing effective Java programs."
+      }
+    },
+    viva: [
+      { q: "What is a class?", a: "A blueprint or template that defines the fields and methods its instances will have." },
+      { q: "What is an object?", a: "A runtime instance of a class, created with 'new', occupying memory in the heap." },
+      { q: "Where is an object stored?", a: "On the heap. The reference variable is stored on the stack." },
+      { q: "What is the 'this' keyword?", a: "A reference to the current object — the receiver of the method call." },
+      { q: "Can two references point to the same object?", a: "Yes. Both references access the same heap object; changes are visible through both." },
+      { q: "What is the default value of an uninitialized int field?", a: "0. For object references it's null; for boolean it's false." }
+    ],
+    quiz: {
+      mcqs: [
+        { question: "An object is created using which keyword?", options: ["class", "new", "this", "object"], answer: 1, explanation: "The 'new' keyword creates an object." },
+        { question: "Where are objects stored in memory?", options: ["Stack", "Heap", "Method area", "Cache"], answer: 1, explanation: "Objects are allocated on the heap." },
+        { question: "The 'this' keyword refers to:", options: ["The current class", "The current object", "The parent class", "The main method"], answer: 1, explanation: "'this' refers to the current object." },
+        { question: "How many objects does 'new Student(); new Student();' create?", options: ["0", "1", "2", "Depends"], answer: 2, explanation: "Two separate objects are allocated on the heap." }
+      ],
+      trueFalse: [
+        { statement: "A class can exist without any objects.", answer: true, explanation: "A class can be used as a namespace for static members without instantiation." },
+        { statement: "Two objects of the same class share their instance fields.", answer: false, explanation: "Each object has its own copy of instance fields." }
+      ]
+    },
+    revision: {
+      oneMin: "Class = blueprint. Object = instance on the heap. new creates it; this refers to it.",
+      fiveMin: [
+        "Class has fields + methods",
+        "Object is created with new",
+        "Memory: heap (object), stack (reference)",
+        "this = current object",
+        "Each object has its own fields"
+      ],
+      examDay: [
+        "Define class and object",
+        "Draw a class diagram with fields/methods",
+        "Show 'new' usage",
+        "Mention heap vs stack"
+      ],
+      memoryTrick: "Class = Cookie cutter. Object = Cookie.",
+      faq: [
+        { q: "Can we create an object without 'new'?", a: "Yes, using reflection (Class.newInstance()), clone(), or deserialization." },
+        { q: "What is an anonymous object?", a: "An object created with 'new' and used immediately, not assigned to any reference." }
       ]
     },
     simulator: { type: "none" }
@@ -852,83 +757,110 @@ public class Demo {
   {
     id: "u1-constructors",
     unitId: 1,
-    index: 9,
+    index: 7,
     title: "Constructors",
     tagline: "Special methods that initialize objects",
-    oneLiner: "A constructor is a special method that is automatically invoked when an object is created, used to initialize the object's state.",
-    analogy: "Think of a constructor as a form you fill out when you arrive at a hotel — it sets up your initial state (room number, name, etc.).",
-    whyExists: "To ensure objects are always created in a valid, initialized state.",
-    whereUsed: ["Every Java class", "Frameworks (Spring, JPA)", "POJOs and DTOs"],
+    oneLiner: "A constructor is a special method with the same name as the class and no return type, automatically invoked when an object is created with the 'new' keyword, used to initialize the object's state.",
+    analogy: "Think of a constructor as the check-in form at a hotel — it captures your name, ID, room preference, and sets you up in a valid initial state before you use the room.",
+    whyExists: "To ensure every object is created in a valid, initialized state and to encapsulate the initialization logic.",
+    whereUsed: ["Every Java class", "Frameworks (Spring, JPA, Jackson)", "POJOs and DTOs", "Singleton pattern", "Builder pattern"],
     visualCue: "🏗️",
     code: {
       language: "java",
       code: `class Student {
     String name;
     int age;
-    Student() {                       // default
-        name = "Unknown";
-        age = 0;
+
+    Student() {
+        this("Unknown", 0);
     }
-    Student(String n, int a) {        // parameterized
-        name = n;
-        age = a;
+
+    Student(String name, int age) {
+        this.name = name;
+        if (age > 0) this.age = age;
+    }
+
+    Student(Student other) {
+        this.name = other.name;
+        this.age = other.age;
+    }
+
+    void display() {
+        System.out.println(name + " (" + age + ")");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s1 = new Student();
+        Student s2 = new Student("Alice", 20);
+        Student s3 = new Student(s2);
+        s1.display(); s2.display(); s3.display();
     }
 }`,
-      caption: "Default and parameterized constructors."
+      caption: "Default, parameterized, and copy constructors with chaining via this()."
     },
     internalWorking: {
       steps: [
-        "Constructor is called by 'new' keyword or reflection.",
-        "JVM allocates memory on heap for the object.",
-        "Instance variables are initialized to default values.",
-        "Explicit constructor body runs.",
-        "Reference to the object is returned to the caller."
-      ]
+        "When 'new Student(...)' is encountered, the JVM ensures the class is loaded.",
+        "Memory is allocated on the heap for the object.",
+        "Instance fields are initialized to default values (0, false, null).",
+        "The matching constructor is invoked (bound at compile time by signature).",
+        "If the constructor uses this(...) or super(...), that call happens first.",
+        "The 'this' reference is bound to the new object throughout the constructor.",
+        "A reference to the constructed object is returned to the caller."
+      ],
+      memory: "Constructors themselves are stored in the method area; they use the stack for parameters and 'this' for accessing the heap object they initialize."
     },
     examAnswer: {
-      twoMark: "A constructor in Java is a special member method used to initialize objects. It has the same name as the class, no return type, and is automatically invoked when an object is created using the new keyword. If no constructor is defined, the compiler provides a default no-arg constructor.",
+      twoMark: "A constructor in Java is a special member used to initialize objects. It has the same name as the class, no return type, and is automatically invoked when an object is created with 'new'. If no constructor is defined, the compiler provides a default no-arg constructor.",
       thirteenMark: {
-        intro: "Constructors are fundamental to object creation in Java.",
-        definition: "A constructor is a special method that is invoked automatically when an object of a class is created. It has the same name as the class, no return type (not even void), and is used to initialize the object's state.",
-        explanation: "Types of constructors in Java:\n1. Default constructor — no-arg, provided by compiler if none is defined.\n2. Parameterized constructor — accepts arguments to set initial values.\n3. Copy constructor — not built-in but can be written by passing an object of the same type.\n4. Private constructor — used in singleton patterns to restrict instantiation.\n5. Constructor chaining — this() calls another constructor in the same class; super() calls the parent constructor.",
-        diagram: "Student s = new Student(\"John\", 20);\n         |\n         +--> Constructor Student(String, int) is invoked\n              |\n              +--> Initializes name and age",
-        example: "class Box { int l, b; Box() { l = 0; b = 0; } Box(int x, int y) { l = x; b = y; } Box(Box o) { l = o.l; b = o.b; } }",
-        conclusion: "Constructors ensure objects are always initialized, supporting encapsulation and robust object creation."
+        intro: "Constructors are fundamental to object creation in Java. They guarantee that every new object starts in a valid state.",
+        definition: "A constructor is a special method invoked automatically when an object of a class is created. It has the same name as the class, no return type (not even void), and is used to initialize the object's state.",
+        explanation: "Types of constructors in Java:\n1. Default constructor — no-arg, provided automatically by the compiler if no constructor is defined.\n2. Parameterized constructor — accepts arguments to set initial values.\n3. Copy constructor — not built-in but commonly written by accepting an object of the same type and copying its fields.\n4. Private constructor — restricts instantiation; used in singleton pattern and utility classes.\n5. Constructor chaining — this() calls another constructor in the same class; super() calls the parent constructor.\n\nRules: the first statement of a constructor is either this() or super() (explicit or implicit). Constructors are not inherited, but a subclass constructor implicitly calls super() if no explicit super(...) is provided.",
+        diagram: "Student s = new Student(\"John\", 20);\n          |\n          +--> Constructor Student(String, int) is invoked\n                  |\n                  +--> super() (Object) called implicitly\n                  +--> Initializes name and age\n                  +--> Returns reference to s",
+        example: "class Box { int l, b; Box() { l = 0; b = 0; } Box(int x, int y) { l = x; b = y; } Box(Box o) { l = o.l; b = o.b; } } // Default, parameterized, and copy constructors.",
+        conclusion: "Constructors ensure objects are always initialized in a valid state, support encapsulation of initialization logic, and enable flexible object creation through overloading and chaining."
       },
       sixteenMark: {
         intro: "Constructors are special members of a class that play a central role in object creation and initialization in Java.",
-        definition: "A constructor is a special method with the same name as the class, no return type, that is automatically invoked when an object is created. Its primary purpose is to initialize the new object's state.",
-        explanation: "Java supports several kinds of constructors. The default constructor (no-arg) is automatically provided by the compiler if no constructor is defined. Parameterized constructors accept arguments to set initial values. Constructor chaining is done using this() and super(). The first line of every constructor is either this() or super(), even if not written explicitly. Constructors are not inherited, but they can be invoked explicitly via super(). A private constructor prevents external instantiation, useful in singleton or utility classes. The compiler inserts a no-arg super() call in every constructor.",
-        working: "1. 'new' triggers class loading (if not already loaded).\n2. Memory is allocated on the heap for the object.\n3. Instance fields are set to default values (0, false, null).\n4. The constructor body executes.\n5. The reference is returned to the caller.",
-        diagram: "ClassLoader loads class\n       |\n    new MyClass()\n       |\n    Heap: allocate object\n       |\n    Initialize fields to defaults\n       |\n    Invoke constructor body\n       |\n    Return reference",
-        example: "class Employee { String name; double salary; Employee() { this(\"Unknown\", 0); } Employee(String n, double s) { name = n; salary = s; } }",
-        output: "Constructors can be chained via this() and super().",
+        definition: "A constructor is a special method with the same name as the class, no return type, automatically invoked when an object is created. Its primary purpose is to initialize the new object's state.",
+        explanation: "Java supports several kinds of constructors:\n- Default (no-arg) constructor: provided automatically by the compiler if no constructor is defined. Disappears as soon as you write any constructor.\n- Parameterized constructor: accepts arguments to set initial values.\n- Copy constructor: a constructor that takes an object of the same class and copies its fields. Java does not provide one automatically; you write it yourself.\n- Private constructor: prevents external instantiation. Used in singleton, utility, and factory classes.\n\nConstructor chaining:\n- this(args) calls another constructor in the same class.\n- super(args) calls a constructor in the parent class.\n- The first statement of a constructor is either this(...) or super(...), even if not written explicitly.\n- If omitted, the compiler inserts super() (no-arg call to parent).\n\nConstructors are NOT inherited. They cannot be overridden, but they can be overloaded.",
+        working: "1. 'new MyClass(args)' triggers class loading (if not already loaded).\n2. Memory is allocated on the heap for the new object.\n3. Instance fields are set to default values (0, false, null).\n4. The matching constructor (selected by argument types at compile time) executes.\n5. The constructor's 'this' refers to the new object.\n6. A reference to the constructed object is returned to the caller.",
+        diagram: "ClassLoader loads class\n            |\n         new MyClass()\n            |\n    Heap: allocate object\n            |\n    Initialize fields to defaults\n            |\n    Invoke constructor body\n            |\n    Return reference",
+        example: "class Employee {\n    String name;\n    double salary;\n\n    Employee() { this(\"Unknown\", 0); }   // chains to parameterized\n\n    Employee(String n, double s) {\n        name = n;\n        salary = s;\n    }\n}",
+        output: "Constructors can be chained via this() and super() to avoid duplication.",
         advantages: [
-          "Guarantees valid object state",
-          "Supports encapsulation of initialization logic",
-          "Enables constructor overloading for flexibility",
-          "Allows inheritance-based super() chaining"
+          "Guarantees objects are created in a valid state",
+          "Encapsulates initialization logic",
+          "Supports constructor overloading for flexibility",
+          "Enables inheritance-based super() chaining",
+          "Allows immutability when all fields are set in the constructor"
         ],
         applications: [
-          "Initializing object fields",
+          "Initializing object fields with validation",
           "Implementing factory and builder patterns",
-          "Dependency injection in frameworks",
-          "Singletons via private constructor"
+          "Dependency injection in frameworks (Spring)",
+          "Singletons via private constructor",
+          "Immutable classes (all fields final, set in constructor)"
         ],
-        conclusion: "Constructors are a cornerstone of Java OOP. Mastering default, parameterized, and chained constructors is essential for robust class design."
+        conclusion: "Constructors are a cornerstone of Java OOP. Mastering default, parameterized, copy, and chained constructors is essential for robust class design and is widely used in real-world frameworks and patterns."
       }
     },
     viva: [
       { q: "What is a constructor?", a: "A special method that initializes an object; same name as class, no return type." },
-      { q: "What happens if you don't write a constructor?", a: "Compiler provides a default no-arg constructor." },
-      { q: "Can a constructor be private?", a: "Yes, to restrict instantiation (e.g., singletons)." },
-      { q: "What is constructor chaining?", a: "Calling one constructor from another using this() or super()." }
+      { q: "What happens if you don't write a constructor?", a: "The compiler provides a default no-arg constructor (but only if no other constructor is defined)." },
+      { q: "Can a constructor be private?", a: "Yes. Used in singleton patterns and utility classes to prevent external instantiation." },
+      { q: "What is constructor chaining?", a: "Calling one constructor from another using this() (same class) or super() (parent class)." },
+      { q: "Are constructors inherited?", a: "No. But a subclass constructor can call the parent's via super()." },
+      { q: "Can a constructor call another constructor explicitly?", a: "Yes, using this(...) as the first statement." }
     ],
     quiz: {
       mcqs: [
-        { question: "A constructor has:", options: ["A return type", "No return type", "void return", "int return"], answer: 1, explanation: "Constructors have no return type." },
-        { question: "What is the name of a constructor?", options: ["init", "create", "Same as class", "main"], answer: 2, explanation: "Same as class name." },
-        { question: "Which keyword is used to call a parent constructor?", options: ["this", "super", "parent", "base"], answer: 1, explanation: "super() calls parent." }
+        { question: "A constructor has:", options: ["A return type", "No return type", "void return", "int return"], answer: 1, explanation: "Constructors have no return type — not even void." },
+        { question: "What is the name of a constructor?", options: ["init", "create", "Same as class", "main"], answer: 2, explanation: "Same as the class name." },
+        { question: "Which keyword is used to call a parent constructor?", options: ["this", "super", "parent", "base"], answer: 1, explanation: "super() calls the parent constructor." },
+        { question: "Can a constructor be overloaded?", options: ["Yes", "No", "Only with default", "Only with private"], answer: 0, explanation: "Multiple constructors with different parameter lists can coexist." }
       ],
       trueFalse: [
         { statement: "Constructors are inherited.", answer: false, explanation: "Constructors are not inherited." },
@@ -936,225 +868,529 @@ public class Demo {
       ]
     },
     revision: {
-      oneMin: "Constructor = same name as class, no return type.",
+      oneMin: "Constructor = same name as class, no return type, called by new.",
       fiveMin: [
         "Default vs parameterized",
-        "this() for chaining",
-        "super() for parent",
-        "Private for singleton",
-        "Compiler default if none"
+        "this() for chaining in same class",
+        "super() for parent constructor",
+        "Private constructor for singleton",
+        "Compiler provides default if none defined"
       ],
       examDay: [
         "Define constructor in 1 line",
-        "Types: default, parameterized, copy",
-        "Constructor chaining diagram"
+        "List types: default, parameterized, copy, private",
+        "Show constructor chaining with this() and super()",
+        "Give a real-life analogy (hotel check-in)"
       ],
       memoryTrick: "Constructor = Class name + no return type + called by new.",
       faq: [
-        { q: "Can a constructor call another constructor?", a: "Yes, using this()." }
+        { q: "Can a constructor call another constructor?", a: "Yes, using this() as the first statement." },
+        { q: "What is a copy constructor?", a: "A constructor that takes an object of the same class and copies its fields. Java does not provide one automatically." }
       ]
     },
-    simulator: { type: "constructor-overloading", options: [{ name: "Student()", params: [] }, { name: "Student(String)", params: ["String"] }, { name: "Student(String, int)", params: ["String", "int"] }] }
+    simulator: { type: "constructor-overloading", options: [
+      { name: "Student()", params: [] },
+      { name: "Student(String name)", params: ["String"] },
+      { name: "Student(String name, int age)", params: ["String", "int"] },
+      { name: "Student(Student other)", params: ["Student"] }
+    ] }
   },
   {
-    id: "u1-constructor-overloading",
+    id: "u1-keywords-static-final",
+    unitId: 1,
+    index: 8,
+    title: "static and final Keywords",
+    tagline: "Class-level members and constants",
+    oneLiner: "static makes a member belong to the class (shared by all instances); final makes a variable a constant, a method non-overridable, or a class non-extendable.",
+    analogy: "static is the school name — same for every student, accessed via the school. final is a permanent record — once written, it cannot be changed.",
+    whyExists: "static enables class-level data and behavior (no instance needed). final enforces immutability and prevents unwanted modification, extension, or overriding.",
+    whereUsed: ["Constants (Math.PI)", "Utility/helper classes", "Counters and IDs", "Singleton pattern", "Immutable classes (String)"],
+    visualCue: "🔑",
+    code: {
+      language: "java",
+      code: `class MathUtils {
+    public static final double PI = 3.14159;
+    public static int counter = 0;
+
+    public static int square(int x) {
+        return x * x;
+    }
+
+    MathUtils() { counter++; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("PI = " + MathUtils.PI);
+        System.out.println("Square of 5 = " + MathUtils.square(5));
+        new MathUtils();
+        new MathUtils();
+        System.out.println("Objects created: " + MathUtils.counter);
+    }
+}`,
+      caption: "static final constant, static method, and static counter."
+    },
+    internalWorking: {
+      steps: [
+        "Static fields are stored in the method area (metaspace since Java 8).",
+        "Static fields are initialized when the class is loaded.",
+        "Static methods are bound at compile time (no 'this' parameter).",
+        "Static methods can be called via ClassName.method() without an instance.",
+        "Static blocks run once at class loading, in the order they appear.",
+        "Final variables (primitives) hold a constant value; final references cannot be reassigned but the object they point to can be mutated unless it is also immutable."
+      ],
+      memory: "Method area: static fields + method bytecode. Heap: per-object instance fields. final references live in the method area (if static) or heap (if instance), but their binding cannot change."
+    },
+    examAnswer: {
+      twoMark: "static makes a member belong to the class rather than any instance, so it is shared and accessed via ClassName.member. final makes a variable a constant, a method non-overridable, or a class non-extendable.",
+      thirteenMark: {
+        intro: "static and final are two important Java keywords that control scope, lifetime, and mutability of class members.",
+        definition: "static is a non-access modifier that makes a member belong to the class, not to instances. final is a non-access modifier that prevents modification: a final variable is a constant, a final method cannot be overridden, and a final class cannot be extended.",
+        explanation: "static can be applied to:\n- Variables: shared across all instances; one copy per class.\n- Methods: called via ClassName.method(); cannot use 'this' or access non-static members directly.\n- Blocks: static { ... } run once at class loading.\n- Nested classes: nested static class doesn't need an outer instance.\n\nfinal can be applied to:\n- Variables: must be initialized exactly once; cannot be reassigned.\n- Methods: cannot be overridden in subclasses.\n- Classes: cannot be extended (e.g., String, Math).\n- Parameters: the parameter cannot be reassigned inside the method.\n\nA 'final static' variable is a compile-time constant (e.g., Math.PI, Integer.MAX_VALUE).",
+        diagram: "Class: MathUtils\n+----------------------+\n| - PI : double (final static)\n| - counter : int (static)\n| - square(int) : int (static)\n+----------------------+\n   ^\n   | accessed via MathUtils.PI, MathUtils.square(5)\n   |\nObject 1, Object 2, ...  share the same 'counter' and access 'PI'",
+        example: "class Config { public static final int MAX_USERS = 100; public static final String APP_NAME = \"MyApp\"; } class Counter { static int count = 0; Counter() { count++; } }",
+        conclusion: "static enables class-level data and behavior; final enforces immutability and prevents unwanted modification. Together they are essential for writing robust, predictable Java code."
+      },
+      sixteenMark: {
+        intro: "static and final are foundational keywords in Java. They control whether a member belongs to a class or an instance, and whether its value or behavior can be changed.",
+        definition: "static is a non-access modifier that makes a member belong to the class rather than to any specific instance. final is a non-access modifier that prevents modification: a final variable is a constant, a final method cannot be overridden, and a final class cannot be extended.",
+        explanation: "static usage:\n- Static variable: one copy per class, shared by all instances. Accessed via ClassName.var. Initialized at class loading.\n- Static method: belongs to the class, not an object. Cannot use 'this' or call non-static methods directly. Can be called as ClassName.method().\n- Static block: static { ... } runs once when the class is loaded, in source order.\n- Static import: import static java.lang.Math.*; lets you write sqrt(x) instead of Math.sqrt(x).\n- Static nested class: a nested class that does not need an outer instance.\n\nfinal usage:\n- Final variable: must be assigned exactly once. For primitives, the value is constant. For references, the binding is constant but the object's state can still change (unless the object is immutable).\n- Final method: cannot be overridden in subclasses. Used to lock down behavior.\n- Final class: cannot be extended. Examples: String, Math, Integer (all wrapper classes).\n- Final parameter: cannot be reassigned inside the method.\n\nstatic + final: a compile-time constant (e.g., public static final int MAX = 100;). These are inlined at compile time.",
+        working: "1. When a class is loaded, the JVM allocates memory for static fields in the method area and runs static initializers.\n2. 'new MyClass()' allocates instance fields on the heap and runs the constructor.\n3. Static methods are bound at compile time; instance methods may be bound at runtime via dynamic dispatch.\n4. Final variables are checked at compile time for definite assignment.",
+        diagram: "        +-------------------------+\n        |      Class Loader       |\n        +-------------------------+\n                  |\n                  v\n+-----------------------------------+\n|         Method Area              |\n|  - static fields                 |\n|  - method bytecode               |\n+-----------------------------------+\n                  |\n                  v\n+-----------------------------------+\n|         Heap (objects)           |\n|  - instance fields per object    |\n+-----------------------------------+\nfinal variable: cannot be reassigned\nfinal method: cannot be overridden\nfinal class: cannot be extended",
+        example: "final class Constants {\n    public static final double PI = 3.14159;\n    public static final int MAX = 100;\n}\nclass Parent {\n    public final void show() { System.out.println(\"Cannot override\"); }\n}\nclass Child extends Parent {\n    // public void show() {} // COMPILE ERROR — cannot override final method\n}",
+        output: "Static members are shared; final members cannot be changed.",
+        advantages: [
+          "static: shared state, memory efficient (one copy)",
+          "static: utility/helper methods callable without an instance",
+          "final: enforces immutability and design contracts",
+          "final: enables compiler optimizations (inlining of constants)",
+          "final: prevents unintended modification in subclasses"
+        ],
+        applications: [
+          "Constants (Math.PI, Integer.MAX_VALUE)",
+          "Utility classes (Collections, Arrays, Math)",
+          "Singleton pattern via private constructor + static instance",
+          "Counters and ID generators",
+          "Immutable value classes (String, LocalDate, BigDecimal)"
+        ],
+        conclusion: "static and final are essential Java keywords. static provides class-level members and behavior; final enforces immutability and prevents unwanted modification. Used together (public static final), they create compile-time constants. They form the foundation of well-designed, robust Java APIs."
+      }
+    },
+    viva: [
+      { q: "What does the static keyword do?", a: "Makes a member belong to the class instead of any instance. It is shared across all objects and accessed via ClassName.member." },
+      { q: "What does the final keyword do?", a: "For variables: makes them constant. For methods: prevents overriding. For classes: prevents extension." },
+      { q: "Where are static variables stored?", a: "In the method area (metaspace in Java 8+)." },
+      { q: "Can a static method access instance variables?", a: "No, not directly. It needs an object reference to do so." },
+      { q: "What is a static block?", a: "A block of code marked static that runs once when the class is loaded, used to initialize static fields." },
+      { q: "Can a final variable be reassigned?", a: "No. It must be assigned exactly once." }
+    ],
+    quiz: {
+      mcqs: [
+        { question: "Static variables are stored in:", options: ["Stack", "Heap", "Method area", "Cache"], answer: 2, explanation: "Static fields are stored in the method area/metaspace." },
+        { question: "How many copies of a static variable exist per class?", options: ["One per object", "One per class", "One per method", "None"], answer: 1, explanation: "One copy shared across all instances." },
+        { question: "Which of the following can be final?", options: ["Variable", "Method", "Class", "All of the above"], answer: 3, explanation: "Variables, methods, and classes can all be marked final." },
+        { question: "Can a final class be inherited?", options: ["Yes", "No", "Only abstract", "Only with permission"], answer: 1, explanation: "A final class cannot be extended." }
+      ],
+      trueFalse: [
+        { statement: "Static variables can be accessed without creating an object.", answer: true, explanation: "Yes, using ClassName.variable." },
+        { statement: "A final reference variable means the object it points to cannot be modified.", answer: false, explanation: "The reference binding cannot change, but the object's internal state can still be mutated (unless it is immutable)." }
+      ]
+    },
+    revision: {
+      oneMin: "static = class-level. final = cannot be changed/overridden/extended.",
+      fiveMin: [
+        "static var: shared, in method area",
+        "static method: no 'this', called via class",
+        "final var: assign once",
+        "final method: no override",
+        "final class: no extension"
+      ],
+      examDay: [
+        "Define static and final",
+        "Give example of public static final",
+        "Mention static block and its use",
+        "State where static fields are stored"
+      ],
+      memoryTrick: "static = Stationery (shared). final = Final exam (cannot be retaken).",
+      faq: [
+        { q: "Can a static variable be local?", a: "No. static can only be a class member, not a local variable." },
+        { q: "Are static variables thread-safe by default?", a: "No. They need synchronization or Atomic* classes for thread safety." }
+      ]
+    },
+    simulator: { type: "none" }
+  },
+  {
+    id: "u1-method-overloading",
+    unitId: 1,
+    index: 9,
+    title: "Method Overloading",
+    tagline: "Same name, different signatures",
+    oneLiner: "Method overloading is defining multiple methods with the same name but different parameter lists (number, type, or order) in the same class — a form of compile-time polymorphism.",
+    analogy: "A 'wash' function with different recipes: wash(car), wash(truck), wash(car, wax). Same name, different inputs, different behaviors.",
+    whyExists: "To improve readability and let callers use the same method name for logically similar operations on different data.",
+    whereUsed: ["Constructors", "println and print in PrintStream", "valueOf in wrapper classes", "Math.max, Math.min", "String.valueOf"],
+    visualCue: "🎯",
+    code: {
+      language: "java",
+      code: `class Calculator {
+    int add(int a, int b) { return a + b; }
+    double add(double a, double b) { return a + b; }
+    int add(int a, int b, int c) { return a + b + c; }
+    String add(String a, String b) { return a + b; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        System.out.println(calc.add(2, 3));
+        System.out.println(calc.add(2.5, 3.5));
+        System.out.println(calc.add(1, 2, 3));
+        System.out.println(calc.add("Hi ", "Java"));
+    }
+}`,
+      caption: "Four overloaded add() methods with different parameter lists."
+    },
+    internalWorking: {
+      steps: [
+        "At compile time, javac groups methods by name and looks at their parameter lists.",
+        "When you call calc.add(2, 3), the compiler picks the method whose signature matches the argument types exactly.",
+        "If no exact match, Java applies type promotion (e.g., int -> long -> float -> double) to find the best match.",
+        "The chosen method is encoded in the bytecode as a static call.",
+        "At runtime, no further dispatch is needed — the binding happened at compile time."
+      ],
+      memory: "Overloaded methods are separate methods at the bytecode level; only the call site is bound at compile time."
+    },
+    examAnswer: {
+      twoMark: "Method overloading in Java is defining multiple methods in the same class with the same name but different parameter lists (number, type, or order). The compiler selects the correct method at compile time based on the arguments — this is called compile-time polymorphism.",
+      thirteenMark: {
+        intro: "Method overloading is a form of compile-time (static) polymorphism that makes APIs more readable and flexible.",
+        definition: "Method overloading is the technique of defining multiple methods with the same name but different parameter lists — different number, type, or order of parameters — within the same class.",
+        explanation: "Overloading rules:\n1. Methods must differ in parameter list. Return type alone is NOT enough to disambiguate.\n2. Access modifiers and exception lists can vary freely.\n3. The compiler picks the best match based on argument types.\n4. If no exact match, Java applies automatic type promotion (byte -> short -> int -> long -> float -> double) to find a match.\n5. Varargs (...) can be used; a method with a fixed-arity match is preferred over a varargs method.\n6. Overloading can occur within a class or across parent and child (subclass can overload parent's methods).",
+        diagram: "add(int, int)\nadd(double, double)\nadd(int, int, int)\nadd(String, String)\n   ^\n   |  all share the name 'add' in the same class\n   |  selected at compile time",
+        example: "class Demo { void show(int a) { System.out.println(\"int: \" + a); } void show(String s) { System.out.println(\"str: \" + s); } void show(double d) { System.out.println(\"dbl: \" + d); } } Demo d = new Demo(); d.show(10); d.show(\"Hi\"); d.show(3.14);",
+        conclusion: "Method overloading increases API usability by letting one name represent logically similar operations. The compiler resolves the right method at compile time, so it is fast and predictable."
+      },
+      sixteenMark: {
+        intro: "Method overloading is a common Java technique that allows a class to have multiple methods with the same name but different parameter lists, supporting clean, readable APIs.",
+        definition: "Method overloading is the practice of defining two or more methods in the same class with the same name but different parameter lists (different number, type, or order of parameters). The compiler selects the right method at compile time based on the argument types — this is called compile-time or static polymorphism.",
+        explanation: "Rules and details:\n- Methods are distinguished by their signatures: name + parameter types. Return type is NOT part of the signature for overloading.\n- Access modifiers, exception lists, and return type can vary freely between overloaded methods.\n- The compiler picks the most specific match:\n  1. Exact match by argument types.\n  2. Widening primitive conversion (e.g., int -> long -> float -> double).\n  3. Autoboxing / unboxing (e.g., int <-> Integer).\n  4. Varargs (only if no other match).\n- A subclass can overload methods inherited from its parent — this is not overriding.\n- Overloading applies to methods and constructors.\n- Overloading is resolved at compile time, so there is no runtime cost.",
+        working: "1. The compiler reads all methods named X in the class and groups them by parameter list.\n2. At each call site, javac selects the best-matching method based on the static types of the arguments.\n3. The chosen method is referenced directly in the bytecode (an invokevirtual or invokespecial instruction).\n4. No runtime lookup of overloads occurs.",
+        diagram: "Source code:\n  calc.add(2, 3)        -->  add(int, int)\n  calc.add(2.5, 3.5)    -->  add(double, double)\n  calc.add(1, 2, 3)     -->  add(int, int, int)\n  calc.add(\"Hi\", \"Bye\") -->  add(String, String)\n\n  Compiler picks one method per call site at compile time.",
+        example: "class Account { String name; double bal;\n  Account() { this(\"Default\", 0); }\n  Account(String n) { this(n, 0); }\n  Account(String n, double b) { name = n; bal = b; }\n}",
+        output: "All three constructors create an Account with appropriate initial values, demonstrating constructor overloading (a special form of method overloading).",
+        advantages: [
+          "Multiple ways to call the same logical operation",
+          "Improves readability — same name for similar actions",
+          "Compile-time resolution — no runtime overhead",
+          "Used heavily in standard library (println, valueOf, etc.)",
+          "Supports flexible API design"
+        ],
+        applications: [
+          "Constructors (overloading is the standard way to provide multiple initializers)",
+          "PrintStream.println (overloaded for int, double, String, Object, char[], etc.)",
+          "Wrapper class valueOf (String -> Integer, int -> Integer, etc.)",
+          "String concatenation and conversion methods",
+          "Math functions (max(int, int), max(double, double), max(long, long))"
+        ],
+        conclusion: "Method overloading is a key technique in Java that enhances API usability and code readability. Because overload resolution happens at compile time, it has no runtime cost and is one of the simplest forms of polymorphism in Java."
+      }
+    },
+    viva: [
+      { q: "What is method overloading?", a: "Multiple methods with the same name but different parameter lists in the same class." },
+      { q: "How does the compiler choose which overloaded method to call?", a: "Based on the static types of the arguments passed at the call site." },
+      { q: "Can overloaded methods differ only in return type?", a: "No. The parameter list must differ; return type alone is not enough." },
+      { q: "Is overloading a runtime or compile-time polymorphism?", a: "Compile-time (static) polymorphism." },
+      { q: "Can a subclass overload a method from its parent?", a: "Yes. The subclass can define new methods with the same name but different parameters — that is overloading, not overriding." }
+    ],
+    quiz: {
+      mcqs: [
+        { question: "Method overloading is resolved at:", options: ["Runtime", "Compile time", "Both", "Never"], answer: 1, explanation: "Static binding by the compiler." },
+        { question: "Which of these is required for two methods to be overloaded?", options: ["Same name, same params", "Same name, different params", "Different name, different params", "Same return type"], answer: 1, explanation: "Overloading = same name, different parameter list." },
+        { question: "Method overloading enables:", options: ["Multiple ways to call similar logic", "Inheritance", "Runtime polymorphism", "Abstraction"], answer: 0, explanation: "It provides flexible, readable APIs." },
+        { question: "Can two methods differ only in return type and be overloaded?", options: ["Yes", "No", "Only if both are static", "Only inside interfaces"], answer: 1, explanation: "Parameter list must differ." }
+      ],
+      trueFalse: [
+        { statement: "Two methods can have the same name and same parameter list if they differ in return type.", answer: false, explanation: "That is a compile error — duplicate method." },
+        { statement: "Constructor overloading is a form of method overloading.", answer: true, explanation: "Constructors follow the same overloading rules." }
+      ]
+    },
+    revision: {
+      oneMin: "Overloading = same name, different parameter lists. Compile-time polymorphism.",
+      fiveMin: [
+        "Differ in number, type, or order of parameters",
+        "Return type alone is not enough",
+        "Compiler picks best match",
+        "Type promotion rules apply",
+        "Used in println, valueOf, constructors"
+      ],
+      examDay: [
+        "Define overloading in 1 line",
+        "Give an example with 3 overloads",
+        "Mention compile-time binding",
+        "Differentiate from overriding"
+      ],
+      memoryTrick: "Overloading = One name, MANY signatures (compile-time). Overriding = One signature, MANY implementations (runtime).",
+      faq: [
+        { q: "Is overloading runtime polymorphism?", a: "No. It is compile-time (static) polymorphism." },
+        { q: "Can private methods be overloaded?", a: "Yes, as long as they are in the same class." }
+      ]
+    },
+    simulator: { type: "none" }
+  },
+  {
+    id: "u1-method-overriding",
     unitId: 1,
     index: 10,
-    title: "Constructor Overloading",
-    tagline: "Multiple constructors, same class name",
-    oneLiner: "Constructor overloading is the technique of defining multiple constructors in a class with different parameter lists.",
-    analogy: "Like having multiple registration forms — short form, long form, premium form. Each creates a 'member' but with different initial info.",
-    whyExists: "To allow objects to be created in different ways with different initial data.",
-    whereUsed: ["Frameworks", "Builders", "DTOs", "Entity classes"],
-    visualCue: "🔁",
+    title: "Method Overriding",
+    tagline: "Subclass redefines parent's behavior",
+    oneLiner: "Method overriding is when a subclass provides a specific implementation of a method already defined in its parent class, with the same name, parameter list, and a compatible return type — enabling runtime polymorphism.",
+    analogy: "A child refusing to follow a parent's recipe exactly — they use the same dish name and ingredients but prepare it their own way. Same signature, different implementation.",
+    whyExists: "To allow subclasses to customize or extend behavior inherited from the parent, enabling polymorphic dispatch and flexible designs.",
+    whereUsed: ["Runtime polymorphism", "Frameworks (Template Method pattern)", "equals() and toString() in Object subclasses", "GUI event handlers", "Strategy and State patterns"],
+    visualCue: "🎭",
     code: {
       language: "java",
-      code: `class Box {
-    int l, b;
-    Box() { l = 1; b = 1; }
-    Box(int s) { l = s; b = s; }
-    Box(int x, int y) { l = x; b = y; }
+      code: `class Bank {
+    double getRateOfInterest() { return 5.0; }
 }
-new Box();        // 1x1
-new Box(5);       // 5x5
-new Box(3, 4);    // 3x4`,
-      caption: "Three overloaded constructors for Box."
+class SBI extends Bank {
+    @Override
+    double getRateOfInterest() { return 6.5; }
+}
+class HDFC extends Bank {
+    @Override
+    double getRateOfInterest() { return 7.0; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Bank b;
+        b = new SBI();
+        System.out.println("SBI rate: " + b.getRateOfInterest() + "%");
+        b = new HDFC();
+        System.out.println("HDFC rate: " + b.getRateOfInterest() + "%");
+    }
+}`,
+      caption: "Each subclass overrides getRateOfInterest() with its own rate."
     },
     internalWorking: {
       steps: [
-        "Compiler binds the 'new ClassName(args)' call to the matching constructor based on argument types.",
-        "This is resolved at compile time (static binding).",
-        "At runtime, the chosen constructor is invoked."
-      ]
+        "The subclass declares a method with the same name, parameter list, and compatible return type as the parent.",
+        "The compiler checks the signature, access level, and exception compatibility.",
+        "At runtime, the JVM uses the actual object's class (via vtable) to find the most specific implementation.",
+        "Dynamic dispatch invokes the subclass's version, even when called via a parent reference.",
+        "Use the @Override annotation to have the compiler verify correctness."
+      ],
+      memory: "Each class has a vtable. Overriding replaces the parent's entry with the child's code. The JVM follows the vtable of the actual object at runtime."
     },
     examAnswer: {
-      twoMark: "Constructor overloading in Java is defining multiple constructors within the same class, each with a different parameter list (number, type, or order of parameters). It allows objects to be created in different ways. The compiler selects the correct constructor based on the arguments passed.",
+      twoMark: "Method overriding is when a subclass provides a specific implementation of a method already defined in its parent class, with the same signature and a compatible return type. It enables runtime polymorphism via dynamic dispatch.",
       thirteenMark: {
-        intro: "Constructor overloading is a form of polymorphism (compile-time) that allows flexible object creation.",
-        definition: "Constructor overloading is the technique of providing multiple constructors in a class with different signatures, so that objects can be initialized in different ways.",
-        explanation: "Overloaded constructors differ in number, type, or order of parameters. The compiler resolves which constructor to call based on the arguments used with the new keyword. This is resolved at compile time. Overloading is a form of static polymorphism. Constructors can also chain using this() to avoid code duplication.",
-        diagram: "Box()      → default\nBox(int)   → square\nBox(int,int) → rectangle",
-        example: "class Demo { Demo() { System.out.println(\"no-arg\"); } Demo(int a) { System.out.println(\"int: \" + a); } Demo(String s) { System.out.println(\"str: \" + s); } }",
-        conclusion: "Constructor overloading increases flexibility and readability of class design."
+        intro: "Method overriding is the foundation of runtime polymorphism in Java. It allows a subclass to provide a specific implementation of an inherited method.",
+        definition: "Method overriding is the act of redefining a method inherited from a superclass in the subclass, with the same name, parameter list, and a return type that is the same or covariant (a subtype of the parent's return type).",
+        explanation: "Rules of overriding:\n1. Method name, parameter list must match exactly.\n2. Return type must be the same or a covariant subtype (Java 5+).\n3. Access level cannot be more restrictive (can be less restrictive).\n4. Cannot override final, static, or private methods.\n5. Cannot throw new or broader checked exceptions; can throw fewer or narrower.\n6. The @Override annotation tells the compiler to verify these rules.\n\nWhen a method is called on a parent reference that actually holds a child object, the JVM uses dynamic dispatch to call the child's overridden version. This is runtime polymorphism.",
+        diagram: "   Bank\n  +--------+\n  | rate() |\n  +--------+\n     ^  (overridden by)\n     |\n  +----+----+\n  |         |\n SBI      HDFC\n rate()=6.5 rate()=7.0\n\n Bank b = new SBI();   b.rate();  --> 6.5 (dynamic dispatch)",
+        example: "class Animal { void sound() { System.out.println(\"...\"); } } class Dog extends Animal { @Override void sound() { System.out.println(\"Bark\"); } } Animal a = new Dog(); a.sound(); // Output: Bark",
+        conclusion: "Method overriding enables runtime polymorphism — the same call behaves differently based on the actual object type. It is a cornerstone of flexible, extensible OOP design."
       },
       sixteenMark: {
-        intro: "Constructor overloading is one of the most useful techniques in Java for providing multiple ways to instantiate a class.",
-        definition: "Constructor overloading is the practice of defining two or more constructors in the same class with different parameter lists (different number, type, or order of parameters).",
-        explanation: "Java distinguishes overloaded constructors by their signatures. The compiler binds the call to the appropriate constructor at compile time. This is called static or compile-time polymorphism. Common patterns: 1) Default + parameterized, 2) Chained constructors using this() to call simpler versions, 3) Copy constructor. Constructor overloading is used heavily in JavaBeans, JPA entities, and builder patterns.",
-        working: "1. 'new' keyword is encountered.\n2. Compiler inspects argument types.\n3. Matching constructor is selected at compile time.\n4. Selected constructor runs at object creation.",
-        diagram: "Box b1 = new Box();        → Box()\nBox b2 = new Box(5);       → Box(int)\nBox b3 = new Box(2,3);     → Box(int,int)",
-        example: "class Account { String name; double bal; Account() { this(\"Default\", 0); } Account(String n) { this(n, 0); } Account(String n, double b) { name = n; bal = b; } }",
-        output: "All three lines create an Account with appropriate initial values.",
+        intro: "Method overriding is the mechanism by which a subclass provides a specific implementation of a method inherited from its superclass, enabling runtime polymorphism and dynamic method dispatch.",
+        definition: "Method overriding is redefining a non-final, non-static, non-private method in a subclass with the same name, parameter list, and a return type that is the same or a covariant subtype. The JVM uses dynamic dispatch to call the actual object's overridden version at runtime.",
+        explanation: "Overriding rules:\n- The method name and parameter list must match exactly.\n- The return type must be the same or a covariant subtype (introduced in Java 5; e.g., overriding List return type with ArrayList is allowed).\n- The access level cannot be more restrictive than the parent's (can be the same or wider).\n- Cannot override final, static, or private methods:\n  - final methods are explicitly non-overridable.\n  - static methods are hidden, not overridden.\n  - private methods are not visible to subclasses.\n- Cannot declare new or broader checked exceptions in the override. Can throw fewer, narrower, or any unchecked (Runtime) exceptions.\n- The @Override annotation is recommended — it makes the compiler verify that you are actually overriding (not overloading) and catches signature mismatches.\n\nDynamic dispatch:\n- The JVM looks up the method in the actual object's class vtable at runtime.\n- The call site uses the reference's static type only for compile-time checks (like access).\n- This is the foundation of runtime polymorphism.",
+        working: "1. Compile time: javac verifies the override is valid (signature, access, exceptions).\n2. Class loading: each class gets a vtable mapping method names to code.\n3. Runtime: when b.rate() is called on a Bank reference holding an SBI object, the JVM walks the actual object's vtable and invokes SBI's rate() method.\n4. The result: the same call yields different behavior depending on the actual object type.",
+        diagram: "      Animal\n     +--------+\n     | sound()|\n     +--------+\n          ^\n          | overrides\n     +----+----+\n     |         |\n    Dog       Cat\n   sound()   sound()\n   =\"Bark\"   =\"Meow\"\n\n Animal a = new Dog();\n a.sound();   --> \"Bark\"  (via dynamic dispatch)\n\n Animal a = new Cat();\n a.sound();   --> \"Meow\"",
+        example: "class Shape { double area() { return 0; } }\nclass Circle extends Shape {\n    double r;\n    Circle(double r) { this.r = r; }\n    @Override\n    double area() { return Math.PI * r * r; }\n}\nclass Square extends Shape {\n    double s;\n    Square(double s) { this.s = s; }\n    @Override\n    double area() { return s * s; }\n}",
+        output: "Same call shape.area() returns the area of the actual shape — circle, square, etc.",
         advantages: [
-          "Multiple ways to create objects",
-          "Code reuse via this() chaining",
-          "Improves readability and flexibility",
-          "Common in API design"
+          "Enables runtime polymorphism (one interface, many behaviors)",
+          "Allows subclasses to customize inherited behavior",
+          "Supports the Open/Closed Principle: open for extension, closed for modification",
+          "Forms the basis of many design patterns (Template, Strategy, State)",
+          "Enables framework design (subclass and override template methods)"
         ],
         applications: [
-          "JavaBeans constructors",
-          "Builder pattern",
-          "DTOs and entity classes",
-          "Spring framework beans"
+          "Template Method pattern (override hooks)",
+          "GUI event handlers (override actionPerformed)",
+          "equals() and toString() in custom classes",
+          "Polymorphic collections (List of Shapes with mixed types)",
+          "Frameworks: Spring, Hibernate, JUnit use overriding heavily"
         ],
-        conclusion: "Constructor overloading is a key technique in Java that enhances class usability and is widely used in real-world frameworks and design patterns."
+        conclusion: "Method overriding is the foundation of runtime polymorphism in Java. By redefining parent methods in subclasses and using dynamic dispatch, Java enables flexible, extensible designs where new behaviors can be added without modifying existing code."
       }
     },
     viva: [
-      { q: "What is constructor overloading?", a: "Multiple constructors with different parameter lists in the same class." },
-      { q: "How does the compiler choose which constructor to call?", a: "Based on the argument types passed to 'new'." },
-      { q: "Can we overload static methods?", a: "Yes, but they are unrelated to constructor overloading." }
+      { q: "What is method overriding?", a: "A subclass provides a specific implementation of a method already defined in its parent class, with the same signature." },
+      { q: "Can we override a static method?", a: "No. Static methods are hidden, not overridden. They are bound at compile time." },
+      { q: "Can we override a private method?", a: "No. Private methods are not visible to subclasses, so they cannot be overridden." },
+      { q: "Can we override a final method?", a: "No. Final methods are explicitly non-overridable." },
+      { q: "What is the role of @Override annotation?", a: "It instructs the compiler to verify that the method is actually overriding a parent method — it catches signature mistakes." },
+      { q: "What is covariant return type?", a: "An overriding method can return a subtype of the parent's return type (e.g., parent returns Animal, child returns Dog)." }
     ],
     quiz: {
       mcqs: [
-        { question: "Constructor overloading is resolved at:", options: ["Runtime", "Compile time", "Both", "Never"], answer: 1, explanation: "Static binding." },
-        { question: "Which is true?", options: ["Same name, same params", "Same name, different params", "Different name", "None"], answer: 1, explanation: "Overloading = same name, different params." },
-        { question: "Constructor overloading enables:", options: ["Multiple ways to initialize objects", "Inheritance", "Polymorphism at runtime", "Abstraction"], answer: 0, explanation: "Flexible object creation." }
+        { question: "Method overriding is an example of:", options: ["Compile-time polymorphism", "Run-time polymorphism", "Encapsulation", "Inheritance"], answer: 1, explanation: "Resolved at runtime via dynamic dispatch." },
+        { question: "Which methods can be overridden?", options: ["static", "final", "private", "Instance methods of a non-final class"], answer: 3, explanation: "Instance methods of non-final classes are overridable." },
+        { question: "In an override, the return type can be:", options: ["Any type", "Same or covariant subtype", "Only the same", "Only a primitive"], answer: 1, explanation: "Same or covariant subtype (Java 5+)." },
+        { question: "Can a subclass throw a new checked exception in an override?", options: ["Yes", "No", "Only RuntimeException", "Only if parent declares it"], answer: 1, explanation: "Cannot throw new or broader checked exceptions." }
       ],
       trueFalse: [
-        { statement: "Two constructors can have the same parameter list.", answer: false, explanation: "They would be duplicates and cause a compile error." }
+        { statement: "Static methods can be overridden.", answer: false, explanation: "Static methods are hidden, not overridden." },
+        { statement: "The @Override annotation is mandatory.", answer: false, explanation: "It is optional but strongly recommended for safety." }
       ]
     },
     revision: {
-      oneMin: "Multiple constructors, different params.",
+      oneMin: "Overriding = same signature, new implementation. Runtime polymorphism.",
       fiveMin: [
-        "Compile-time polymorphism",
-        "Differs in number, type, or order",
-        "Selected by 'new' args",
-        "Chain with this()",
-        "Used in JavaBeans"
+        "Match name + parameter list",
+        "Same or covariant return type",
+        "Cannot be more restrictive",
+        "Cannot throw new checked exceptions",
+        "Resolved at runtime by JVM"
       ],
       examDay: [
-        "Define with example",
-        "Mention compile-time binding",
-        "Show this() chaining"
+        "Define overriding in 1 line",
+        "List 5 rules of overriding",
+        "Show a runtime polymorphism example",
+        "Mention @Override annotation"
       ],
-      memoryTrick: "Overloading = same name, different recipes.",
+      memoryTrick: "Overriding = Overwriting the parent's recipe with your own version (same name, same ingredients).",
       faq: [
-        { q: "Is constructor overloading runtime polymorphism?", a: "No, it is compile-time (static) polymorphism." }
+        { q: "Can a constructor be overridden?", a: "No. Constructors are not inherited and cannot be overridden." },
+        { q: "Can an overridden method be called from the subclass?", a: "Yes, using super.methodName()." }
       ]
     },
-    simulator: { type: "constructor-overloading", options: [{ name: "Box()", params: [] }, { name: "Box(int side)", params: ["int"] }, { name: "Box(int l, int b)", params: ["int", "int"] }, { name: "Box(Box other)", params: ["Box"] }] }
+    simulator: { type: "dynamic-dispatch", classes: [
+      { name: "Bank", methods: [{ name: "rateOfInterest", impl: "5.0%" }] },
+      { name: "SBI", methods: [{ name: "rateOfInterest", impl: "6.5%" }] },
+      { name: "HDFC", methods: [{ name: "rateOfInterest", impl: "7.0%" }] }
+    ] }
   },
   {
-    id: "u1-control-flow",
+    id: "u1-packages-access-control",
     unitId: 1,
     index: 11,
-    title: "Control Flow Statements",
-    tagline: "Decision-making and looping",
-    oneLiner: "Control flow statements in Java determine the order in which statements are executed: selection (if, switch), iteration (for, while, do-while), and jump (break, continue, return).",
-    analogy: "Control flow is the traffic signal system for your program. It tells the program which road to take at every junction.",
-    whyExists: "To allow programs to make decisions, repeat tasks, and control execution flow.",
-    whereUsed: ["All Java programs", "Algorithms", "Business logic", "Game loops"],
-    visualCue: "🔀",
+    title: "Packages and Access Control",
+    tagline: "Organizing code and controlling visibility",
+    oneLiner: "Packages group related classes and interfaces into namespaces; access modifiers (private, default, protected, public) control which classes and packages can see and use each member.",
+    analogy: "A building has public lobbies (anyone), apartment floors (residents only), offices (employees only), and vaults (just the manager). Packages and access modifiers give code the same layered visibility.",
+    whyExists: "To organize code, prevent naming conflicts, and enforce encapsulation by controlling which parts of a program can see which other parts.",
+    whereUsed: ["Every non-trivial Java project", "Standard library (java.util, java.io, java.net)", "Frameworks and libraries", "JAR files", "Modular code organization"],
+    visualCue: "📁",
     code: {
       language: "java",
-      code: `for (int i = 1; i <= 5; i++) {
-    if (i == 3) continue;
-    if (i == 5) break;
-    System.out.println(i);
-}
-// Output: 1 2 4`,
-      caption: "Demonstrates for loop, continue, and break."
+      code: `// File: myapp/utils/Helper.java
+package myapp.utils;
+
+public class Helper {
+    public void publicMethod() {
+        System.out.println("Public: visible everywhere");
+    }
+    protected void protectedMethod() {
+        System.out.println("Protected: same package or subclass");
+    }
+    void defaultMethod() {
+        System.out.println("Default: same package only");
+    }
+    private void privateMethod() {
+        System.out.println("Private: inside this class only");
+    }
+
+    public void callAll() {
+        publicMethod();
+        protectedMethod();
+        defaultMethod();
+        privateMethod();
+    }
+}`,
+      caption: "Different access modifiers in a single class."
     },
     internalWorking: {
       steps: [
-        "JVM maintains a program counter (PC) pointing to the next instruction.",
-        "Conditional checks (if) compute a boolean and choose a branch.",
-        "Loops (for, while, do-while) repeat a block while the condition is true.",
-        "break exits the loop/switch; continue skips to the next iteration.",
-        "return exits the method."
-      ]
+        "The package keyword places the class in a named namespace (mapped to a directory).",
+        "import statements bring types from other packages into scope.",
+        "The compiler resolves type names using the import list and java.lang.* default.",
+        "Access checks happen at compile time, with additional checks for protected at runtime (subclass context).",
+        "The JVM enforces access flags in the .class file: each member has ACC_PUBLIC, ACC_PRIVATE, ACC_PROTECTED bits.",
+        "Reflection can bypass access control but may trigger IllegalAccessError without setAccessible(true)."
+      ],
+      memory: "Code from any package can be loaded by the JVM; access control is enforced by the compiler and JVM when members are actually referenced."
     },
     examAnswer: {
-      twoMark: "Control flow statements in Java control the order of execution of statements. They include decision-making (if-else, switch), looping (for, while, do-while), and jump statements (break, continue, return).",
+      twoMark: "Packages group related classes into namespaces and map to directories. Access modifiers (private, default, protected, public) control visibility of class members, enforcing encapsulation across packages and class hierarchies.",
       thirteenMark: {
-        intro: "Control flow statements are essential to any non-trivial program.",
-        definition: "Control flow statements in Java are constructs that alter the sequential flow of execution. They include selection statements (if, if-else, switch), iteration statements (for, while, do-while), and jump statements (break, continue, return, try-catch).",
-        explanation: "Selection statements: if executes a block if a condition is true; if-else adds an alternative; switch selects among multiple cases based on a value. Iteration statements: for is a counter-based loop; while runs while a condition holds; do-while runs at least once. Jump statements: break exits a loop or switch; continue skips the rest of the current iteration; return exits a method.",
-        diagram: "if (cond) ─yes→ block\n            │no\n            └──else block (optional)\n\nfor (init; cond; update) → repeat block\nwhile (cond) → repeat block",
-        example: "int n = 5; if (n > 0) System.out.println(\"positive\"); else System.out.println(\"non-positive\");",
-        conclusion: "Mastery of control flow is fundamental to writing correct, efficient, and readable Java programs."
+        intro: "Packages and access control are essential for organizing large Java projects and enforcing encapsulation at a module level.",
+        definition: "A package is a namespace that groups related classes and interfaces; in Java, it maps to a directory structure. An access modifier is a keyword (private, default, protected, public) that controls the visibility of a class, method, or field.",
+        explanation: "Access modifiers in Java:\n- private: accessible only within the same class.\n- default (no modifier): accessible within the same package.\n- protected: accessible within the same package AND by subclasses (even in other packages).\n- public: accessible from anywhere.\n\nFor top-level classes, only public and default are allowed (a class cannot be private or protected at the top level).\n\nPackages:\n- Declared with the 'package' keyword at the top of the file.\n- Convention: reverse domain, e.g., com.example.project.\n- Subpackages (com.example.project.utils) are separate packages for access purposes — they are not 'inside' the parent.\n- The import statement brings types into scope; import java.util.* imports all classes from java.util.",
+        diagram: "Visibility Matrix\n+----------------+--------+--------+--------+--------+\n| Modifier        | Same   | Same   | Sub-   | Other  |\n|                 | Class  | Pkg    | class  |        |\n+----------------+--------+--------+--------+--------+\n| private         |  YES   |  no    |  no    |  no    |\n| default         |  YES   |  YES   |  no    |  no    |\n| protected       |  YES   |  YES   |  YES   |  no    |\n| public          |  YES   |  YES   |  YES   |  YES   |\n+----------------+--------+--------+--------+--------+",
+        example: "package com.example.school;\npublic class Student {\n    private int rollNo;          // only Student\n    String name;                 // same package only (default)\n    protected int age;           // same package or subclass\n    public String getName() { return name; }  // everywhere\n}",
+        conclusion: "Packages and access modifiers are foundational to organizing Java code and enforcing encapsulation. Choosing the right visibility is essential for maintainable, secure APIs."
       },
       sixteenMark: {
-        intro: "Control flow statements are the building blocks that allow Java programs to make decisions, repeat operations, and handle exceptional conditions.",
-        definition: "Control flow statements are Java constructs that determine the order in which statements are executed. They fall into three categories: selection (if-else, switch), iteration (for, while, do-while, enhanced for), and transfer (break, continue, return, throw).",
-        explanation: "Selection: if-else evaluates a boolean and chooses between two blocks. switch works on int, byte, short, char, String, and enum values (Java 7+ for String). Iteration: for loop has init, condition, update; useful for known iterations. Enhanced for (for-each) is used for arrays and collections. while runs as long as condition is true. do-while guarantees at least one execution. Transfer: break exits the innermost loop or switch; continue jumps to the next iteration; return exits a method; throw raises an exception.",
-        working: "The JVM executes bytecode instructions linearly. Branching instructions (ifeq, if_icmpge, etc.) modify the program counter. Loop counters are typically stored in local variable slots in the current stack frame.",
-        diagram: "Statement 1\n  ↓\nif (cond) → yes → block A\n            no  → block B\n  ↓\nStatement 2\n  ↓\nwhile (cond) ↺ body",
-        example: "int[] arr = {1,2,3,4,5}; for (int x : arr) if (x % 2 == 0) System.out.println(x); // 2 4",
-        output: "2 4",
+        intro: "Packages and access control are the mechanisms that organize Java code into namespaces and restrict visibility of types and members. They are critical for large projects and reusable libraries.",
+        definition: "A package is a namespace that groups related types; it is declared with the 'package' keyword and corresponds to a directory structure. An access modifier is a keyword that controls the visibility of a class member — private, default (package-private), protected, or public.",
+        explanation: "Access modifier rules:\n- private: visible only inside the same class.\n- default (no keyword): visible inside the same package.\n- protected: visible inside the same package and from subclasses (even in other packages).\n- public: visible everywhere.\n\nTop-level classes can be only public or default. Inner classes can use all four modifiers.\n\nPackage rules:\n- The package declaration must be the first non-comment statement in a .java file.\n- By convention, package names are lowercase and reverse-DNS, e.g., com.example.project.\n- Subpackages are independent for access purposes: com.example and com.example.util are different packages, and com.example.util cannot access default members of com.example.\n- The CLASSPATH environment variable (or -cp flag) tells the JVM where to find .class files.\n- The import statement lets you use short class names from other packages; java.lang.* is imported automatically.\n- Static import (import static) lets you use static members without class qualification.",
+        working: "1. Compiler checks access at compile time based on the call site's package and inheritance relationship.\n2. JVM stores access flags in the .class file: ACC_PUBLIC, ACC_PRIVATE, ACC_PROTECTED.\n3. At runtime, when a method or field is accessed, the JVM checks the caller's relationship to the target class.\n4. Reflection can bypass these checks via setAccessible(true), but is restricted by the SecurityManager / module system.",
+        diagram: "Java Project Structure\n\nmyapp/\n├── Main.java          (package myapp;)\n└── utils/\n    └── Helper.java    (package myapp.utils;)\n\n   +----------------+\n   |   myapp        |\n   +----------------+\n         |\n   +----------------+\n   | myapp.utils    |\n   +----------------+   default members visible to both\n\nAccess from myapp.Main:\n  public  -> YES\n  default -> YES (same package)\n  protected -> YES (same package or subclass)\n  private -> NO",
+        example: "// File: com/example/shape/Shape.java\npackage com.example.shape;\npublic class Shape {\n    public void draw() { System.out.println(\"Drawing\"); }\n    protected void resize() { System.out.println(\"Resizing\"); }\n}\n\n// File: com/example/Circle.java\npackage com.example;\nimport com.example.shape.Shape;\npublic class Circle extends Shape {\n    void demo() {\n        draw();          // OK - public\n        resize();        // OK - protected + subclass (different package)\n    }\n}",
+        output: "Public members are visible everywhere. Default members are only visible within the same package. Protected members extend visibility to subclasses in any package. Private members are only visible inside the declaring class.",
         advantages: [
-          "Enables decision-making in programs",
-          "Supports repetition and automation",
-          "Provides fine-grained control over execution",
-          "Foundation of algorithms"
+          "Prevents naming conflicts between classes",
+          "Enables modular code organization",
+          "Enforces encapsulation across packages",
+          "Supports controlled API exposure",
+          "Makes large projects maintainable"
         ],
         applications: [
-          "Validating user input",
-          "Iterating over collections",
-          "Game loops and simulations",
-          "State machines",
-          "Algorithms and data processing"
+          "Standard library organization (java.util, java.io, java.net)",
+          "Frameworks (org.springframework, com.fasterxml.jackson)",
+          "Multi-team enterprise codebases",
+          "Reusable libraries published as JAR files",
+          "Java 9+ modules (a stronger form of packages)"
         ],
-        conclusion: "Control flow statements are the core of any Java program. A strong understanding of selection, iteration, and jump statements is essential for building reliable software."
+        conclusion: "Packages and access control are the foundations of code organization and encapsulation in Java. Packages group related types; access modifiers enforce who can see and use each member. Together they make large Java projects maintainable, secure, and reusable."
       }
     },
     viva: [
-      { q: "Difference between while and do-while?", a: "do-while executes the body at least once, then checks the condition." },
-      { q: "What is the enhanced for loop?", a: "Also called for-each; iterates over arrays and Iterable collections." },
-      { q: "Can we use break outside a loop or switch?", a: "No, it causes a compile error." }
+      { q: "What is a package in Java?", a: "A namespace that groups related classes and interfaces. Declared with the 'package' keyword; mapped to a directory." },
+      { q: "What is the default access modifier?", a: "No keyword — also called package-private. Visible only within the same package." },
+      { q: "Difference between default and protected?", a: "Default: same package only. Protected: same package OR subclass (even in another package)." },
+      { q: "Can a top-level class be private?", a: "No. Top-level classes can be public or default (package-private) only." },
+      { q: "What is the default package?", a: "The unnamed package — classes without a package declaration. Discouraged for real projects." },
+      { q: "What is the use of the import statement?", a: "It brings types from other packages into scope so you can use their short names." }
     ],
     quiz: {
       mcqs: [
-        { question: "Which loop runs at least once?", options: ["for", "while", "do-while", "enhanced for"], answer: 2, explanation: "do-while runs body first, then checks." },
-        { question: "Which is a jump statement?", options: ["if", "for", "break", "switch"], answer: 2, explanation: "break is a jump statement." },
-        { question: "Switch supports which type from Java 7?", options: ["int", "char", "String", "double"], answer: 2, explanation: "String is supported from Java 7." }
+        { question: "Which access modifier is the most restrictive?", options: ["public", "protected", "default", "private"], answer: 3, explanation: "private is visible only inside the same class." },
+        { question: "A member with no access modifier is:", options: ["public", "protected", "default (package-private)", "private"], answer: 2, explanation: "No modifier = package-private." },
+        { question: "Which access allows subclass access from a different package?", options: ["private", "default", "protected", "package"], answer: 2, explanation: "protected allows subclass access across packages." },
+        { question: "Top-level classes can be:", options: ["public or private", "public or default", "Only public", "Any modifier"], answer: 1, explanation: "Top-level classes can only be public or default." }
       ],
       trueFalse: [
-        { statement: "continue exits the loop entirely.", answer: false, explanation: "continue skips to the next iteration." },
-        { statement: "for-each works on arrays.", answer: true, explanation: "Yes, on arrays and Iterables." }
+        { statement: "A protected member is accessible from a subclass in a different package.", answer: true, explanation: "Protected allows access from subclasses regardless of package." },
+        { statement: "Two classes in the same package can access each other's private members.", answer: false, explanation: "Private members are only accessible inside the declaring class." }
       ]
     },
     revision: {
-      oneMin: "if, switch, for, while, do-while, break, continue, return.",
+      oneMin: "Package = namespace. private < default < protected < public.",
       fiveMin: [
-        "if-else = decision",
-        "switch = multi-way branch",
-        "for = counted loop",
-        "while = condition loop",
-        "do-while = at-least-once loop"
+        "private: same class only",
+        "default: same package only",
+        "protected: same package + subclasses",
+        "public: everywhere",
+        "Subpackages are independent"
       ],
       examDay: [
-        "List selection, iteration, jump",
-        "Distinguish while vs do-while",
-        "Show for-each example"
+        "Define package and access modifiers",
+        "Draw the visibility matrix",
+        "Give one example per modifier",
+        "Mention import statement and CLASSPATH"
       ],
-      memoryTrick: "S-I-J: Selection, Iteration, Jump.",
+      memoryTrick: "private < default < protected < public. Like rooms: bedroom < house < family < town.",
       faq: [
-        { q: "Can switch take float?", a: "No, switch does not support float, double, or long." }
+        { q: "Can a class be protected?", a: "No, only public or default at the top level. Inner classes can be protected." },
+        { q: "What is the unnamed package?", a: "The default package used when no package declaration is given — discouraged in real projects." }
       ]
     },
-    simulator: { type: "control-flow", code: `for (int i = 1; i <= 5; i++) {\n  if (i == 3) continue;\n  System.out.println(i);\n}` }
+    simulator: { type: "none" }
   }
 ];

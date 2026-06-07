@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GraduationCap, BookOpen, Sparkles } from "lucide-react";
 import type { TopicContent } from "@/data/types";
+import { formatJavaCode } from "@/lib/format-java-code";
 
 export default function ExamWriterPage() {
   const [topicId, setTopicId] = useState(allTopics[0].id);
@@ -140,7 +141,7 @@ function MidMarkView({ topic }: { topic: TopicContent }) {
         </Section>
       )}
       <Section label="Example">
-        <CodeBlock>{a.example}</CodeBlock>
+        <CodeBlock>{formatJavaCode(a.example)}</CodeBlock>
       </Section>
       <Section label="Conclusion"><p>{a.conclusion}</p></Section>
     </div>
@@ -163,7 +164,7 @@ function LongMarkView({ topic }: { topic: TopicContent }) {
         </Section>
       )}
       <Section label="Example">
-        <CodeBlock>{a.example}</CodeBlock>
+        <CodeBlock>{formatJavaCode(a.example)}</CodeBlock>
       </Section>
       <Section label="Output">
         <CodeBlock>{a.output}</CodeBlock>

@@ -7,60 +7,90 @@ export const unit5Topics: TopicContent[] = [
     index: 1,
     title: "Event Handling",
     tagline: "Responding to user actions",
-    oneLiner: "Event handling in JavaFX is the mechanism to respond to user actions (mouse clicks, key presses, etc.) using event listeners and handlers.",
-    analogy: "A doorbell. When a visitor presses (event), the bell rings (handler).",
-    whyExists: "To allow GUI applications to react to user input.",
-    whereUsed: ["GUI applications", "Games", "Interactive forms"],
+    oneLiner: "Event handling in JavaFX is the mechanism to respond to user actions (mouse clicks, key presses, focus changes, etc.) using event listeners, handlers, and the delegation-based dispatch chain.",
+    analogy: "A doorbell system. The button (event source) is pressed (event fires); the bell (handler) is called and rings. Pressing different buttons can ring different bells (polymorphic dispatch).",
+    whyExists: "To allow GUI applications to react to user input in a decoupled, type-safe, and composable way using Java's delegation event model (DEM).",
+    whereUsed: ["GUI applications", "Games", "Interactive forms", "Drawing tools", "Touch interfaces"],
     visualCue: "🖱️",
     code: {
       language: "java",
       code: `Button btn = new Button("Click me");
 btn.setOnAction(e -> System.out.println("Clicked!"));
-// Or with EventHandler:
+// Or with EventHandler interface:
 btn.setOnAction(new EventHandler<ActionEvent>() {
     public void handle(ActionEvent e) { System.out.println("Clicked!"); }
-});`,
-      caption: "JavaFX event handling with lambda and anonymous class."
+});
+// Property listener (text changes):
+Label lbl = new Label("Hi");
+lbl.textProperty().addListener((obs, oldV, newV) -> System.out.println(newV));`,
+      caption: "JavaFX event handling with lambda, anonymous class, and property listener."
     },
     internalWorking: {
-      steps: ["Event source fires an event.", "Event is dispatched to registered handlers.", "Handler's handle() is invoked."]
+      steps: [
+        "User performs an action (mouse click, key press, focus change).",
+        "JavaFX constructs an Event of a specific EventType (e.g., ActionEvent.ACTION, MouseEvent.MOUSE_CLICKED).",
+        "Event traverses the EventDispatchChain from the root node downward (CAPTURE phase) where EventFilters run.",
+        "At the TARGET node, the event is dispatched to registered EventHandlers.",
+        "Event then bubbles back up the scene graph (BUBBLING phase) where other handlers may run.",
+        "Consumed events (event.consume()) stop further propagation."
+      ]
     },
     examAnswer: {
-      twoMark: "Event handling in JavaFX is the mechanism to respond to user interactions. An EventHandler is registered on a node (e.g., button) and is invoked when the corresponding event occurs. Java 8+ lambdas make this concise.",
+      twoMark: "Event handling in JavaFX is the mechanism to respond to user interactions. An EventHandler is registered on a node (e.g., setOnAction on a Button) and is invoked when the corresponding event occurs. Java 8+ lambdas make this concise via the EventHandler<T extends Event> functional interface.",
       thirteenMark: {
-        intro: "Event handling is fundamental to interactive JavaFX apps.",
-        definition: "Event handling is a delegation-based model: an event source registers with an event handler, which is invoked when the event occurs.",
-        explanation: "EventHandler<ActionEvent> is a functional interface. Nodes have setOn* methods (setOnAction, setOnMouseClicked, etc.). Events bubble through the scene graph; filters (capture phase) and handlers (bubble phase) can be added.",
-        diagram: "Source → Event → Filter (capture) → Target → Handler (bubble)",
-        example: "btn.setOnAction(e -> label.setText(\"Clicked\"));",
-        conclusion: "JavaFX event handling is clean and lambda-friendly."
+        intro: "Event handling is fundamental to interactive JavaFX apps and follows the delegation event model.",
+        definition: "Event handling is a delegation-based model: an event source (Node) registers one or more EventHandler<T extends Event> or EventFilter<T extends Event> instances. When an event occurs, the runtime traverses the scene graph, invoking filters during the capture phase (root → target) and handlers during the bubbling phase (target → root).",
+        explanation: "EventHandler<ActionEvent> is a functional interface with a single void handle(T event) method, so lambdas can be used since Java 8. Nodes expose convenience setters like setOnAction, setOnMouseClicked, setOnKeyPressed, setOnMouseEntered, setOnScroll, etc., each replacing any previous handler. For multiple listeners on the same event, use addEventHandler or addEventFilter. The event object carries source, target, type, and event-specific data (mouse coords, key code, modifiers). Events can be consumed to stop propagation.",
+        diagram: "Source → Event → Filter (capture) → Target → Handler (bubble)\n\n  CAPTURE phase        TARGET        BUBBLING phase\n   (root → target)    (handlers)    (target → root)\n  +---------------+   +-------+   +---------------+\n  | filter1       |   | h1    |   | h2            |\n  | filter2       |   | h3    |   | h4            |\n  +---------------+   +-------+   +---------------+",
+        example: "Button b = new Button(\"Go\"); Label l = new Label(\"...\"); b.setOnAction(e -> l.setText(\"Clicked!\"));",
+        conclusion: "JavaFX event handling is clean, lambda-friendly, and provides both capture and bubble phases for fine-grained control over event flow."
       },
       sixteenMark: {
-        intro: "JavaFX event handling uses a delegation model with filters and handlers.",
-        definition: "Event handling in JavaFX is the process of capturing and responding to events (mouse, keyboard, etc.) using EventHandler and EventFilter interfaces.",
-        explanation: "Events are dispatched along a chain from the root to the target. EventFilter runs in the capture phase (root to target); EventHandler runs in the bubble phase (target to root). Common events: ActionEvent, MouseEvent, KeyEvent. setOn* methods are convenience for adding handlers.",
-        working: "1. User triggers event (e.g., clicks button).\n2. JavaFX builds EventDispatchChain.\n3. Event passes through filters (root to target).\n4. Handlers at target and bubble back to root are called.",
-        diagram: "[root] → ... → [target]\n         filters         handlers\n         (down)         (up)",
-        example: "button.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> { if (e.getClickCount() == 2) System.out.println(\"Double click\"); });",
-        output: "Double click detected.",
-        advantages: ["Flexible", "Filters and handlers", "Lambda support"],
-        applications: ["Forms", "Games", "Interactive UIs"],
-        conclusion: "Mastering event handling is essential for building interactive JavaFX applications."
+        intro: "JavaFX event handling uses a delegation model with filters, handlers, and a two-phase (capture + bubble) dispatch along the scene graph.",
+        definition: "Event handling in JavaFX is the process of capturing and responding to events (mouse, keyboard, touch, window, etc.) using the EventHandler<T extends Event> and EventFilter<T extends Event> interfaces registered on a Node or Scene.",
+        explanation: "When an event occurs, JavaFX creates an Event object with a specific EventType. It then walks the EventDispatchChain: starting from the Stage → Scene → root → ... → target. During the CAPTURE phase (root downward), all registered EventFilters on each ancestor are invoked. At the TARGET, the event is delivered. During the BUBBLE phase (target back up to root), EventHandlers on each node are invoked. Convenience methods (setOnAction, etc.) install a single handler. For additive registration, use addEventHandler() / addEventFilter(). Common event types: ActionEvent (buttons, menus), MouseEvent (clicks, moves, enters), KeyEvent (pressed, released, typed), WindowEvent (close, hidden), and InputEvent (parent of mouse + key).",
+        working: "1. User triggers event (e.g., clicks a button).\n2. JavaFX builds EventDispatchChain and dispatches the Event.\n3. Capture phase: filters run from root down to target.\n4. Target receives the event; its handlers run.\n5. Bubble phase: handlers on ancestors fire from target back to root.\n6. If event.consume() is called, dispatch stops.",
+        diagram: "  CAPTURE (down)              TARGET          BUBBLE (up)\n   +-----------+             +-------+         +-----------+\n   | root      | ---Event--> | target| --Ev--> | root      |\n   | filters   |             |handlers|        | handlers  |\n   +-----------+             +-------+         +-----------+\n   EventDispatchChain: Stage → Scene → Parent → ... → Node",
+        example: "Button b = new Button(\"OK\");\nb.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {\n    if (e.getClickCount() == 2) { System.out.println(\"Double!\"); e.consume(); }\n});\nb.setOnAction(e -> System.out.println(\"Single click action\"));",
+        output: "Single click action\nDouble!   (only on double click; consume() prevents ActionEvent)",
+        advantages: [
+          "Decoupled source vs handler — easy to add/remove listeners",
+          "Two-phase (capture + bubble) for fine-grained control",
+          "Lambda support since Java 8 (functional interface)",
+          "Type-safe generic EventHandler<T extends Event>",
+          "Convenience setters for common events",
+          "Pluggable EventFilter for early interception"
+        ],
+        applications: [
+          "Button clicks, menu selections",
+          "Mouse drag/drop drawing apps",
+          "Keyboard shortcuts and form input",
+          "Touch gestures on touch screens",
+          "Custom events (Event.fireEvent)"
+        ],
+        conclusion: "Mastering JavaFX event handling — including the capture/bubble model, lambda handlers, filters, and event consumption — is essential for building interactive, responsive applications."
       }
     },
     viva: [
-      { q: "What is the difference between filter and handler?", a: "Filter runs in capture phase (root to target); handler runs in bubble phase (target to root)." },
-      { q: "Can a node have multiple handlers for the same event?", a: "Yes, via addEventHandler." }
+      { q: "What is the difference between filter and handler?", a: "Filter runs in capture phase (root → target); handler runs in bubble phase (target → root)." },
+      { q: "Can a node have multiple handlers for the same event?", a: "Yes, via addEventHandler. setOnAction replaces any previous handler." },
+      { q: "What does event.consume() do?", a: "Stops the event from being delivered to further nodes/handlers." },
+      { q: "Which method is preferred, lambda or anonymous class?", a: "Lambda (since Java 8) — same behavior, more concise, less boilerplate." }
     ],
     quiz: {
       mcqs: [
-        { question: "setOnAction expects:", options: ["ActionEvent handler", "MouseEvent", "Runnable", "String"], answer: 0, explanation: "ActionEvent handler." }
+        { question: "setOnAction expects:", options: ["ActionEvent handler", "MouseEvent", "Runnable", "String"], answer: 0, explanation: "setOnAction takes an EventHandler<ActionEvent>." },
+        { question: "EventFilter runs in the:", options: ["Bubble phase", "Capture phase", "Render phase", "Idle phase"], answer: 1, explanation: "Capture phase, from root toward target." },
+        { question: "Calling event.consume() will:", options: ["Restart event", "Stop propagation", "Throw an exception", "Log the event"], answer: 1, explanation: "Stops further dispatch." },
+        { question: "EventHandler is a(n) ___ interface.", options: ["Marker", "Functional", "Abstract class", "Concrete"], answer: 1, explanation: "Functional interface — single abstract method handle(T)." }
       ],
       trueFalse: [
-        { statement: "Filters run in bubble phase.", answer: false, explanation: "Capture phase." }
+        { statement: "Filters run in bubble phase.", answer: false, explanation: "Capture phase." },
+        { statement: "setOnAction replaces any existing handler.", answer: true, explanation: "Yes, setOn* is a single-slot setter." },
+        { statement: "Lambdas can be used as event handlers in JavaFX.", answer: true, explanation: "Since Java 8, yes." }
       ]
     },
-    revision: { oneMin: "Event → Handler.handle() called.", fiveMin: ["Lambda handlers", "setOn* methods", "Filter vs Handler"], examDay: ["Event example with lambda"], memoryTrick: "Source fires, listener listens, handler handles.", faq: [{ q: "What is event bubbling?", a: "Event travels from target up to root." }] },
+    revision: { oneMin: "Event → capture (filters) → target → bubble (handlers).", fiveMin: ["Lambda handlers", "setOn* methods", "addEventHandler vs addEventFilter", "event.consume()", "EventDispatchChain"], examDay: ["Lambda button example", "Capture vs bubble diagram"], memoryTrick: "Capture = Car (going down); Bubble = Ball (going up).", faq: [{ q: "What is event bubbling?", a: "Event travels from target up to root in the bubble phase." }, { q: "EventHandler vs EventFilter?", a: "Handler fires at/after target; filter can intercept earlier in capture phase." }] },
     simulator: { type: "javafx-event" }
   },
   {
@@ -69,52 +99,80 @@ btn.setOnAction(new EventHandler<ActionEvent>() {
     index: 2,
     title: "Event Listener",
     tagline: "Listening for events",
-    oneLiner: "An event listener is an object that waits for and reacts to events fired by an event source.",
-    analogy: "A smoke detector. It listens (waits) for smoke (event) and triggers an alarm (handler).",
-    whyExists: "To decouple event sources from event handlers.",
-    whereUsed: ["GUI", "Servlet listeners", "JavaFX EventHandler"],
+    oneLiner: "An event listener is an object that waits for and reacts to events fired by an event source; in JavaFX this is implemented via the EventHandler<T extends Event> functional interface.",
+    analogy: "A smoke detector. It listens (waits) for smoke (event) and triggers an alarm (handler). Multiple detectors can listen to the same fire — multiple listeners on one source.",
+    whyExists: "To decouple event sources from event handlers so that producers (UI) and consumers (logic) can vary independently.",
+    whereUsed: ["GUI", "Servlet listeners", "JavaFX EventHandler", "Observer pattern", "Reactive streams"],
     visualCue: "👂",
     code: {
       language: "java",
-      code: `btn.setOnAction(event -> System.out.println("clicked")); // listener (lambda)`,
-      caption: "Lambda as listener."
+      code: `btn.setOnAction(event -> System.out.println("clicked"));            // lambda listener
+btn.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> handleClick(e));   // additive
+btn.removeEventHandler(MouseEvent.MOUSE_CLICKED, handler);            // removal
+// Property listener (similar pattern):
+slider.valueProperty().addListener((obs, oldV, newV) -> label.setText("Vol: " + newV));`,
+      caption: "Lambda as listener and additive handler registration."
     },
-    internalWorking: { steps: ["Listener is registered with the source.", "Source calls listener's method when event occurs."] },
+    internalWorking: {
+      steps: [
+        "Listener (EventHandler or EventFilter) is registered with a source node via setOn* or addEventHandler/addEventFilter.",
+        "Source keeps an internal list of registered listeners (per EventType).",
+        "When the source fires an event, its internal dispatch iterates the listener list and invokes handle() / handle() on each.",
+        "removeEventHandler() removes a specific listener instance (by reference equality)."
+      ]
+    },
     examAnswer: {
-      twoMark: "An event listener is an object that implements an event-handling interface (e.g., EventHandler<ActionEvent>) and is registered on a source. When the source fires the event, the listener's method is invoked.",
+      twoMark: "An event listener is an object that implements an event-handling interface (e.g., EventHandler<ActionEvent> in JavaFX, ActionListener in Swing) and is registered on a source. When the source fires the event, the listener's method is invoked. JavaFX's EventHandler<T extends Event> is a functional interface, so lambdas are common.",
       thirteenMark: {
-        intro: "Listeners are key to event-driven programming.",
-        definition: "An event listener is an object that implements a listener interface and is notified when an event of interest occurs.",
-        explanation: "In JavaFX, EventHandler<T extends Event> is a functional interface with handle(T event). Lambdas can be used as listeners.",
-        diagram: "Source → has → Listeners\nEvent → invokes → listener.handle(e)",
-        example: "btn.setOnMouseClicked(e -> System.out.println(e.getX()));",
-        conclusion: "Listeners decouple event generation from response."
+        intro: "Listeners are key to event-driven programming and the Observer pattern.",
+        definition: "An event listener is an object that implements a listener interface (EventHandler<T extends Event> in JavaFX) and is notified when an event of interest occurs on a source. It is the consumer side of the event delegation model.",
+        explanation: "In JavaFX, EventHandler<T extends Event> is a functional interface with handle(T event). It can be implemented as a lambda, an anonymous class, or a method reference. setOn* methods (setOnAction, setOnMouseClicked, ...) install/replace a single handler; addEventHandler allows multiple listeners. Listeners receive the event and can read source, target, type, and event-specific data (e.g., MouseEvent.getX(), KeyEvent.getCode()).",
+        diagram: "Source (Button)\n   |\n   |-- listeners: [EventHandler#1, EventHandler#2, ...]\n   |\n   '--- on event --> listener.handle(e) for each",
+        example: "btn.setOnMouseClicked(e -> System.out.println(\"x=\" + e.getX() + \" y=\" + e.getY()));",
+        conclusion: "Listeners decouple event generation from response and form the foundation of JavaFX's interaction model."
       },
       sixteenMark: {
-        intro: "Event listeners are a core part of GUI programming.",
-        definition: "An event listener is an object registered to receive notifications of events occurring on a source.",
-        explanation: "In JavaFX, you can attach handlers via setOn* methods (replaces any previous handler) or addEventHandler (additive). For custom events, you can create your own EventType and dispatch them with Event.fireEvent.",
-        working: "1. Listener registered with source.\n2. Source's internal event dispatcher calls registered listeners.\n3. Listener handles the event.",
-        diagram: "Source\n  ↑\n  listeners[]",
-        example: "button.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> handleClick(e));",
-        output: "Click handled.",
-        advantages: ["Decoupling", "Multiple listeners per source", "Reusable handlers"],
-        applications: ["GUI", "Server-side events"],
-        conclusion: "Listeners are foundational to event-driven Java applications."
+        intro: "Event listeners are a core part of GUI programming and follow the Observer pattern.",
+        definition: "An event listener is an object registered to receive notifications of events occurring on a source. In JavaFX, it implements the EventHandler<T extends Event> interface (functional) whose single method handle(T event) is invoked when a matching event is dispatched.",
+        explanation: "You can attach handlers via setOn* methods (which replace any previous handler) or addEventHandler (additive, supports multiple listeners). For custom events, you can create your own EventType and dispatch them with Event.fireEvent(target, customEvent). Property listeners (added via ObservableValue.addListener) observe value changes on properties like text, value, selected, etc., and are similar in spirit but live on properties rather than events. Lambda listeners are concise; method references allow reuse. Listeners can be removed with removeEventHandler when no longer needed (e.g., when a node is removed from the scene).",
+        working: "1. Listener registered with source via setOn* or addEventHandler.\n2. Source's internal event dispatcher walks the registered listeners.\n3. Each listener's handle(event) is invoked with the event object.\n4. Listener can read state, mutate UI, or call event.consume().\n5. Listeners can be removed via removeEventHandler(type, listener).",
+        diagram: "Source\n  +-----------------------+\n  | handlers[ActionEvent] |  <-- list per EventType\n  |   -> handler1        |\n  |   -> handler2        |\n  +-----------------------+\n  on Event: dispatch all handlers in order",
+        example: "Button btn = new Button(\"Click\");\nEventHandler<MouseEvent> h = e -> System.out.println(\"click\");\nbtn.addEventHandler(MouseEvent.MOUSE_CLICKED, h);\n// later: btn.removeEventHandler(MouseEvent.MOUSE_CLICKED, h);",
+        output: "click",
+        advantages: [
+          "Decouples source from handler",
+          "Multiple listeners per source / event type",
+          "Reusable handlers across nodes",
+          "Lambda support for terse code",
+          "Type-safe via generic EventHandler<T>"
+        ],
+        applications: [
+          "GUI controls responding to clicks",
+          "Game input (keyboard, mouse)",
+          "Observable property change tracking",
+          "Custom domain events with EventType"
+        ],
+        conclusion: "Listeners are foundational to event-driven Java applications, enabling loosely coupled, reactive UIs that respond cleanly to user input and state changes."
       }
     },
     viva: [
-      { q: "How to remove a listener?", a: "removeEventHandler(EventType, handler)." }
+      { q: "How to remove a listener?", a: "removeEventHandler(EventType, handler) — by reference equality." },
+      { q: "Difference: setOn* vs addEventHandler?", a: "setOn* replaces the single handler; addEventHandler adds to the list (multiple allowed)." },
+      { q: "Can a lambda listener be removed?", a: "Only if you keep a reference to the same lambda — reference equality is used." },
+      { q: "What is a property listener?", a: "An InvalidationListener or ChangeListener on an ObservableValue (e.g., text, value)." }
     ],
     quiz: {
       mcqs: [
-        { question: "JavaFX listener interface is:", options: ["Runnable", "EventHandler", "ActionListener", "Listener"], answer: 1, explanation: "EventHandler." }
+        { question: "JavaFX listener interface is:", options: ["Runnable", "EventHandler", "ActionListener", "Listener"], answer: 1, explanation: "EventHandler<T extends Event>." },
+        { question: "setOnAction does what to previous handler?", options: ["Adds", "Replaces", "Throws", "Ignores"], answer: 1, explanation: "setOn* is a single-slot setter." },
+        { question: "To attach multiple listeners to one event, use:", options: ["setOnAction", "addEventHandler", "setListener", "addAction"], answer: 1, explanation: "addEventHandler is additive." }
       ],
       trueFalse: [
-        { statement: "A lambda can be a listener.", answer: true, explanation: "Yes, since Java 8." }
+        { statement: "A lambda can be a listener.", answer: true, explanation: "Yes, since Java 8." },
+        { statement: "removeEventHandler uses object equality (==).", answer: true, explanation: "Reference equality of the handler instance." }
       ]
     },
-    revision: { oneMin: "Listener = object that reacts to events.", fiveMin: ["EventHandler functional interface", "setOn* vs addEventHandler"], examDay: ["Lambda listener example"], memoryTrick: "Listener = ear, source = speaker.", faq: [{ q: "setOn* vs addEventHandler?", a: "setOn* replaces; addEventHandler adds." }] },
+    revision: { oneMin: "Listener = object that reacts to events.", fiveMin: ["EventHandler functional interface", "setOn* vs addEventHandler", "Property listeners", "Removal by reference"], examDay: ["Lambda listener example", "addEventHandler pattern"], memoryTrick: "Listener = ear, source = speaker.", faq: [{ q: "setOn* vs addEventHandler?", a: "setOn* replaces; addEventHandler adds. Use addEventHandler for multiple subscribers." }] },
     simulator: { type: "javafx-event" }
   },
   {
@@ -123,57 +181,90 @@ btn.setOnAction(new EventHandler<ActionEvent>() {
     index: 3,
     title: "Stage & Scene",
     tagline: "Top-level windows and content",
-    oneLiner: "In JavaFX, a Stage is the top-level container (window), and a Scene is the content tree attached to the stage.",
-    analogy: "Stage = theater stage. Scene = the set/props on the stage. You swap scenes to change what is on the stage.",
-    whyExists: "To organize the visual hierarchy of a JavaFX application.",
-    whereUsed: ["All JavaFX apps"],
+    oneLiner: "In JavaFX, a Stage is the top-level container (OS window), and a Scene is the content tree (scene graph) attached to the stage. A Stage can display one Scene at a time.",
+    analogy: "Stage = theater stage. Scene = the set/props on the stage. You swap scenes to change what is on the stage. The Application's start(Stage) hands you the primary stage.",
+    whyExists: "To organize the visual hierarchy of a JavaFX application: window → content tree → nodes, enabling scene switching, CSS, and hardware-accelerated rendering via Prism.",
+    whereUsed: ["All JavaFX apps", "Multi-window dialogs", "Wizards (scene swap)", "MDI applications"],
     visualCue: "🎬",
     code: {
       language: "java",
-      code: `Stage stage = new Stage();
-Scene scene = new Scene(root, 800, 600);
-stage.setScene(scene);
-stage.setTitle("My App");
-stage.show();`,
-      caption: "Creating a stage and scene."
+      code: `public class MyApp extends Application {
+  @Override public void start(Stage stage) {
+    VBox root = new VBox(new Label("Hello"), new Button("OK"));
+    Scene scene = new Scene(root, 400, 300);
+    scene.getStylesheets().add("file:style.css");
+    stage.setTitle("My App");
+    stage.setScene(scene);
+    stage.setResizable(false);
+    stage.show();
+  }
+  public static void main(String[] args) { launch(args); }
+}`,
+      caption: "Creating a stage, scene, and root layout."
     },
-    internalWorking: { steps: ["Stage is the top-level window.", "Scene holds the root node of the scene graph.", "Stage renders the scene."] },
+    internalWorking: {
+      steps: [
+        "Application.launch() initializes the toolkit and calls init() (optional, runs on JavaFX Application Thread).",
+        "start(Stage primaryStage) is called with the primary stage created by the platform.",
+        "Inside start, you build a root Node (e.g., VBox) and wrap it in a Scene(root, w, h).",
+        "stage.setScene(scene) attaches the scene; stage.show() makes it visible.",
+        "Prism (JavaFX's graphics pipeline) renders the scene graph each frame using GPU acceleration.",
+        "When the last window closes, stop() is invoked and the application exits."
+      ]
+    },
     examAnswer: {
-      twoMark: "Stage is the top-level window in JavaFX; Scene is the content of the stage, consisting of a root node and a graph of children. A stage can have only one scene at a time.",
+      twoMark: "Stage is the top-level window in JavaFX (created by the platform or via new Stage()); Scene is the content of the stage, consisting of a root node and a graph of children. A stage can have only one scene at a time, but scenes can be swapped.",
       thirteenMark: {
         intro: "Stage and Scene are the top of the JavaFX hierarchy.",
-        definition: "Stage is the top-level container representing a window. Scene is a tree of nodes (the scene graph) attached to a stage.",
-        explanation: "Stage has methods like setTitle, setScene, show, close. Scene has setRoot and dimensions. Only one scene is shown at a time, but you can switch scenes. The primary stage is created by the Application's start() method.",
-        diagram: "Stage (window)\n  └── Scene\n        └── root (e.g., VBox)\n              ├── Button\n              └── Label",
-        example: "VBox root = new VBox(new Label(\"Hi\"), new Button(\"OK\"));\nstage.setScene(new Scene(root));",
-        conclusion: "Stage and Scene are essential to JavaFX's structure."
+        definition: "Stage is the top-level container representing a window (an instance of javafx.stage.Stage, which extends Window). Scene is a tree of nodes (the scene graph) attached to a stage (an instance of javafx.scene.Scene).",
+        explanation: "Stage methods: setTitle, setScene, show, hide, close, setResizable, setFullScreen, setMaximized, initStyle (DECORATED/UNDECORATED/TRANSPARENT/UTILITY), initModality (NONE/MODAL), centerOnScreen. Scene methods: setRoot, getRoot, getStylesheets (for CSS), getWidth/getHeight, setFill, setCursor. Only one scene is shown at a time per stage, but you can switch with setScene(). The primary stage is created by the Application's start(Stage) method; additional stages can be created with new Stage().",
+        diagram: "Stage (window)\n  +-- title bar\n  +-- Scene\n        +-- root (e.g., VBox)\n              +-- Button\n              +-- Label",
+        example: "VBox root = new VBox(new Label(\"Hi\"), new Button(\"OK\"));\nStage s = new Stage();\ns.setScene(new Scene(root, 320, 200));\ns.setTitle(\"Demo\");\ns.show();",
+        conclusion: "Stage and Scene are essential to JavaFX's structure, providing clear window/content separation, scene swapping, and CSS integration."
       },
       sixteenMark: {
-        intro: "JavaFX apps use Stage and Scene to organize UI hierarchy.",
-        definition: "Stage is the top-level window in a JavaFX app. Scene is the content tree of nodes attached to a stage. The Application's start(Stage primaryStage) method is the entry point.",
-        explanation: "Stages have an init, showing, and hidden lifecycle. Scenes can be swapped. A scene's root is typically a layout pane (VBox, HBox, BorderPane). CSS can be applied to a scene. The scene graph is rendered using the prism pipeline (hardware-accelerated).",
-        working: "1. Application.start(Stage) is called.\n2. Create root layout.\n3. Wrap in Scene.\n4. Set scene on stage and show.",
-        diagram: "[PrimaryStage]\n   |\n  [Scene]\n   |\n  [Root: Pane]\n   |---Child1\n   |---Child2",
-        example: "@Override public void start(Stage stage) { StackPane root = new StackPane(); root.getChildren().add(new Text(\"Hello\")); stage.setScene(new Scene(root, 300, 200)); stage.show(); }",
-        output: "Window with 'Hello' text.",
-        advantages: ["Clear hierarchy", "Scene swapping", "Hardware acceleration"],
-        applications: ["Desktop apps", "Tools", "Games"],
-        conclusion: "Stage and Scene form the foundation of any JavaFX application."
+        intro: "JavaFX apps use Stage and Scene to organize UI hierarchy and lifecycle.",
+        definition: "Stage is the top-level window in a JavaFX app (an OS-level window). Scene is the content tree of nodes attached to a stage. The Application subclass's start(Stage primaryStage) method is the entry point called by the framework after init().",
+        explanation: "Stages have a lifecycle: created, shown, hidden, closed. You can use initStyle() to choose between decorated, undecorated, transparent, or utility windows, and initModality() to make a new stage block its owner (modal). The scene's root is typically a layout Pane (VBox, HBox, BorderPane, StackPane, GridPane, etc.). CSS can be applied to a scene via getStylesheets().add(\"file:style.css\") for global styling, or per-node with setStyle() for inline styles (e.g., -fx-background-color). The scene graph is rendered using the Prism pipeline (hardware-accelerated) and laid out by the layout system in pulses (~60 fps). The Application's init() method runs before start() and is good for non-UI setup; stop() runs when the last window closes and is good for cleanup.",
+        working: "1. Application.start(Stage) is called by the framework.\n2. Create a root layout (e.g., BorderPane).\n3. Wrap in Scene: new Scene(root, width, height).\n4. Optionally attach CSS: scene.getStylesheets().add(\"style.css\").\n5. stage.setScene(scene) and stage.show().\n6. (Optional) listen for window events via stage.setOnCloseRequest().\n7. When last window closes → stop() → app exits.",
+        diagram: "Application Thread\n   |\n   init()\n   |\n   start(Stage primaryStage)\n   |\n   +--- Stage (window) -- title, scene, style, modality\n   |     |\n   |     +-- Scene (w x h, css, fill, cursor)\n   |           |\n   |           +-- root: Pane\n   |                 +-- Node1, Node2, ...\n   |\n   stop()   <-- when last window closes",
+        example: "@Override public void start(Stage stage) {\n  StackPane root = new StackPane();\n  root.getChildren().add(new Text(\"Hello\"));\n  Scene scene = new Scene(root, 300, 200);\n  scene.setFill(Color.LIGHTBLUE);\n  stage.setTitle(\"Demo\");\n  stage.setScene(scene);\n  stage.setResizable(false);\n  stage.show();\n}",
+        output: "Window titled 'Demo' with light blue background and 'Hello' text in the center.",
+        advantages: [
+          "Clear separation of window vs content",
+          "Scene swapping enables wizard/multi-view UIs",
+          "Hardware-accelerated rendering (Prism)",
+          "CSS integration for global theming",
+          "Programmatic and declarative (FXML) UI options"
+        ],
+        applications: [
+          "Desktop applications",
+          "Tools and IDEs",
+          "Games and visualizations",
+          "Multi-window dialogs (modal Stages)"
+        ],
+        conclusion: "Stage and Scene form the foundation of any JavaFX application. Mastering their lifecycle, styling, and scene switching is essential for building robust, polished desktop UIs."
       }
     },
     viva: [
-      { q: "How many scenes can a stage have at once?", a: "Only one." },
-      { q: "What is the primary stage?", a: "The main stage passed to Application.start()." }
+      { q: "How many scenes can a stage have at once?", a: "Only one — setScene replaces the displayed scene." },
+      { q: "What is the primary stage?", a: "The main stage passed to Application.start() by the framework." },
+      { q: "What is the difference between Stage and Window?", a: "Stage extends Window; Stage adds the public JavaFX API (setScene, show, initStyle, etc.)." },
+      { q: "How is CSS applied to a Scene?", a: "scene.getStylesheets().add(\"file:style.css\") or scene.getStylesheets().add(getClass().getResource(\"style.css\").toExternalForm())." }
     ],
     quiz: {
       mcqs: [
-        { question: "Scene contains:", options: ["Window", "Graph of nodes", "Process", "Class"], answer: 1, explanation: "Scene = node graph." }
+        { question: "Scene contains:", options: ["Window", "Graph of nodes", "Process", "Class"], answer: 1, explanation: "Scene = node graph (the scene graph)." },
+        { question: "Stage is:", options: ["A Node", "A Window", "A CSS class", "A thread"], answer: 1, explanation: "Stage is a top-level window." },
+        { question: "Which method makes the stage visible?", options: ["show()", "open()", "setVisible(true)", "display()"], answer: 0, explanation: "stage.show() displays the window." },
+        { question: "Application.start() is given:", options: ["A Scene", "A Stage", "A Pane", "A Node"], answer: 1, explanation: "start(Stage primaryStage)." }
       ],
       trueFalse: [
-        { statement: "A Stage is a Node.", answer: false, explanation: "Stage is Window; Scene contains Nodes." }
+        { statement: "A Stage is a Node.", answer: false, explanation: "Stage is a Window; Scene contains Nodes." },
+        { statement: "You can swap a Stage's scene at runtime.", answer: true, explanation: "stage.setScene(newScene) replaces the current scene." }
       ]
     },
-    revision: { oneMin: "Stage = window, Scene = content tree.", fiveMin: ["setScene", "show()", "Application.start()"], examDay: ["Stage/Scene example"], memoryTrick: "Stage = theater window, Scene = what's on it.", faq: [{ q: "Can stage be modal?", a: "Yes, via initModality." }] },
+    revision: { oneMin: "Stage = window, Scene = content tree, root = topmost Parent.", fiveMin: ["setScene", "show()", "Application.start()", "getStylesheets()", "initStyle/initModality"], examDay: ["Stage/Scene example with CSS"], memoryTrick: "Stage = theater window, Scene = what's on it.", faq: [{ q: "Can stage be modal?", a: "Yes, via initModality(Modality.APPLICATION_MODAL or WINDOW_MODAL)." }, { q: "Init vs start?", a: "init() runs before start() (no UI), start() receives the primary stage." }] },
     simulator: { type: "javafx-layout", controls: [{ type: "Stage", label: "Main Window" }, { type: "Scene", label: "Root" }] }
   },
   {
@@ -182,55 +273,83 @@ stage.show();`,
     index: 4,
     title: "HBox & VBox",
     tagline: "Horizontal and vertical layouts",
-    oneLiner: "HBox arranges its children in a single horizontal row; VBox arranges them in a single vertical column.",
-    analogy: "HBox = books on a horizontal shelf. VBox = books in a vertical stack.",
-    whyExists: "To provide simple linear layouts without manual positioning.",
-    whereUsed: ["Forms", "Toolbars", "Menus"],
+    oneLiner: "HBox arranges its children in a single horizontal row; VBox arranges them in a single vertical column. Both are layout panes in javafx.scene.layout.",
+    analogy: "HBox = books on a horizontal shelf. VBox = books in a vertical stack. Both let you control spacing, padding, and alignment like arranging books neatly.",
+    whyExists: "To provide simple linear layouts without manual positioning, while remaining composable (HBox and VBox can be nested for complex UIs).",
+    whereUsed: ["Forms", "Toolbars", "Menus", "Button rows", "Side panels"],
     visualCue: "📐",
     code: {
       language: "java",
-      code: `HBox h = new HBox(10, new Button("A"), new Button("B"));
-h.setPadding(new Insets(10));
-VBox v = new VBox(5, new Label("Top"), new TextField(), new Button("Go"));`,
-      caption: "HBox and VBox layouts."
+      code: `HBox row  = new HBox(10, new Button("A"), new Button("B")); // 10px gap
+row.setPadding(new Insets(10));
+row.setAlignment(Pos.CENTER);
+VBox col  = new VBox(5, new Label("Top"), new TextField(), new Button("Go"));
+col.setSpacing(5);
+Button b = new Button("Big"); HBox.setHgrow(b, Priority.ALWAYS);  // grow to fill
+row.getChildren().add(b);`,
+      caption: "HBox and VBox with spacing, padding, alignment, and Hgrow."
     },
-    internalWorking: { steps: ["Layout computes preferred size of each child.", "Children are placed in order with spacing."] },
+    internalWorking: {
+      steps: [
+        "Each child reports its preferred size (computePrefWidth/Height) based on its content.",
+        "Layout sums the children's preferred sizes plus spacing × (n-1) and adds padding.",
+        "If the pane is larger than preferred, alignment and Hgrow/Vgrow decide extra space distribution.",
+        "If the pane is smaller, children may be clipped or shrunk (depending on min size and resize policy)."
+      ]
+    },
     examAnswer: {
-      twoMark: "HBox and VBox are JavaFX layout containers. HBox arranges child nodes horizontally; VBox arranges them vertically. Both support spacing, padding, and alignment.",
+      twoMark: "HBox and VBox are JavaFX layout containers in javafx.scene.layout. HBox arranges child nodes horizontally (left to right); VBox arranges them vertically (top to bottom). Both support spacing (gap between children), padding (Insets), and alignment (Pos).",
       thirteenMark: {
-        intro: "HBox and VBox are simple linear layout panes.",
-        definition: "HBox (Horizontal Box) and VBox (Vertical Box) are layout containers in javafx.scene.layout.",
-        explanation: "Children are added in order. spacing sets gap between children. setPadding adds inner padding. setAlignment controls alignment. setFillWidth (HBox) controls if children fill the width.",
-        diagram: "HBox: [A] - [B] - [C]\nVBox: [A]\n       [B]\n       [C]",
-        example: "HBox h = new HBox(5, new Button(\"OK\"), new Button(\"Cancel\"));",
-        conclusion: "HBox and VBox are the simplest layout containers."
+        intro: "HBox and VBox are simple, composable linear layout panes.",
+        definition: "HBox (HorizontalBox) and VBox (VerticalBox) are Pane subclasses that lay out children in a single row (HBox) or column (VBox), with optional spacing, padding, alignment, and per-node growth priority.",
+        explanation: "Children are added in order via the constructor or getChildren().add(). spacing sets the gap between consecutive children. setPadding(new Insets(...)) adds inner padding on all four sides. setAlignment(Pos.CENTER) (or Pos.CENTER_LEFT, TOP_RIGHT, BASELINE_CENTER, etc.) controls how children are aligned within the pane. HBox.setHgrow(child, Priority.ALWAYS) and VBox.setVgrow(child, Priority.ALWAYS) make a child expand to fill extra space. HBox.fillWidth (boolean) controls whether children share the available width equally when they don't have Hgrow. Per-child margins can be set with HBox.setMargin(child, new Insets(...)).",
+        diagram: "HBox: [A] - [B] - [C]   (left → right)\nVBox: [A]\n       [B]\n       [C]   (top → bottom)\n\nNesting: VBox containing HBoxes is a very common form layout.",
+        example: "HBox h = new HBox(5, new Button(\"OK\"), new Button(\"Cancel\"));\nh.setAlignment(Pos.CENTER);",
+        conclusion: "HBox and VBox are the simplest, most-used layout containers in JavaFX, and nesting them gives powerful form-like layouts with minimal code."
       },
       sixteenMark: {
-        intro: "HBox and VBox are linear layout panes for horizontal and vertical arrangement.",
-        definition: "HBox (HorizontalBox) and VBox (VerticalBox) are Pane subclasses that lay out children in a single row or column, with optional spacing, padding, and alignment.",
-        explanation: "HBox arranges children left-to-right by default; alignment can be set (center, top-right, etc.). VBox stacks top-to-bottom. margin (Insets) can be set per child. fillWidth (HBox) makes all children fill the available width equally. HBox and VBox can be nested for complex layouts.",
-        working: "1. Add children via constructor or getChildren().add().\n2. Layout pass computes positions.\n3. Rendering uses computed layout.",
-        diagram: "HBox(spacing=10)\n  ├── [Button A]\n  ├── [Button B]\n  └── [Button C]\n\nVBox(spacing=5)\n  ├── [Label]\n  ├── [TextField]\n  └── [Button]",
-        example: "HBox root = new HBox(10, new Button(\"Save\"), new Button(\"Load\"), new Button(\"Exit\"));\nroot.setAlignment(Pos.CENTER);",
-        output: "Three buttons in a row, centered.",
-        advantages: ["Simple", "Predictable", "Composable"],
-        applications: ["Forms", "Toolbars", "Menus"],
-        conclusion: "HBox and VBox are the workhorses of JavaFX layout."
+        intro: "HBox and VBox are linear layout panes for horizontal and vertical child arrangement, with rich options for spacing, padding, alignment, and growth.",
+        definition: "HBox (HorizontalBox) and VBox (VerticalBox) are Pane subclasses in javafx.scene.layout that lay out children in a single row or column, with optional spacing, padding, alignment, and per-child growth priority.",
+        explanation: "HBox arranges children left-to-right by default; alignment can be set (Pos.CENTER, Pos.CENTER_LEFT, Pos.TOP_RIGHT, Pos.BASELINE_CENTER, etc.). VBox stacks top-to-bottom. The Insets class represents padding (top, right, bottom, left) and margins. fillWidth (HBox) makes all children fill the available width equally unless overridden by Hgrow; HBox's fillHeight controls vertical fill. HBox and VBox can be freely nested: a VBox of HBoxes is the canonical pattern for forms. Use Region.setPrefSize / setMinSize / setMaxSize to hint at sizing; Pane.setStyle supports inline CSS like -fx-background-color. The layout pass is triggered on each pulse whenever the scene graph changes (children added, size changed, etc.).",
+        working: "1. Add children via constructor or getChildren().add().\n2. Optionally set spacing, padding, alignment, fillWidth/Height.\n3. Set per-child growth with HBox.setHgrow/VBox.setVgrow.\n4. Layout pass queries each child for preferred size, distributes spacing and Hgrow, and places.\n5. Rendering uses the computed layout positions and sizes.",
+        diagram: "HBox(spacing=10, alignment=CENTER)\n  +--[Button A]--[Button B]--[Button C]--+\n\nVBox(spacing=5, padding=10)\n  +--[Label]------+\n  |  [TextField]  |\n  |  [Button]     |\n  +---------------+\n\nNested form:\n  VBox\n    HBox: [Label][TextField]\n    HBox: [Label][TextField]\n    Button [Submit]",
+        example: "HBox toolbar = new HBox(10, new Button(\"Save\"), new Button(\"Load\"), new Button(\"Exit\"));\ntoolbar.setAlignment(Pos.CENTER);\ntoolbar.setPadding(new Insets(8));\nButton save = new Button(\"Save\");\nHBox.setHgrow(save, Priority.ALWAYS);  // expands\ntoolbar.getChildren().add(save);",
+        output: "Toolbar with three buttons centered; the 'Save' button grows to fill any extra horizontal space.",
+        advantages: [
+          "Simple, predictable, and lightweight",
+          "Composability via nesting (VBox of HBoxes)",
+          "Fine-grained control with spacing, padding, alignment",
+          "Per-child growth/margins for responsive layout",
+          "Inline CSS via setStyle() for theming"
+        ],
+        applications: [
+          "Forms (label + field rows)",
+          "Toolbars and button rows",
+          "Menus and side panels",
+          "Login/registration screens",
+          "Card layouts and dialog bodies"
+        ],
+        conclusion: "HBox and VBox are the workhorses of JavaFX layout. Mastering spacing, padding, alignment, and growth priorities enables building clean, responsive UIs with very little code."
       }
     },
     viva: [
-      { q: "How to add spacing?", a: "new HBox(10, ...)." },
-      { q: "How to center children?", a: "setAlignment(Pos.CENTER)." }
+      { q: "How to add spacing?", a: "new HBox(10, ...) or h.setSpacing(10) — same for VBox." },
+      { q: "How to center children?", a: "setAlignment(Pos.CENTER)." },
+      { q: "How to make a child grow?", a: "HBox.setHgrow(child, Priority.ALWAYS) or VBox.setVgrow(child, Priority.ALWAYS)." },
+      { q: "What does fillWidth do on HBox?", a: "If true, all children share available width equally (unless overridden by Hgrow)." }
     ],
     quiz: {
       mcqs: [
-        { question: "HBox arranges children:", options: ["Vertically", "Horizontally", "Grid", "Free"], answer: 1, explanation: "Horizontal." }
+        { question: "HBox arranges children:", options: ["Vertically", "Horizontally", "In a grid", "Freely"], answer: 1, explanation: "Horizontal row." },
+        { question: "Which class represents padding/margins?", options: ["Margin", "Insets", "Padding", "Edge"], answer: 1, explanation: "Insets in javafx.geometry." },
+        { question: "To make a child fill extra horizontal space in HBox use:", options: ["setGrow", "setHgrow(Priority.ALWAYS)", "setFill(true)", "setExpand()"], answer: 1, explanation: "HBox.setHgrow(child, Priority.ALWAYS)." }
       ],
       trueFalse: [
-        { statement: "HBox and VBox can be nested.", answer: true, explanation: "Yes." }
+        { statement: "HBox and VBox can be nested.", answer: true, explanation: "Yes — a very common pattern." },
+        { statement: "VBox has setHgrow but not setVgrow.", answer: false, explanation: "VBox has setVgrow; HBox has setHgrow." }
       ]
     },
-    revision: { oneMin: "HBox = horizontal, VBox = vertical.", fiveMin: ["spacing, padding, alignment", "Nesting"], examDay: ["Simple form example"], memoryTrick: "HBox = row, VBox = column.", faq: [{ q: "What is fillWidth?", a: "HBox option to make all children same width." }] },
+    revision: { oneMin: "HBox = row, VBox = column; spacing + padding + alignment.", fiveMin: ["Insets", "Pos.CENTER", "Priority.ALWAYS", "fillWidth", "Nesting"], examDay: ["VBox of HBoxes form layout", "Hgrow example"], memoryTrick: "HBox = row, VBox = column; H goes horizontal, V goes vertical.", faq: [{ q: "What is fillWidth?", a: "HBox option to make all children the same width when no Hgrow is set." }] },
     simulator: { type: "javafx-layout", controls: [{ type: "HBox", label: "HBox" }, { type: "VBox", label: "VBox" }] }
   },
   {
@@ -239,58 +358,85 @@ VBox v = new VBox(5, new Label("Top"), new TextField(), new Button("Go"));`,
     index: 5,
     title: "ComboBox & ListView",
     tagline: "Selecting from a list",
-    oneLiner: "ComboBox is a drop-down list allowing the user to select one of several options; ListView displays a vertical list of selectable items.",
-    analogy: "ComboBox = a closed drawer you open to pick one item. ListView = a shelf of items always visible.",
-    whyExists: "To provide pre-defined choices to the user in a compact way.",
-    whereUsed: ["Country pickers", "Settings", "Filters"],
+    oneLiner: "ComboBox<T> is a drop-down list allowing the user to select one of several options; ListView<T> displays a vertical list of selectable items, supporting single or multiple selection.",
+    analogy: "ComboBox = a closed drawer you open to pick one item. ListView = an open shelf of items always visible. Both are populated from an ObservableList<T>.",
+    whyExists: "To provide pre-defined choices to the user in a compact, observable, and customizable way, replacing ad-hoc text input with validated selections.",
+    whereUsed: ["Country/state pickers", "Settings screens", "Filters", "Searchable lists", "Tag pickers"],
     visualCue: "📋",
     code: {
       language: "java",
       code: `ComboBox<String> cb = new ComboBox<>();
 cb.getItems().addAll("Red", "Green", "Blue");
 cb.setValue("Red");
-
-ListView<String> lv = new ListView<>();
-lv.getItems().addAll("Apple", "Banana", "Cherry");`,
-      caption: "ComboBox and ListView."
+cb.setEditable(true);                                   // user can type
+cb.setPromptText("Pick a color");
+cb.setOnAction(e -> System.out.println(cb.getValue()));
+ListView<String> lv = new ListView<>(FXCollections.observableArrayList("Apple", "Banana", "Cherry"));
+lv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+lv.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> System.out.println(nv));`,
+      caption: "ComboBox (drop-down) and ListView (visible list) with selection."
     },
-    internalWorking: { steps: ["Items list is observed; UI updates on changes.", "Selection is tracked by selection model."] },
+    internalWorking: {
+      steps: [
+        "Both controls back their items with an ObservableList<T>, so UI auto-updates when the list changes.",
+        "A CellFactory (Callback<ListView<T>, ListCell<T>>) creates a ListCell for each item, allowing custom rendering.",
+        "A SelectionModel tracks which item(s) are selected; it exposes selectedItem / selectedIndex properties.",
+        "For ComboBox, the editor is a TextField when editable=true, otherwise just a label showing the value."
+      ]
+    },
     examAnswer: {
-      twoMark: "ComboBox is a drop-down list that allows the user to select one item from many. ListView displays a vertical list of items from which the user can select one or multiple. Both use ObservableList for items.",
+      twoMark: "ComboBox is a drop-down list that allows the user to select one item from many. ListView displays a vertical list of items from which the user can select one or multiple. Both use ObservableList<T> for their items and expose a SelectionModel for tracking selection.",
       thirteenMark: {
-        intro: "ComboBox and ListView are selection controls.",
-        definition: "ComboBox<T> is a drop-down list of T items. ListView<T> displays T items in a vertical scrollable list.",
-        explanation: "Use getItems() to access the ObservableList. setValue / getValue for ComboBox; getSelectionModel for ListView. CellFactory customizes rendering.",
-        diagram: "ComboBox: [▼] → Dropdown\nListView: Item1\n          Item2\n          Item3",
-        example: "ComboBox<String> cb = new ComboBox<>(); cb.getItems().addAll(\"A\", \"B\");",
-        conclusion: "Both are essential for choice input."
+        intro: "ComboBox and ListView are selection controls in javafx.scene.control.",
+        definition: "ComboBox<T> is a drop-down list of T items, showing the selected value with an arrow that expands the full list. ListView<T> displays T items in a vertical scrollable list with built-in selection.",
+        explanation: "Use getItems() to access the underlying ObservableList<T> (so add/remove updates UI automatically). setValue/getValue works on ComboBox; ListView uses getSelectionModel().getSelectedItem() and selectedItemProperty(). A CellFactory (setCellFactory) customizes how each item is rendered (text, graphics). Both can fire change events via selection property listeners. ComboBox.setEditable(true) allows free-text input (with completion from items).",
+        diagram: "ComboBox (collapsed):  [ Red         ▼ ]\n              (expanded):   [ Red         ▲ ]\n                            +---------+\n                            | Red     |\n                            | Green   |\n                            | Blue    |\n                            +---------+\nListView:        +---------+\n                | Apple   |\n                | Banana  |\n                | Cherry  |\n                +---------+",
+        example: "ComboBox<String> cb = new ComboBox<>();\ncb.getItems().addAll(\"A\", \"B\", \"C\");\ncb.setValue(\"A\");",
+        conclusion: "Both are essential for choice input; ComboBox for compactness, ListView for visibility and multi-selection."
       },
       sixteenMark: {
-        intro: "ComboBox and ListView provide selection from a list of items.",
-        definition: "ComboBox shows a collapsed drop-down that expands on click. ListView shows items in a vertical scrollable list. Both use ObservableList for their items.",
-        explanation: "ComboBox supports editing (setEditable(true)). ListView supports single or multiple selection. Cell factory allows custom rendering of items (e.g., with images). Both can be observed via listeners on their selection model.",
-        working: "1. Create with items or empty.\n2. Add items via getItems().add(...).\n3. Set selection model and listeners.",
-        diagram: "ComboBox\n  ┌─────────┐\n  │ Red     │\n  └─────────┘\n\nListView\n  ┌─────────┐\n  │ Apple   │\n  │ Banana  │\n  │ Cherry  │\n  └─────────┘",
-        example: "ComboBox<String> cb = new ComboBox<>(FXCollections.observableArrayList(\"A\", \"B\"));\ncb.setOnAction(e -> System.out.println(cb.getValue()));",
-        output: "Selected item printed.",
-        advantages: ["Compact UI", "Customizable rendering", "Observable"],
-        applications: ["Forms", "Filters", "Settings"],
-        conclusion: "ComboBox and ListView are versatile selection controls for JavaFX."
+        intro: "ComboBox and ListView provide selection from a list of items with rich customization and observable data binding.",
+        definition: "ComboBox<T> shows a collapsed drop-down that expands on click to reveal a list of T items, while ListView<T> shows T items in a vertical scrollable list. Both back their items with ObservableList<T> and use a SelectionModel to track chosen item(s).",
+        explanation: "ComboBox supports editing (setEditable(true)) so users can type a custom value in addition to picking from the list. The converter (setConverter) lets you map between String and T (useful for custom types). ListView supports single or multiple selection (setSelectionMode(SelectionMode.MULTIPLE)). CellFactory allows custom rendering of items (e.g., with images, two-line rows, colored badges). Both can be observed via listeners on the selection model (selectedItemProperty) or via a ChangeListener on the items list. FocusModel supports keyboard navigation. For very large lists, use a paging ListView or virtualize rendering (default cells are virtualized).",
+        working: "1. Create with items (or empty and add later).\n2. Add items via getItems().add(...) — ObservableList auto-updates UI.\n3. Configure selection: cb.setValue(x) or lv.getSelectionModel().select(i).\n4. (Optional) Provide a CellFactory for custom rendering.\n5. Listen to selection changes for reactive UI updates.",
+        diagram: "ComboBox (single-select drop-down)\n  collapsed: [ value      ▼ ]\n  expanded:  +----------------+\n             | item 1         |\n             | item 2  <--sel |\n             | item 3         |\n             +----------------+\n\nListView (single or multi-select)\n  +-----------+\n  | item 1    |\n  | item 2    |  <-- selected (multi: shift/ctrl)\n  | item 3    |\n  | ...       |\n  +-----------+",
+        example: "ComboBox<String> cb = new ComboBox<>(FXCollections.observableArrayList(\"A\", \"B\", \"C\"));\ncb.setOnAction(e -> System.out.println(\"Picked: \" + cb.getValue()));\n\nListView<String> lv = new ListView<>(FXCollections.observableArrayList(\"Apple\", \"Banana\"));\nlv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);\nlv.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> System.out.println(nv));",
+        output: "On selection, prints the chosen item(s) to console.",
+        advantages: [
+          "Compact UI (ComboBox) and visible list (ListView)",
+          "Observable item list — UI updates automatically",
+          "Customizable rendering with CellFactory",
+          "Multiple-selection support (ListView)",
+          "Editable text input (ComboBox)"
+        ],
+        applications: [
+          "Forms (country, language, theme pickers)",
+          "Filters and faceted search",
+          "Settings screens",
+          "Tag/keyword pickers",
+          "Reorderable lists (with drag/drop extension)"
+        ],
+        conclusion: "ComboBox and ListView are versatile selection controls for JavaFX. Understanding ObservableList, SelectionModel, and CellFactory unlocks powerful, reactive list UIs."
       }
     },
     viva: [
       { q: "How to make ComboBox editable?", a: "setEditable(true)." },
-      { q: "How to allow multiple selection in ListView?", a: "lv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE)." }
+      { q: "How to allow multiple selection in ListView?", a: "lv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE)." },
+      { q: "What is a CellFactory?", a: "A Callback<ListView<T>, ListCell<T>> that creates a custom ListCell for rendering each item (e.g., with images, two lines)." },
+      { q: "Why use ObservableList instead of ArrayList?", a: "ObservableList fires change events so the UI auto-updates when items are added/removed." }
     ],
     quiz: {
       mcqs: [
-        { question: "ComboBox is used to:", options: ["Show images", "Pick one from many", "Enter free text", "Display grid"], answer: 1, explanation: "Pick one from a list." }
+        { question: "ComboBox is used to:", options: ["Show images", "Pick one from many", "Enter free text", "Display grid"], answer: 1, explanation: "Pick one item from a drop-down list." },
+        { question: "ListView's items should be an:", options: ["ArrayList", "ObservableList", "HashSet", "Vector"], answer: 1, explanation: "ObservableList<T> for automatic UI updates." },
+        { question: "To customize how items render, override:", options: ["CellFactory", "ItemFactory", "RenderBuilder", "setRender"], answer: 0, explanation: "setCellFactory(Callback<ListView<T>, ListCell<T>>)." }
       ],
       trueFalse: [
-        { statement: "ListView supports multi-selection.", answer: true, explanation: "Yes." }
+        { statement: "ListView supports multi-selection.", answer: true, explanation: "Yes, via SelectionModel." },
+        { statement: "ComboBox cannot be made editable.", answer: false, explanation: "setEditable(true) makes it editable." }
       ]
     },
-    revision: { oneMin: "ComboBox = dropdown, ListView = visible list.", fiveMin: ["ObservableList", "Selection model", "CellFactory"], examDay: ["ComboBox example"], memoryTrick: "Combo = compressed, List = laid out.", faq: [{ q: "Editable ComboBox?", a: "setEditable(true) for user input + suggestions." }] },
+    revision: { oneMin: "ComboBox = dropdown, ListView = visible list; both use ObservableList + SelectionModel.", fiveMin: ["ObservableList", "SelectionMode", "CellFactory", "setEditable", "selectedItemProperty"], examDay: ["ComboBox + ListView code", "Multi-selection example"], memoryTrick: "Combo = compressed, List = laid out.", faq: [{ q: "Editable ComboBox?", a: "setEditable(true) for user text input + suggestions from items." }] },
     simulator: { type: "javafx-layout", controls: [{ type: "ComboBox", label: "Choose" }, { type: "ListView", label: "List" }] }
   },
   {
@@ -299,55 +445,85 @@ lv.getItems().addAll("Apple", "Banana", "Cherry");`,
     index: 6,
     title: "TextField, Button, Label",
     tagline: "Basic input/output controls",
-    oneLiner: "TextField is a single-line text input. Button is a clickable control. Label is a non-editable text display.",
-    analogy: "TextField = blank form field. Button = action trigger. Label = printed name tag.",
-    whyExists: "To provide basic input and display primitives.",
-    whereUsed: ["Forms", "Dialogs", "Every GUI app"],
+    oneLiner: "TextField is a single-line text input. PasswordField is a masked TextField. Button is a clickable control firing ActionEvent. Label is a non-editable text display that can also host a graphic (icon).",
+    analogy: "TextField = blank form field. PasswordField = the same field with dots. Button = action trigger. Label = printed name tag.",
+    whyExists: "To provide the most basic input, output, and trigger primitives for any GUI form or dialog.",
+    whereUsed: ["Forms", "Dialogs", "Search bars", "Every GUI app"],
     visualCue: "🔘",
     code: {
       language: "java",
       code: `TextField tf = new TextField();
+tf.setPromptText("Enter your name");
+tf.setPrefColumnCount(20);
+PasswordField pf = new PasswordField();
 Button btn = new Button("Submit");
-Label lbl = new Label("Enter name:");
-btn.setOnAction(e -> lbl.setText("Hi " + tf.getText()));`,
-      caption: "TextField, Button, Label."
+ImageView icon = new ImageView(new Image("file:check.png"));
+btn.setGraphic(icon);
+Label lbl = new Label("Status: ready");
+btn.setOnAction(e -> lbl.setText("Hi " + tf.getText() + "!"));
+tf.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) btn.fire(); });`,
+      caption: "TextField, PasswordField, Button with graphic, and Label."
     },
-    internalWorking: { steps: ["TextField stores text in a string property.", "Button fires ActionEvent on click.", "Label is read-only."] },
+    internalWorking: {
+      steps: [
+        "TextField exposes a StringProperty text; setting it programmatically updates the displayed text and fires change events.",
+        "PasswordField extends TextField and masks input with bullets/circles.",
+        "Button has a StringProperty text and a BooleanProperty armed; clicking fires an ActionEvent if the button is not disabled.",
+        "Label is read-only; it can wrap text (setWrapText(true)) and display a graphic (setGraphic(node))."
+      ]
+    },
     examAnswer: {
-      twoMark: "TextField is a single-line text input control. Button is a clickable control that fires an ActionEvent. Label displays read-only text. All are javafx.scene.control classes.",
+      twoMark: "TextField is a single-line text input control in javafx.scene.control. PasswordField is a TextField subclass that masks input. Button is a clickable control that fires an ActionEvent when clicked. Label displays read-only text and optionally a graphic.",
       thirteenMark: {
-        intro: "These are the basic controls in JavaFX.",
-        definition: "TextField, Button, and Label are the most fundamental input and display controls in JavaFX.",
-        explanation: "TextField: getText(), setText(), setPromptText(). Button: setText, setOnAction. Label: setText, setGraphic. Use HBox/VBox to lay them out.",
-        diagram: "Label: \"Name:\"\nTextField: [_____]\nButton: [Submit]",
-        example: "new TextField(); new Button(\"OK\"); new Label(\"Status\");",
-        conclusion: "These three are the building blocks of any form."
+        intro: "These are the basic controls in JavaFX and the building blocks of any form.",
+        definition: "TextField, PasswordField, Button, and Label are the most fundamental input and display controls in javafx.scene.control. They all extend Control/Region and have observable properties (text, promptText, graphic, etc.).",
+        explanation: "TextField: getText(), setText(), setPromptText(\"...\") for placeholder, setPrefColumnCount(n) for width hint. PasswordField: same as TextField, but displays dots. Button: setText, setOnAction, setGraphic(Node), setDisable. Label: setText, setGraphic, setWrapText(true). They are typically arranged in HBox/VBox/GridPane.",
+        diagram: "Label: \"Name:\"\nTextField: [_________________]\nPasswordField: [*****]\nButton: [Submit 🖫]",
+        example: "TextField tf = new TextField(); Button b = new Button(\"OK\"); Label l = new Label(\"Status\"); b.setOnAction(e -> l.setText(\"Hi \" + tf.getText()));",
+        conclusion: "These four controls are the building blocks of any JavaFX form, and together enable simple, complete input/output interactions."
       },
       sixteenMark: {
-        intro: "TextField, Button, and Label are basic input/output controls in JavaFX.",
-        definition: "TextField is a single-line text input control. Button is a clickable control. Label is a non-editable text display.",
-        explanation: "TextField supports prompt text (placeholder), text change listeners, and action handlers. Button can have text and/or a graphic (icon). Label can wrap text and display a graphic. All have CSS-styleable properties.",
-        working: "1. Create control.\n2. Set text or prompt.\n3. Add to scene graph.\n4. Attach event handlers for Button and TextField.",
-        diagram: "VBox\n  ├── Label \"Name:\"\n  ├── TextField\n  └── Button \"OK\"",
-        example: "TextField tf = new TextField(); tf.setPromptText(\"Your name\");\nButton b = new Button(\"Greet\");\nb.setOnAction(e -> System.out.println(\"Hi \" + tf.getText()));",
-        output: "Greets user on click.",
-        advantages: ["Simple API", "Easy to use", "Styleable"],
-        applications: ["Forms", "Dialogs", "Search bars"],
-        conclusion: "These basic controls are essential to any JavaFX form."
+        intro: "TextField, PasswordField, Button, and Label are basic input/output controls in JavaFX with rich text, graphic, and event features.",
+        definition: "TextField is a single-line text input control. PasswordField is a TextField that masks its content. Button is a clickable control that fires an ActionEvent when activated. Label is a non-editable text display that can host a graphic (icon, image) and wrap text.",
+        explanation: "TextField supports prompt text (placeholder, setPromptText), text change listeners (textProperty().addListener), action handlers (setOnAction, fired on Enter), and a default column count (setPrefColumnCount). PasswordField hides input but stores the actual string. Button can have text and/or a graphic (setGraphic(node)) and supports keyboard activation. Button.fire() simulates a click programmatically. Label can wrap text (setWrapText(true)) and display a graphic to the left of or above the text. All have CSS-styleable properties (e.g., -fx-background-color, -fx-text-fill, -fx-font) that can be set inline via setStyle() or globally via a stylesheet.",
+        working: "1. Create control (e.g., new TextField()).\n2. Set text, prompt, or graphic as needed.\n3. Add to a layout pane (VBox, HBox, GridPane).\n4. Attach event handlers: setOnAction for Button, textProperty for TextField, setOnKeyPressed for keyboard.\n5. Style inline (setStyle) or via CSS stylesheet.",
+        diagram: "VBox\n  +-- Label \"Name:\" -----------+\n  +-- TextField [_________] ---+\n  +-- PasswordField [*****] --+\n  +-- Button [ Submit 🖫 ] ---+\n  +-- Label \"Status: ...\" ----+",
+        example: "TextField tf = new TextField();\ntf.setPromptText(\"Your name\");\nButton greet = new Button(\"Greet\");\ngreet.setOnAction(e -> System.out.println(\"Hi \" + tf.getText()));\ntf.setOnAction(e -> greet.fire());   // Enter triggers Button",
+        output: "User types name and presses Enter (or clicks Greet); 'Hi <name>' is printed.",
+        advantages: [
+          "Simple, well-known API",
+          "Observable text property for reactive binding",
+          "Customizable with graphics and CSS",
+          "Keyboard-friendly (focus traversal, accelerators)",
+          "PasswordField reuses TextField code with masking"
+        ],
+        applications: [
+          "Forms (login, registration, search)",
+          "Dialogs (input prompts, confirmations)",
+          "Toolbars and command bars",
+          "Status bars and captions"
+        ],
+        conclusion: "TextField, PasswordField, Button, and Label are essential to any JavaFX form. Master their text properties, events, and CSS styling to build polished, interactive UIs."
       }
     },
     viva: [
-      { q: "How to set placeholder text?", a: "setPromptText(\"Enter name\")." }
+      { q: "How to set placeholder text?", a: "setPromptText(\"Enter name\") — shown when the field is empty." },
+      { q: "PasswordField extends what?", a: "TextField — it overrides the skin/cell to mask characters." },
+      { q: "How to fire a Button programmatically?", a: "button.fire() — triggers the action handler as if clicked." },
+      { q: "Label vs TextField?", a: "Label is read-only; TextField allows user input. Label can also show a graphic." }
     ],
     quiz: {
       mcqs: [
-        { question: "Label is:", options: ["Editable", "Read-only", "Clickable", "Hidden"], answer: 1, explanation: "Read-only." }
+        { question: "Label is:", options: ["Editable", "Read-only", "Clickable", "Hidden"], answer: 1, explanation: "Label is read-only by design." },
+        { question: "PasswordField extends:", options: ["Label", "TextField", "Control", "Field"], answer: 1, explanation: "It is a TextField subclass with masked input." },
+        { question: "Button's primary event is:", options: ["MouseEvent", "ActionEvent", "KeyEvent", "WindowEvent"], answer: 1, explanation: "ActionEvent (via setOnAction)." }
       ],
       trueFalse: [
-        { statement: "Button can have a graphic.", answer: true, explanation: "Yes, setGraphic(node)." }
+        { statement: "Button can have a graphic.", answer: true, explanation: "setGraphic(node) — typically an ImageView or icon node." },
+        { statement: "TextField is single-line only.", answer: true, explanation: "For multi-line, use TextArea." }
       ]
     },
-    revision: { oneMin: "TextField = input, Button = action, Label = display.", fiveMin: ["promptText", "setOnAction", "setGraphic"], examDay: ["Simple form"], memoryTrick: "TBL = Type, Button, Look.", faq: [{ q: "TextField vs TextArea?", a: "TextField is single-line; TextArea multi-line." }] },
+    revision: { oneMin: "TextField = input, PasswordField = masked input, Button = action, Label = display.", fiveMin: ["promptText", "setOnAction", "setGraphic", "textProperty listener", "button.fire()"], examDay: ["Simple form with 3 controls"], memoryTrick: "TBL = Type, Button, Look.", faq: [{ q: "TextField vs TextArea?", a: "TextField is single-line; TextArea multi-line and supports wrapping." }] },
     simulator: { type: "javafx-layout", controls: [{ type: "TextField", label: "Name" }, { type: "Button", label: "OK" }, { type: "Label", label: "Output" }] }
   },
   {
@@ -356,61 +532,93 @@ btn.setOnAction(e -> lbl.setText("Hi " + tf.getText()));`,
     index: 7,
     title: "Registration Form",
     tagline: "Putting it all together",
-    oneLiner: "A registration form is a JavaFX scene combining TextField, PasswordField, ComboBox, RadioButton, CheckBox, DatePicker, and Button to collect user data.",
-    analogy: "A sign-up sheet at a workshop, but with dropdowns, checkboxes, and date pickers.",
-    whyExists: "To provide a real-world demonstration of JavaFX controls, layout, and event handling.",
-    whereUsed: ["Sign-up forms", "Account creation", "Surveys"],
+    oneLiner: "A registration form is a JavaFX scene combining TextField, PasswordField, ComboBox, RadioButton (in a ToggleGroup), CheckBox, DatePicker, and Button to collect, validate, and submit user data.",
+    analogy: "A sign-up sheet at a workshop, but with dropdowns, checkboxes, date pickers, and password fields — backed by validation logic and a submit handler.",
+    whyExists: "To provide a real-world demonstration of JavaFX controls, layout, event handling, validation, and feedback (Alert/label) all working together.",
+    whereUsed: ["Sign-up forms", "Account creation", "Surveys", "Event registration", "Admin onboarding"],
     visualCue: "📝",
     code: {
       language: "java",
-      code: `GridPane gp = new GridPane();
-gp.add(new Label("Name:"), 0, 0);
-gp.add(new TextField(), 1, 0);
-gp.add(new Label("Email:"), 0, 1);
-gp.add(new TextField(), 1, 1);
-gp.add(new Label("Country:"), 0, 2);
-gp.add(new ComboBox<>(), 1, 2);
-Button submit = new Button("Register");
-gp.add(submit, 1, 3);
-submit.setOnAction(e -> System.out.println("Registered!"));`,
-      caption: "Simple registration form with GridPane."
+      code: `GridPane gp = new GridPane(); gp.setHgap(8); gp.setVgap(8); gp.setPadding(new Insets(12));
+gp.add(new Label("Name:"), 0, 0);   TextField nameF = new TextField();   gp.add(nameF, 1, 0);
+gp.add(new Label("Email:"), 0, 1);  TextField emailF = new TextField();  gp.add(emailF, 1, 1);
+gp.add(new Label("Password:"), 0, 2); PasswordField passF = new PasswordField(); gp.add(passF, 1, 2);
+gp.add(new Label("Country:"), 0, 3); ComboBox<String> country = new ComboBox<>(); country.getItems().addAll("India","USA","UK"); gp.add(country, 1, 3);
+gp.add(new Label("Gender:"), 0, 4); ToggleGroup g = new ToggleGroup(); RadioButton m = new RadioButton("Male"); m.setToggleGroup(g); RadioButton f = new RadioButton("Female"); f.setToggleGroup(g); HBox gh = new HBox(10, m, f); gp.add(gh, 1, 4);
+gp.add(new Label("DOB:"), 0, 5); DatePicker dob = new DatePicker(); gp.add(dob, 1, 5);
+CheckBox terms = new CheckBox("I agree to the terms"); gp.add(terms, 1, 6);
+Button submit = new Button("Register"); gp.add(submit, 1, 7);
+submit.setOnAction(e -> {
+  if (nameF.getText().isEmpty() || !emailF.getText().matches(".+@.+\\\\..+") || passF.getText().length() < 6 || g.getSelectedToggle() == null || !terms.isSelected()) {
+    new Alert(Alert.AlertType.ERROR, "Please fill all fields correctly.").show();
+  } else {
+    new Alert(Alert.AlertType.INFORMATION, "Welcome, " + nameF.getText() + "!").show();
+  }
+});`,
+      caption: "Full registration form with GridPane, validation, and Alert feedback."
     },
-    internalWorking: { steps: ["Form is built in start(Stage).", "Inputs are collected on submit.", "Validation logic is added in handler."] },
+    internalWorking: {
+      steps: [
+        "Form is built in start(Stage) using a GridPane to align label/value pairs in rows.",
+        "Inputs are read from each control (getText, getValue, isSelected, getSelectedToggle) on submit.",
+        "Validation logic runs in the submit handler (Button.setOnAction).",
+        "Feedback is shown via Alert (modal dialog) or by updating a status Label.",
+        "For complex forms, use ScrollPane to wrap content; for multi-step forms, swap Scenes."
+      ]
+    },
     examAnswer: {
-      twoMark: "A JavaFX registration form combines layout containers (VBox, GridPane) with input controls (TextField, PasswordField, ComboBox, DatePicker) and a submit Button. The submit button's handler validates and processes the data.",
+      twoMark: "A JavaFX registration form combines layout containers (VBox, GridPane) with input controls (TextField, PasswordField, ComboBox, DatePicker, RadioButton in a ToggleGroup, CheckBox) and a submit Button. The submit button's handler validates inputs and shows an Alert (or updates a Label) with success or error feedback.",
       thirteenMark: {
-        intro: "Registration forms are a classic JavaFX exercise.",
-        definition: "A registration form is a GUI scene that collects user information through various input controls and processes the data when submitted.",
-        explanation: "Use GridPane for clean alignment. Combine TextField, PasswordField, ComboBox, DatePicker, RadioButton, CheckBox. Validate input in the submit handler. Show feedback via Labels or Alert dialogs.",
-        diagram: "GridPane\n  Name   [_____]\n  Email  [_____]\n  Pass   [*****]\n  Country[▼]\n  DOB    [📅]\n  Gender ( ) Male ( ) Female\n  ☐ Subscribe\n  [Register]",
-        example: "See code above; uses GridPane and various controls.",
-        conclusion: "Registration forms are a comprehensive demonstration of JavaFX."
+        intro: "Registration forms are a classic JavaFX exercise that integrates layouts, controls, and event handling.",
+        definition: "A registration form is a GUI scene that collects user information through various input controls and processes the data when a submit button is pressed, typically with validation and feedback.",
+        explanation: "Use GridPane for clean label/field alignment. Combine TextField (name, email), PasswordField (password, masked), ComboBox (country, role), DatePicker (DOB), ToggleGroup with RadioButton (gender), CheckBox (terms), and Button (submit). Validate input in the submit handler: non-empty checks, regex for email, minimum password length, terms accepted. Show feedback via Alert (information/error) or by updating a status Label. Use HBox to group related controls (gender radios, action buttons).",
+        diagram: "GridPane form (label : value):\n  Name    [______________]\n  Email   [______________]\n  Pass    [**************]\n  Country [▼ India     ]\n  DOB     [📅 2000-01-01]\n  Gender  (•) Male  ( ) Female\n  ☐ I agree to the terms\n  [ Register ]",
+        example: "See the multi-line code block above: a GridPane with all common controls, validation in submit handler, and Alert feedback.",
+        conclusion: "Registration forms are a comprehensive demonstration of JavaFX: layouts, controls, events, validation, and user feedback in a single, cohesive app."
       },
       sixteenMark: {
-        intro: "Registration forms showcase the integration of JavaFX layouts and controls.",
-        definition: "A registration form is a JavaFX application that uses multiple controls and layouts to collect user data for account creation.",
-        explanation: "Typical controls: TextField (name, email), PasswordField (password), ComboBox (country, gender), DatePicker (DOB), CheckBox (terms), RadioButton (gender), Button (submit). Layout: GridPane or VBox with HBox. Validation: check non-empty fields, email format, password strength. Use Alert (information/error) for feedback. Bind values to a model class (MVVM).",
-        working: "1. Build form layout in start().\n2. Add controls to layout.\n3. Implement submit handler with validation.\n4. Show success/failure via Alert or label update.",
-        diagram: "[VBox]\n  [HBox: Title]\n  [GridPane: fields]\n  [HBox: Buttons]",
-        example: "Alert a = new Alert(Alert.AlertType.INFORMATION, \"Registered!\");\na.show();",
-        output: "Confirmation dialog.",
-        advantages: ["User-friendly", "Comprehensive demo", "Validation built-in"],
-        applications: ["Account creation", "Surveys", "Event registration"],
-        conclusion: "Building a registration form is a great way to master JavaFX layouts, controls, and event handling."
+        intro: "Registration forms showcase the integration of JavaFX layouts, multiple controls, validation logic, and user feedback via Alerts — a holistic demo of desktop UI development.",
+        definition: "A registration form is a JavaFX application (or scene) that uses multiple controls and layouts to collect, validate, and submit user data for account creation, event registration, or any data-entry workflow.",
+        explanation: "Typical controls used: TextField (name, email, phone), PasswordField (password, masked), ComboBox or ChoiceBox (country, role), DatePicker (date of birth), RadioButton grouped by ToggleGroup (gender, single choice), CheckBox (terms, subscriptions, multi-choice), TextArea (address, comments), Button (submit, reset). Layout: GridPane is most common for label/value alignment, with VBox as the outer container and HBox for grouping related controls (gender radios, action buttons). Validation runs in the submit handler: check non-empty fields, regex for email (.+@.+\\..+), minimum password length (e.g., 6+), checkbox for terms, date not in future, etc. Use Alert (information/error/warning) for modal feedback, or update a status Label. For long forms, wrap the GridPane in a ScrollPane. For multi-step forms, swap Scenes (e.g., personal info → address → review). For MVVM-style apps, bind form values to a model class. FXML can be used to define the UI declaratively, with @FXML annotations injecting controls into a controller class.",
+        working: "1. Build form layout in start() with GridPane/VBox/HBox.\n2. Add controls to layout; group radios in a ToggleGroup.\n3. Implement submit handler with validation logic.\n4. On success: persist (e.g., to DB) and show Alert with success message.\n5. On failure: show Alert with error message, or highlight fields in red.\n6. (Optional) Use FXML + @FXML for cleaner separation of UI and logic.\n7. (Optional) Bind to a model class for MVVM; use Alert/Toast for feedback.",
+        diagram: "[VBox root]\n  +--[Label: \"Create Account\"]\n  +--[GridPane: form rows]\n  |    +-- Name     [TextField]\n  |    +-- Email    [TextField]\n  |    +-- Password [PasswordField]\n  |    +-- Country  [ComboBox]\n  |    +-- DOB      [DatePicker]\n  |    +-- Gender   (•)M ( )F  (RadioButton + ToggleGroup)\n  |    +-- Terms    [CheckBox]\n  +--[HBox: [Register] [Reset]]\n  +--[Label: status / errors]\n\nValidation flow:\n  Submit -> read fields -> validate -> Alert.show()",
+        example: "Alert a = new Alert(Alert.AlertType.INFORMATION, \"Registered successfully!\");\na.setHeaderText(\"Welcome, \" + nameF.getText());\na.showAndWait();\n// Or for errors:\nnew Alert(Alert.AlertType.ERROR, \"Please correct the highlighted fields.\").show();",
+        output: "Modal Alert dialog (success or error) appears over the form; user clicks OK to dismiss.",
+        advantages: [
+          "User-friendly with rich input controls",
+          "Validation built into the submit handler",
+          "Great for learning layouts, events, and CSS together",
+          "Easy to extend with more fields or steps",
+          "FXML + controller enables clean separation"
+        ],
+        applications: [
+          "Account creation in desktop apps",
+          "Event/competition registration",
+          "Surveys and feedback collection",
+          "Admin onboarding",
+          "Kiosk data entry"
+        ],
+        conclusion: "Building a registration form is the best single exercise to master JavaFX layouts, controls, event handling, validation, and user feedback — a complete mini-application that touches every key concept in the framework."
       }
     },
     viva: [
-      { q: "Which layout is best for forms?", a: "GridPane for label/field alignment; VBox for vertical stacking." }
+      { q: "Which layout is best for forms?", a: "GridPane for label/field alignment; VBox as outer container; HBox for grouping buttons or related controls." },
+      { q: "How to group radio buttons so only one is selected?", a: "Put them in the same ToggleGroup via setToggleGroup(group)." },
+      { q: "How to validate an email?", a: "Regex: .+@.+\\..+ on the email TextField's text in the submit handler." },
+      { q: "How to show a modal confirmation?", a: "new Alert(Alert.AlertType.INFORMATION, \"...\").showAndWait()." }
     ],
     quiz: {
       mcqs: [
-        { question: "PasswordField is a:", options: ["TextField", "Special TextField", "Label", "Button"], answer: 1, explanation: "Masked TextField." }
+        { question: "PasswordField is a:", options: ["TextField", "Special TextField (masked)", "Label", "Button"], answer: 1, explanation: "PasswordField extends TextField and masks input." },
+        { question: "To make only one RadioButton selectable, use:", options: ["Group", "ToggleGroup", "RadioGroup", "SelectionGroup"], answer: 1, explanation: "ToggleGroup in javafx.scene.control." },
+        { question: "DatePicker is used to:", options: ["Pick a date", "Show a clock", "Pick time", "Display calendar"], answer: 0, explanation: "DatePicker lets the user choose a date (LocalDate)." }
       ],
       trueFalse: [
-        { statement: "Alert is a dialog.", answer: true, explanation: "Yes, Alert shows modal dialogs." }
+        { statement: "Alert is a modal dialog.", answer: true, explanation: "Yes, Alert blocks input to its owner window." },
+        { statement: "FXML is a Java code UI definition.", answer: false, explanation: "FXML is XML-based; controllers are Java." }
       ]
     },
-    revision: { oneMin: "Form = layout + controls + handler.", fiveMin: ["GridPane alignment", "Validation in handler", "Alert for feedback"], examDay: ["Full registration code"], memoryTrick: "Form = fields + submit + validate.", faq: [{ q: "How to validate email format?", a: "Regex: .+@.+\\..+" }] },
+    revision: { oneMin: "Form = GridPane + controls + ToggleGroup + Button + validation + Alert.", fiveMin: ["GridPane alignment", "ToggleGroup for radios", "Validation regex", "Alert types", "FXML + @FXML"], examDay: ["Full registration code with validation", "Alert usage"], memoryTrick: "Form = fields + submit + validate + feedback.", faq: [{ q: "How to validate email format?", a: "Regex: .+@.+\\..+" }, { q: "What is FXML?", a: "XML-based UI definition loaded with FXMLLoader; controllers use @FXML to inject controls." }] },
     simulator: { type: "registration-form" }
   }
 ];
