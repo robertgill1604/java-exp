@@ -41,7 +41,74 @@ export const unit3Topics: TopicContent[] = [
         explanation: "Java's exception hierarchy is rooted at Throwable. It branches into Error (fatal, unrecoverable, e.g. OutOfMemoryError) and Exception. Exception further splits into checked exceptions (compile-time, e.g. IOException, SQLException) and unchecked exceptions (RuntimeException and its subclasses, e.g. NullPointerException, ArithmeticException). Checked exceptions must be either caught or declared with throws. The five keywords are try (guarded region), catch (handler), finally (always runs), throw (explicitly raise), and throws (declare in method signature). Custom exceptions are created by extending Exception (checked) or RuntimeException (unchecked). Java 7+ also added try-with-resources for automatic cleanup of AutoCloseable objects.",
         diagram: "java.lang.Throwable\n   +-- java.lang.Error          (unchecked, fatal)\n   |     +-- OutOfMemoryError\n   |     +-- StackOverflowError\n   +-- java.lang.Exception\n         +-- IOException         (checked)\n         +-- SQLException        (checked)\n         +-- RuntimeException    (unchecked)\n               +-- NullPointerException\n               +-- ArithmeticException\n               +-- ArrayIndexOutOfBoundsException",
         example: "try {\n  FileReader f = new FileReader(\"a.txt\");\n  f.read();\n} catch (FileNotFoundException e) {\n  System.out.println(\"Missing file\");\n} catch (IOException e) {\n  System.out.println(\"Read error\");\n} finally {\n  System.out.println(\"Cleanup\");\n}",
-        conclusion: "Exception handling is critical for writing reliable, maintainable Java applications. Understanding the hierarchy and the difference between checked and unchecked is essential."
+        conclusion: "Exception handling is critical for writing reliable, maintainable Java applications. Understanding the hierarchy and the difference between checked and unchecked is essential.",
+        types: [
+          {
+            name: "Checked Exceptions",
+            definition: "Checked exceptions extend java.lang.Exception directly (not via RuntimeException) and are verified at compile time, so the caller must either catch them or declare them with throws.",
+            diagram: "Throwable\n   v\nException --> IOException, SQLException",
+            code: {
+              language: "java",
+              code: `import java.io.*;
+
+public class Checked {
+  public static void main(String[] args) throws IOException {
+    FileReader fr = new FileReader("data.txt");
+    fr.read();
+    fr.close();
+  }
+}`,
+              caption: "IOException is checked - handled by a throws declaration."
+            },
+            notes: [
+              "Verified at compile time by javac; the program won't compile if not handled.",
+              "Must be caught with try-catch or declared with throws in the method signature.",
+              "Common examples: IOException, SQLException, ClassNotFoundException, InterruptedException."
+            ],
+            exampleOutput: "If 'data.txt' is missing, FileNotFoundException is thrown; otherwise the file is read and closed."
+          },
+          {
+            name: "Unchecked Exceptions",
+            definition: "Unchecked exceptions extend java.lang.RuntimeException; the compiler does not require they be caught or declared, so they surface only at runtime.",
+            diagram: "RuntimeException --> NPE, ArithmeticException, AIOOBE",
+            code: {
+              language: "java",
+              code: `public class Unchecked {
+  public static void main(String[] args) {
+    int a = 10 / 0; // ArithmeticException at runtime
+  }
+}`,
+              caption: "ArithmeticException is unchecked - no throws needed."
+            },
+            notes: [
+              "Compiler does not enforce handling or declaration.",
+              "Subclasses of RuntimeException - e.g. NullPointerException, ArithmeticException, ArrayIndexOutOfBoundsException.",
+              "Indicate programming bugs; usually preventable rather than recoverable."
+            ],
+            exampleOutput: "Exception in thread 'main' java.lang.ArithmeticException: / by zero"
+          },
+          {
+            name: "Errors",
+            definition: "Errors extend java.lang.Error and represent fatal, unrecoverable JVM-level conditions (e.g. OutOfMemoryError, StackOverflowError); applications are not expected to catch them.",
+            diagram: "Error --> OutOfMemoryError, StackOverflowError",
+            code: {
+              language: "java",
+              code: `public class Err {
+  public static void main(String[] args) {
+    recursive();
+  }
+  static void recursive() { recursive(); }
+}`,
+              caption: "Infinite recursion triggers StackOverflowError."
+            },
+            notes: [
+              "Subclasses of java.lang.Error, not Exception.",
+              "Generally unrecoverable; the JVM cannot continue reliably after most errors.",
+              "Applications should not catch or declare Errors."
+            ],
+            exampleOutput: "java.lang.StackOverflowError thrown at runtime; the JVM terminates the thread."
+          }
+        ]
       },
       sixteenMark: {
         intro: "Java's exception handling is a structured, type-safe approach to managing runtime errors. It separates error-handling code from business logic, supports propagation, and provides a uniform way to model error conditions.",
@@ -65,7 +132,78 @@ export const unit3Topics: TopicContent[] = [
           "Distributed systems and remote calls",
           "Server request handling"
         ],
-        conclusion: "Exception handling is a cornerstone of robust Java programming. Mastering the Throwable hierarchy, the difference between checked and unchecked, and best practices (specific catches, no empty catch, prefer try-with-resources) is essential for writing production-quality code."
+        conclusion: "Exception handling is a cornerstone of robust Java programming. Mastering the Throwable hierarchy, the difference between checked and unchecked, and best practices (specific catches, no empty catch, prefer try-with-resources) is essential for writing production-quality code.",
+        types: [
+          {
+            name: "Checked Exceptions",
+            definition: "Checked exceptions extend java.lang.Exception directly (not via RuntimeException) and are verified at compile time, so the caller must either catch them or declare them with throws.",
+            diagram: "Throwable\n   v\nException ---> IOException, SQLException, ClassNotFoundException",
+            code: {
+              language: "java",
+              code: `import java.io.*;
+
+public class Checked {
+  public static void main(String[] args) throws IOException {
+    FileReader fr = new FileReader("data.txt");
+    fr.read();
+    fr.close();
+  }
+}`,
+              caption: "IOException is checked — handled by a throws declaration."
+            },
+            notes: [
+              "Verified at compile time by javac; the program won't compile if not handled.",
+              "Must be caught with try-catch or declared with throws in the method signature.",
+              "Subclasses of Exception (not RuntimeException) — e.g. IOException, SQLException, ClassNotFoundException, InterruptedException.",
+              "Indicate recoverable conditions the application is expected to anticipate and handle."
+            ],
+            exampleOutput: "If 'data.txt' is missing, throws FileNotFoundException at runtime; otherwise reads and closes the file successfully."
+          },
+          {
+            name: "Unchecked Exceptions",
+            definition: "Unchecked exceptions extend java.lang.RuntimeException; the compiler does not require they be caught or declared, so they surface only at runtime.",
+            diagram: "RuntimeException ---> NPE, ArithmeticException, ArrayIndexOutOfBoundsException",
+            code: {
+              language: "java",
+              code: `public class Unchecked {
+  public static void main(String[] args) {
+    int x = 10 / 0; // ArithmeticException
+    System.out.println(x);
+  }
+}`,
+              caption: "ArithmeticException is unchecked — no catch or throws required."
+            },
+            notes: [
+              "Compiler does not enforce catching or declaring; they bubble up at runtime.",
+              "Usually signal programming bugs — null dereference, divide-by-zero, bad index, bad cast.",
+              "Examples: NullPointerException, ArithmeticException, ArrayIndexOutOfBoundsException, ClassCastException, NumberFormatException.",
+              "Catching Exception or Throwable will also catch unchecked exceptions, but doing so broadly is discouraged."
+            ],
+            exampleOutput: "Exception in thread \"main\" java.lang.ArithmeticException: / by zero"
+          },
+          {
+            name: "Errors",
+            definition: "Errors are subclasses of java.lang.Error representing severe, JVM-level failures such as OutOfMemoryError and StackOverflowError that applications are not expected to recover from.",
+            diagram: "Throwable\n   v\nError ---> OutOfMemoryError, StackOverflowError (unrecoverable)",
+            code: {
+              language: "java",
+              code: `public class Err {
+  static void recurse() { recurse(); } // infinite recursion
+  public static void main(String[] args) {
+    recurse(); // throws StackOverflowError
+  }
+}`,
+              caption: "Unbounded recursion produces a StackOverflowError, not a normal Exception."
+            },
+            notes: [
+              "Thrown by the JVM itself, not by ordinary application code.",
+              "Best practice: do not catch Error — the JVM may be in an unstable state and recovery is unlikely.",
+              "Catching Throwable is discouraged because it would also catch Errors.",
+              "Examples: OutOfMemoryError, StackOverflowError, VirtualMachineError, LinkageError, AssertionError."
+            ],
+            exampleOutput: "Exception in thread \"main\" java.lang.StackOverflowError"
+          }
+        ]
       }
     },
     viva: [
@@ -148,7 +286,83 @@ export const unit3Topics: TopicContent[] = [
         explanation: "The try { } block contains the code to be monitored. catch(ExceptionType e) { } catches and handles a specific exception — multiple catches are allowed and the most specific must come first (subclass before superclass). Multi-catch (Java 7+) lets one catch handle multiple types: catch (E1 | E2 e). The throw keyword followed by an exception object raises an exception. The throws keyword in a method signature declares checked exceptions that the method may propagate. The finally { } block runs regardless of whether an exception occurred or was caught, and is typically used for cleanup (closing files, releasing locks). Java 7+ also provides try-with-resources, where the resource is declared in the try header and auto-closed.",
         diagram: "try       → wraps risky code\ncatch     → handles a specific exception type\nthrow     → explicitly raise an exception\nthrows    → declare checked exceptions in method signature\nfinally   → always runs (cleanup)\n\ntry { ... }\ncatch (E1 e) { ... }\ncatch (E2 | E3 e) { ... }   // multi-catch (Java 7+)\nfinally { ... }",
         example: "static void check(int a) {\n  if (a < 0) throw new IllegalArgumentException(\"negative\");\n}\n\nvoid read() throws IOException {\n  FileReader r = new FileReader(\"f.txt\");\n  r.read();\n}\n\n// multi-catch\ntry {\n  risky();\n} catch (IOException | SQLException e) {\n  System.out.println(e.getMessage());\n}",
-        conclusion: "Mastering these five keywords is essential for robust Java error handling. Modern Java encourages try-with-resources and multi-catch for cleaner code."
+        conclusion: "Mastering these five keywords is essential for robust Java error handling. Modern Java encourages try-with-resources and multi-catch for cleaner code.",
+        types: [
+          {
+            name: "try-catch-finally",
+            definition: "The classic form: a try block wraps code that may throw, one or more catch blocks handle matching exception types, and an optional finally block runs cleanup code regardless of outcome.",
+            diagram: "try { ... }\n  |           |\n  v           v\ncatch(E)   finally\n(handle)   (always)",
+            code: {
+              language: "java",
+              code: `public class Demo {
+  public static void main(String[] args) {
+    try {
+      int a = 10 / 0;
+    } catch (ArithmeticException e) {
+      System.out.println("Cannot divide by zero");
+    } finally {
+      System.out.println("Cleanup");
+    }
+  }
+}`,
+              caption: "try-catch-finally with arithmetic exception."
+            },
+            notes: [
+              "finally runs whether or not an exception is thrown (and even if catch re-throws).",
+              "Multiple catch blocks are evaluated top-down; most specific type must come first.",
+              "A try block must be followed by at least one catch or a finally."
+            ],
+            exampleOutput: "Cannot divide by zero\nCleanup"
+          },
+          {
+            name: "try-with-resources",
+            definition: "A try statement (Java 7+) that declares one or more AutoCloseable resources which are automatically closed at the end of the block, even on exception.",
+            diagram: "try (R r = ...) { ... }\n  |\n  v\nr.close()  (auto)",
+            code: {
+              language: "java",
+              code: `import java.io.*;
+
+public class Twr {
+  public static void main(String[] args) throws IOException {
+    try (FileReader fr = new FileReader("data.txt")) {
+      fr.read();
+    }
+  }
+}`,
+              caption: "FileReader is auto-closed by try-with-resources."
+            },
+            notes: [
+              "Resource must implement java.lang.AutoCloseable (or java.io.Closeable).",
+              "close() is called in reverse order of declaration; suppressed exceptions are added via addSuppressed.",
+              "Replaces verbose finally blocks for cleanup of files, sockets, and JDBC connections."
+            ],
+            exampleOutput: "data.txt is read and the FileReader is closed automatically, even if read() throws."
+          },
+          {
+            name: "Multi-catch",
+            definition: "A single catch block (Java 7+) that handles multiple unrelated exception types by listing them separated by |, with one parameter variable.",
+            diagram: "catch (E1 | E2 | E3 e) { ... }",
+            code: {
+              language: "java",
+              code: `public class Multi {
+  public static void main(String[] args) {
+    try {
+      int n = Integer.parseInt("x");
+    } catch (NumberFormatException | NullPointerException e) {
+      System.out.println("Bad input: " + e.getMessage());
+    }
+  }
+}`,
+              caption: "NumberFormatException and NullPointerException handled in one block."
+            },
+            notes: [
+              "The variable e is effectively final and cannot be reassigned.",
+              "Alternatives in the | list must not have a subtype relationship (no redundancy allowed).",
+              "Reduces boilerplate when several unrelated exceptions share the same recovery logic."
+            ],
+            exampleOutput: "Bad input: For input string: \"x\""
+          }
+        ]
       },
       sixteenMark: {
         intro: "Java's exception model is built on five keywords. Together they provide structured detection, raising, declaration, handling, and cleanup of exceptional conditions.",
@@ -171,7 +385,117 @@ export const unit3Topics: TopicContent[] = [
           "Remote procedure calls",
           "Validation of preconditions"
         ],
-        conclusion: "These five keywords are central to writing reliable Java code. Modern Java adds multi-catch and try-with-resources to make the model more concise, and you should prefer those where applicable."
+        conclusion: "These five keywords are central to writing reliable Java code. Modern Java adds multi-catch and try-with-resources to make the model more concise, and you should prefer those where applicable.",
+        types: [
+          {
+            name: "try-catch-finally",
+            definition: "The classic form: a try block wraps code that may throw, one or more catch blocks handle matching exception types, and an optional finally block runs cleanup code regardless of outcome.",
+            diagram: "try { ... }\n  |           |\n  v           v\ncatch(E)   finally\n(handle)   (always)",
+            code: {
+              language: "java",
+              code: `public class Demo {
+  public static void main(String[] args) {
+    try {
+      int a = 10 / 0;
+    } catch (ArithmeticException e) {
+      System.out.println("Cannot divide by zero");
+    } finally {
+      System.out.println("Cleanup");
+    }
+  }
+}`,
+              caption: "try-catch-finally with arithmetic exception."
+            },
+            notes: [
+              "finally runs whether or not an exception is thrown (and even if catch re-throws).",
+              "Multiple catch blocks are evaluated top-down; most specific type must come first.",
+              "A try block must be followed by at least one catch or a finally.",
+              "System.exit() in try prevents finally from running."
+            ],
+            exampleOutput: "Cannot divide by zero\nCleanup"
+          },
+          {
+            name: "try-with-resources",
+            definition: "A try statement (Java 7+) that declares one or more AutoCloseable resources which are automatically closed at the end of the block, even on exception.",
+            diagram: "try (R r = ...) { ... }\n  |\n  v\nr.close()  (auto)",
+            code: {
+              language: "java",
+              code: `import java.io.*;
+
+public class Twr {
+  public static void main(String[] args) throws IOException {
+    try (FileReader fr = new FileReader("data.txt")) {
+      fr.read();
+    }
+  }
+}`,
+              caption: "FileReader is auto-closed by try-with-resources."
+            },
+            notes: [
+              "Resource must implement java.lang.AutoCloseable (or java.io.Closeable).",
+              "close() is called in reverse order of declaration; suppressed exceptions are added via addSuppressed.",
+              "Replaces verbose finally blocks for cleanup of files, sockets, and JDBC connections.",
+              "Multiple resources can be declared, separated by semicolons."
+            ],
+            exampleOutput: "data.txt is read and the FileReader is closed automatically, even if read() throws."
+          },
+          {
+            name: "Multi-catch",
+            definition: "A single catch block (Java 7+) that handles multiple unrelated exception types by listing them separated by |, with one parameter variable.",
+            diagram: "catch (E1 | E2 | E3 e) { ... }",
+            code: {
+              language: "java",
+              code: `public class Multi {
+  public static void main(String[] args) {
+    try {
+      int n = Integer.parseInt("x");
+    } catch (NumberFormatException | NullPointerException e) {
+      System.out.println("Bad input: " + e.getMessage());
+    }
+  }
+}`,
+              caption: "NumberFormatException and NullPointerException handled in one block."
+            },
+            notes: [
+              "The variable e is effectively final and cannot be reassigned.",
+              "Alternatives in the | list must not have a subtype relationship (no redundancy allowed).",
+              "Reduces boilerplate when several unrelated exceptions share the same recovery logic.",
+              "Works for both checked and unchecked exceptions."
+            ],
+            exampleOutput: "Bad input: For input string: \"x\""
+          },
+          {
+            name: "throw and throws",
+            definition: "throw explicitly raises an exception object; throws declares in a method signature that the method may propagate one or more checked exception types to its caller.",
+            diagram: "void m() throws E1, E2 { ... throw new E1(); }",
+            code: {
+              language: "java",
+              code: `class MyException extends Exception {
+  MyException(String s) { super(s); }
+}
+
+public class Th {
+  static void validate(int age) throws MyException {
+    if (age < 18) throw new MyException("Too young");
+    System.out.println("OK");
+  }
+
+  public static void main(String[] args) {
+    try { validate(15); }
+    catch (MyException e) { System.out.println(e.getMessage()); }
+  }
+}`,
+              caption: "throw raises a custom exception; throws declares it."
+            },
+            notes: [
+              "throw new ExceptionType(...) is the syntax for explicit raising.",
+              "throws lists checked exception types the method may propagate; callers must handle or re-declare.",
+              "Unchecked exceptions (RuntimeException and subclasses) need not be declared in throws.",
+              "void m() throws E1, E2 { ... } can declare multiple propagated types separated by commas."
+            ],
+            exampleOutput: "Too young"
+          }
+        ]
       }
     },
     viva: [
@@ -264,7 +588,82 @@ new Thread(() -> System.out.println("Lambda thread")).start();`,
         explanation: "Extending Thread: the subclass overrides run() and you call start() on an instance. Implementing Runnable: you provide a class with run() and pass it to the Thread constructor. Runnable is preferred because Java does not support multiple class inheritance — extending Thread consumes your only extends slot, while implementing Runnable lets your class extend another class if needed. Runnable also decouples the task from the thread, which is useful for thread pools. Java 8+ lambdas can implement Runnable concisely. start() vs run(): start() creates a new thread of execution and invokes run() on it; calling run() directly executes the code in the current thread with no new thread created. Callable<V> is the task interface for ExecutorService.submit() that returns a value via a Future.",
         diagram: "java.lang.Object\n   |\njava.lang.Thread       java.lang.Runnable (interface)\n   |                          ^\n   +-- MyThread extends        +-- MyTask implements Runnable\n        Thread, overrides          overrides run()\n        run()                      |\n   |                              |\n   +-- new Thread(task).start()  ← wraps task and starts thread\n\njava.util.concurrent.Callable<V>  →  call() returns V, throws Exception\nsubmit(Callable) → Future<V>     →  result via future.get()",
         example: "// Lambda Runnable\nnew Thread(() -> System.out.println(\"Lambda thread\")).start();\n\n// Callable via ExecutorService\nExecutorService es = Executors.newSingleThreadExecutor();\nFuture<Integer> f = es.submit(() -> 1 + 2);\nSystem.out.println(f.get()); // 3\nes.shutdown();",
-        conclusion: "Both Thread and Runnable work; Runnable is the more flexible and idiomatic choice. Use Callable with ExecutorService when you need a return value or checked exceptions."
+        conclusion: "Both Thread and Runnable work; Runnable is the more flexible and idiomatic choice. Use Callable with ExecutorService when you need a return value or checked exceptions.",
+        types: [
+          {
+            name: "Thread class",
+            definition: "A Thread is a thread of execution in a Java program. The java.lang.Thread class encapsulates a thread; you create one, give it work to do (via a Runnable target or by overriding run()), and call start() to launch it.",
+            diagram: "Thread t = new Thread();\n  |\n  v\nt.start() --> new OS thread\n  |\n  v\nt.run() executes in that thread",
+            code: {
+              language: "java",
+              code: `public class MyThread extends Thread {
+  public void run() {
+    System.out.println("Running in: " + getName());
+  }
+
+  public static void main(String[] args) {
+    MyThread t = new MyThread();
+    t.start(); // new thread, calls run()
+  }
+}`,
+              caption: "Extending Thread and calling start()."
+            },
+            notes: [
+              "Always call start(); calling run() directly executes in the caller's thread, not a new one.",
+              "Subclassing Thread is inflexible because Java has no multiple inheritance, so you can't extend another class.",
+              "Constructor: Thread(), Thread(String name), Thread(Runnable target), Thread(Runnable target, String name)."
+            ],
+            exampleOutput: "Running in: Thread-0"
+          },
+          {
+            name: "Runnable interface",
+            definition: "Runnable is a functional interface in java.lang with a single method void run(). It represents a unit of work that can be executed by a Thread, an Executor, or any class implementing Runnable.",
+            diagram: "Runnable r = () -> { ... };\nnew Thread(r).start();",
+            code: {
+              language: "java",
+              code: `public class R {
+  public static void main(String[] args) {
+    Runnable task = () -> System.out.println("Hi from " + Thread.currentThread().getName());
+    Thread t = new Thread(task, "worker");
+    t.start();
+  }
+}`,
+              caption: "Implementing Runnable with a lambda."
+            },
+            notes: [
+              "Preferred over extending Thread because the class can extend another class.",
+              "Decouples the task (what to run) from the mechanism (Thread, Executor, etc.).",
+              "Can be used as a target for Thread, ExecutorService.execute, or any custom runner."
+            ],
+            exampleOutput: "Hi from worker"
+          },
+          {
+            name: "Callable<V> interface",
+            definition: "Callable<V> is a functional interface in java.util.concurrent with a single method V call() throws Exception. It represents a task that returns a value and may throw a checked exception.",
+            diagram: "Callable<V> c = () -> ...; // returns V\nFuture<V> f = exec.submit(c);",
+            code: {
+              language: "java",
+              code: `import java.util.concurrent.*;
+
+public class C {
+  public static void main(String[] args) throws Exception {
+    Callable<Integer> task = () -> 1 + 2;
+    ExecutorService exec = Executors.newSingleThreadExecutor();
+    Future<Integer> f = exec.submit(task);
+    System.out.println(f.get()); // blocks until result ready
+    exec.shutdown();
+  }
+}`,
+              caption: "Submitting a Callable to an ExecutorService."
+            },
+            notes: [
+              "Used with ExecutorService.submit() which returns a Future<V> holding the result.",
+              "Can throw checked exceptions, unlike Runnable's run().",
+              "V call() throws Exception is the method signature."
+            ],
+            exampleOutput: "3"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Thread and Runnable are the two pillars of Java multithreading. Choosing between them — and knowing about Callable — is essential for writing concurrent Java applications.",
@@ -288,7 +687,107 @@ new Thread(() -> System.out.println("Lambda thread")).start();`,
           "Parallel computation (fork/join, parallel streams)",
           "Asynchronous I/O"
         ],
-        conclusion: "Threads are essential for concurrent Java programs. Prefer implementing Runnable (or using Callable with ExecutorService) for flexibility, and always call start() — never run() — to spawn a new thread."
+        conclusion: "Threads are essential for concurrent Java programs. Prefer implementing Runnable (or using Callable with ExecutorService) for flexibility, and always call start() — never run() — to spawn a new thread.",
+        types: [
+          {
+            name: "Thread class",
+            definition: "A Thread is a thread of execution in a Java program. The java.lang.Thread class encapsulates a thread; you create one, give it work to do (via a Runnable target or by overriding run()), and call start() to launch it.",
+            diagram: "Thread t = new Thread();\n  |\n  v\nt.start() --> new OS thread\n  |\n  v\nt.run() executes in that thread",
+            code: {
+              language: "java",
+              code: `public class MyThread extends Thread {
+  public void run() {
+    System.out.println("Running in: " + getName());
+  }
+
+  public static void main(String[] args) {
+    MyThread t = new MyThread();
+    t.start(); // new thread, calls run()
+  }
+}`,
+              caption: "Extending Thread and calling start()."
+            },
+            notes: [
+              "Always call start(); calling run() directly executes in the caller's thread, not a new one.",
+              "Subclassing Thread is inflexible because Java has no multiple inheritance.",
+              "Constructor: Thread(), Thread(String name), Thread(Runnable target), Thread(Runnable target, String name).",
+              "Useful methods: getName(), setName(), getId(), isAlive(), join(), sleep(), yield()."
+            ],
+            exampleOutput: "Running in: Thread-0"
+          },
+          {
+            name: "Runnable interface",
+            definition: "Runnable is a functional interface in java.lang with a single method void run(). It represents a unit of work that can be executed by a Thread, an Executor, or any class implementing Runnable.",
+            diagram: "Runnable r = () -> { ... };\nnew Thread(r).start();",
+            code: {
+              language: "java",
+              code: `public class R {
+  public static void main(String[] args) {
+    Runnable task = () -> System.out.println("Hi from " + Thread.currentThread().getName());
+    Thread t = new Thread(task, "worker");
+    t.start();
+  }
+}`,
+              caption: "Implementing Runnable with a lambda."
+            },
+            notes: [
+              "Preferred over extending Thread because the class can extend another class.",
+              "Decouples the task (what to run) from the mechanism (Thread, Executor, etc.).",
+              "Single method: void run() (no checked exceptions, no return value).",
+              "Can be used as a target for Thread, ExecutorService.execute, or any custom runner."
+            ],
+            exampleOutput: "Hi from worker"
+          },
+          {
+            name: "Callable<V> interface",
+            definition: "Callable<V> is a functional interface in java.util.concurrent with a single method V call() throws Exception. It represents a task that returns a value and may throw a checked exception.",
+            diagram: "Callable<V> c = () -> ...; // returns V\nFuture<V> f = exec.submit(c);",
+            code: {
+              language: "java",
+              code: `import java.util.concurrent.*;
+
+public class C {
+  public static void main(String[] args) throws Exception {
+    Callable<Integer> task = () -> 1 + 2;
+    ExecutorService exec = Executors.newSingleThreadExecutor();
+    Future<Integer> f = exec.submit(task);
+    System.out.println(f.get()); // blocks until result ready
+    exec.shutdown();
+  }
+}`,
+              caption: "Submitting a Callable to an ExecutorService."
+            },
+            notes: [
+              "Used with ExecutorService.submit() which returns a Future<V> holding the result.",
+              "Can throw checked exceptions, unlike Runnable's run().",
+              "V call() throws Exception is the method signature.",
+              "Future.get() blocks; Future.get(long, TimeUnit) throws TimeoutException on expiry."
+            ],
+            exampleOutput: "3"
+          },
+          {
+            name: "start() vs run()",
+            definition: "start() creates a new OS thread and invokes run() inside it. Calling run() directly executes the code in the caller's current thread with no new thread created.",
+            diagram: "t.start()  --> new thread -> t.run()\nt.run()    --> same thread, no new thread",
+            code: {
+              language: "java",
+              code: `public class S {
+  public static void main(String[] args) {
+    Thread t = new Thread(() -> System.out.println(Thread.currentThread().getName()));
+    t.run();   // prints 'main'
+    t.start(); // prints 'Thread-0' in a new thread
+  }
+}`,
+              caption: "Demonstrating run() vs start()."
+            },
+            notes: [
+              "start() can only be called once per Thread instance; a second call throws IllegalThreadStateException.",
+              "run() can be called any number of times, but does not create a new thread.",
+              "Always use start() to spawn a new thread; never call run() directly for concurrency."
+            ],
+            exampleOutput: "main\nThread-0"
+          }
+        ]
       }
     },
     viva: [
@@ -378,7 +877,76 @@ System.out.println(t.getState()); // TERMINATED`,
         explanation: "New: the Thread object is created but start() has not been called. Runnable: start() has been called and the thread is eligible for the CPU; the scheduler may have already given it time. Blocked: the thread is waiting to acquire an object's monitor lock to enter a synchronized block or method. Waiting: the thread waits indefinitely for another thread to perform a particular action — Object.wait() without timeout, Thread.join() without timeout, or LockSupport.park(). Timed_Waiting: like Waiting but with a timeout — Thread.sleep(ms), Object.wait(ms, n), Thread.join(ms), or LockSupport.parkNanos(). Terminated: run() has returned normally, or an uncaught exception caused the thread to die. The Thread.getState() method returns the current state as a Thread.State enum value.",
         diagram: "+-------+  start()  +----------+ run() exits  +-------------+\n|  NEW  | ---------> | RUNNABLE | -----------> | TERMINATED  |\n+-------+            +----------+               +-------------+\n                          ^  |\n                          |  |  notify/notifyAll/timeout\n                          |  v\n              +-------------------+  +----------------------+\n              |      BLOCKED      |  |     WAITING /        |\n              |  (waiting for     |  |   TIMED_WAITING      |\n              |   monitor lock)   |  |   (wait/join/sleep)  |\n              +-------------------+  +----------------------+",
         example: "Thread t = new Thread(() -> {\n  try { Thread.sleep(500); } catch (InterruptedException ignored) {}\n});\nt.start();\nThread.sleep(100);\nSystem.out.println(t.getState()); // TIMED_WAITING\nt.join();\nSystem.out.println(t.getState()); // TERMINATED",
-        conclusion: "Knowing the six thread states and what causes transitions between them is essential for diagnosing deadlocks, starvation, and other concurrency issues."
+        conclusion: "Knowing the six thread states and what causes transitions between them is essential for diagnosing deadlocks, starvation, and other concurrency issues.",
+        types: [
+          {
+            name: "NEW",
+            definition: "A thread is in NEW after a Thread object has been created but before start() has been called; the thread is not yet considered alive.",
+            diagram: "Thread t = new Thread(...);\n  |\n  v\nstate = NEW (not alive)",
+            code: {
+              language: "java",
+              code: `public class N {
+  public static void main(String[] args) {
+    Thread t = new Thread(() -> {});
+    System.out.println(t.getState()); // NEW
+  }
+}`,
+              caption: "A Thread is NEW before start() is called."
+            },
+            notes: [
+              "Thread is created but not yet considered alive by the JVM.",
+              "Calling start() moves the thread to RUNNABLE.",
+              "isAlive() returns false in this state."
+            ],
+            exampleOutput: "NEW"
+          },
+          {
+            name: "RUNNABLE",
+            definition: "A thread in RUNNABLE is executing in the JVM but may be waiting for OS-level resources (CPU time); the JVM treats ready-to-run and currently-running as the same state.",
+            diagram: "t.start()\n  |\n  v\nRUNNABLE <--> (OS scheduler picks)\n  |\n  v\nyield() keeps RUNNABLE",
+            code: {
+              language: "java",
+              code: `public class R {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> {});
+    t.start();
+    Thread.sleep(50);
+    System.out.println(t.getState()); // likely TERMINATED, not RUNNABLE
+  }
+}`,
+              caption: "After start(), a thread becomes RUNNABLE."
+            },
+            notes: [
+              "Combines 'ready to run' and 'running' from the OS scheduler's view.",
+              "Thread.yield() suggests the scheduler pick another thread but does not leave RUNNABLE.",
+              "Thread.getState() returns Thread.State.RUNNABLE."
+            ],
+            exampleOutput: "TERMINATED (because the task completes before getState() runs)."
+          },
+          {
+            name: "TERMINATED",
+            definition: "A thread is in TERMINATED when its run() method has returned normally or thrown an uncaught exception; the thread has finished execution and cannot be restarted.",
+            diagram: "run() returns / throws\n  |\n  v\nTERMINATED (dead)",
+            code: {
+              language: "java",
+              code: `public class T {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> { /* done */ });
+    t.start();
+    t.join(); // wait for it to finish
+    System.out.println(t.getState()); // TERMINATED
+  }
+}`,
+              caption: "After run() returns, the thread is TERMINATED."
+            },
+            notes: [
+              "Terminal state; a Thread cannot be start()ed again once TERMINATED.",
+              "isAlive() returns false in this state.",
+              "Reaching this state normally means work completed; throwing uncaught also lands here."
+            ],
+            exampleOutput: "TERMINATED"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Java threads have a well-defined lifecycle governed by the JVM and the OS scheduler. There are six states in java.lang.Thread.State, and every thread is always in exactly one of them.",
@@ -399,7 +967,152 @@ System.out.println(t.getState()); // TERMINATED`,
           "Diagnosing deadlocks and live-lock",
           "Operating systems concepts"
         ],
-        conclusion: "Thread lifecycle knowledge is essential for concurrent Java programming. The six states (NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED) and the transitions between them explain how Java threads interact with the scheduler, locks, and waits."
+        conclusion: "Thread lifecycle knowledge is essential for concurrent Java programming. The six states (NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED) and the transitions between them explain how Java threads interact with the scheduler, locks, and waits.",
+        types: [
+          {
+            name: "NEW",
+            definition: "A thread is in NEW after a Thread object has been created but before start() has been called; the thread is not yet considered alive.",
+            diagram: "Thread t = new Thread(...);\n  |\n  v\nstate = NEW (not alive)",
+            code: {
+              language: "java",
+              code: `public class N {
+  public static void main(String[] args) {
+    Thread t = new Thread(() -> {});
+    System.out.println(t.getState()); // NEW
+  }
+}`,
+              caption: "A Thread is NEW before start() is called."
+            },
+            notes: [
+              "Thread is created but not yet considered alive by the JVM.",
+              "Calling start() moves the thread to RUNNABLE.",
+              "isAlive() returns false in this state."
+            ],
+            exampleOutput: "NEW"
+          },
+          {
+            name: "RUNNABLE",
+            definition: "A thread in RUNNABLE is executing in the JVM but may be waiting for OS-level resources (CPU time); the JVM treats ready-to-run and currently-running as the same state.",
+            diagram: "t.start()\n  |\n  v\nRUNNABLE <--> (OS scheduler)\n  |\n  v\nyield() stays RUNNABLE",
+            code: {
+              language: "java",
+              code: `public class R {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> {
+      while (!Thread.currentThread().isInterrupted()) {}
+    });
+    t.start();
+    Thread.sleep(50);
+    System.out.println(t.getState()); // RUNNABLE
+    t.interrupt();
+  }
+}`,
+              caption: "A live thread that is not blocked is RUNNABLE."
+            },
+            notes: [
+              "Combines 'ready to run' and 'running' from the OS scheduler's view.",
+              "Thread.yield() suggests the scheduler pick another thread but does not leave RUNNABLE.",
+              "Thread.getState() returns Thread.State.RUNNABLE."
+            ],
+            exampleOutput: "RUNNABLE"
+          },
+          {
+            name: "BLOCKED",
+            definition: "A thread is BLOCKED when it is waiting to acquire a monitor lock to enter a synchronized block or method, after calling Object.wait() (transiently), or when re-entering from a blocking I/O call.",
+            diagram: "synchronized(lock) { ... }\n  |        ^\n  v        |\nBLOCKED <- lock released",
+            code: {
+              language: "java",
+              code: `public class B {
+  static final Object LOCK = new Object();
+
+  public static void main(String[] args) throws InterruptedException {
+    Thread holder = new Thread(() -> { synchronized (LOCK) { try { Thread.sleep(2000); } catch (Exception e) {} } });
+    holder.start();
+    Thread.sleep(50);
+    Thread waiter = new Thread(() -> { synchronized (LOCK) {} });
+    waiter.start();
+    Thread.sleep(50);
+    System.out.println(waiter.getState()); // BLOCKED
+  }
+}`,
+              caption: "Thread waiting for monitor lock is BLOCKED."
+            },
+            notes: [
+              "Distinct from WAITING: BLOCKED is specifically about monitor-lock contention.",
+              "Transitions back to RUNNABLE when the lock becomes available.",
+              "A thread re-entering synchronized after wait() briefly goes through BLOCKED."
+            ],
+            exampleOutput: "BLOCKED"
+          },
+          {
+            name: "WAITING",
+            definition: "A thread is WAITING when it is parked indefinitely, waiting for another thread to perform a specific action. Entered by Object.wait() (no timeout), Thread.join() (no timeout), or LockSupport.park().",
+            diagram: "wait() / join() / park()\n  |\n  v\nWAITING\n  ^\n  |\nnotify() / thread ends / unpark()",
+            code: {
+              language: "java",
+              code: `public class W {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> { try { Thread.currentThread().join(); } catch (Exception e) {} });
+    // Self-join example is contrived; in practice WAITING comes from wait()/join()/park()
+    System.out.println("Use wait()/join()/park() to enter WAITING");
+  }
+}`,
+              caption: "WAITING is entered via wait(), join(), or LockSupport.park()."
+            },
+            notes: [
+              "No timeout; the thread stays parked until another thread signals it.",
+              "wait() and notify() must be called inside synchronized on the same object's monitor.",
+              "LockSupport.park() and unpark() are lower-level building blocks for concurrent utilities."
+            ],
+            exampleOutput: "A thread that calls t.join() on another thread enters WAITING until that thread finishes."
+          },
+          {
+            name: "TIMED_WAITING",
+            definition: "A thread is TIMED_WAITING when it is parked for a specified maximum time, such as via Thread.sleep(ms), Object.wait(ms), Thread.join(ms), or LockSupport.parkNanos/parkUntil.",
+            diagram: "sleep(ms) / wait(ms) / join(ms)\n  |\n  v\nTIMED_WAITING\n  ^\n  |\ntimer expires / notify() / target ends",
+            code: {
+              language: "java",
+              code: `public class TW {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> { try { Thread.sleep(60_000); } catch (InterruptedException e) {} });
+    t.start();
+    Thread.sleep(50);
+    System.out.println(t.getState()); // TIMED_WAITING (from sleep)
+  }
+}`,
+              caption: "Thread.sleep(60_000) puts the thread in TIMED_WAITING."
+            },
+            notes: [
+              "Differs from WAITING only in that it auto-wakes after a timeout.",
+              "InterruptedException is thrown when wait/sleep/join is interrupted.",
+              "LockSupport.parkNanos and parkUntil are the lower-level variants."
+            ],
+            exampleOutput: "TIMED_WAITING"
+          },
+          {
+            name: "TERMINATED",
+            definition: "A thread is in TERMINATED when its run() method has returned normally or thrown an uncaught exception; the thread has finished execution and cannot be restarted.",
+            diagram: "run() returns / throws\n  |\n  v\nTERMINATED (dead)",
+            code: {
+              language: "java",
+              code: `public class T {
+  public static void main(String[] args) throws InterruptedException {
+    Thread t = new Thread(() -> { /* done */ });
+    t.start();
+    t.join(); // wait for it to finish
+    System.out.println(t.getState()); // TERMINATED
+  }
+}`,
+              caption: "After run() returns, the thread is TERMINATED."
+            },
+            notes: [
+              "Terminal state; a Thread cannot be start()ed again once TERMINATED.",
+              "isAlive() returns false in this state.",
+              "Reaching this state normally means work completed; throwing uncaught also lands here."
+            ],
+            exampleOutput: "TERMINATED"
+          }
+        ]
       }
     },
     viva: [
@@ -483,7 +1196,72 @@ System.out.println(t.getState()); // TERMINATED`,
         explanation: "synchronized can be applied to instance methods, static methods, or arbitrary blocks. Instance synchronized methods lock the current object (this); static synchronized methods lock the Class object. Only one thread can hold a given monitor at a time; other threads block (state BLOCKED) until it is released. Synchronization provides two guarantees: mutual exclusion (atomicity) and visibility (writes inside a synchronized block are visible to subsequent acquirers of the same monitor, via the happens-before relationship). The alternative is the explicit Lock API in java.util.concurrent.locks (ReentrantLock, ReadWriteLock), which offers more features (tryLock, interruptible lock, fair lock). The volatile keyword gives visibility but no atomicity. Common pitfalls: deadlock from inconsistent lock ordering, livelock, and performance overhead from coarse locking.",
         diagram: "Thread1  ---lock(obj)--->  [ critical section ]  ---unlock(obj)--->\nThread2  ---(waits)----->     BLOCKED                    woken up\n\nsynchronized (lockObj) {\n  // critical section — only one thread at a time\n}",
         example: "class SafeCounter {\n  private int c = 0;\n  public synchronized void inc() { c++; }\n  public synchronized int get() { return c; }\n}\n\n// Block form for finer control\nsynchronized (this) {\n  if (balance >= amount) balance -= amount;\n}",
-        conclusion: "Synchronization is fundamental for safe multithreaded programming. Use synchronized for simple cases; prefer java.util.concurrent.locks (ReentrantLock) when you need tryLock, fairness, or interruptible locking."
+        conclusion: "Synchronization is fundamental for safe multithreaded programming. Use synchronized for simple cases; prefer java.util.concurrent.locks (ReentrantLock) when you need tryLock, fairness, or interruptible locking.",
+        types: [
+          {
+            name: "synchronized method",
+            definition: "Declaring a method with the synchronized keyword makes the JVM acquire the object's monitor lock (or the Class object lock for static methods) before the method body executes, releasing it on exit (normal or exceptional).",
+            diagram: "synchronized void m() { ... }\n  |\n  v\nacquire monitor(this)\n  |\n  v\n... body ...\n  |\n  v\nrelease monitor(this)",
+            code: {
+              language: "java",
+              code: `public class Counter {
+  private int n = 0;
+  public synchronized void inc() { n++; }
+  public synchronized int get() { return n; }
+}`,
+              caption: "Two synchronized instance methods share the same 'this' monitor."
+            },
+            notes: [
+              "Instance synchronized methods lock on 'this'; static synchronized methods lock on the Class object.",
+              "Only one thread can hold a given monitor at a time; other threads block until it's released.",
+              "Lock is released even if the body throws, because the JVM emits an implicit finally."
+            ],
+            exampleOutput: "Two threads calling inc() and get() safely interleave; 'n' is never lost or stale."
+          },
+          {
+            name: "synchronized block",
+            definition: "A finer-grained form of synchronization: synchronized(expr) { ... } acquires the monitor of the object denoted by expr for just the enclosed statements, instead of an entire method.",
+            diagram: "synchronized (lock) { ... }\n  |\n  v\nacquire monitor(lock)\n  |\n  v\n... block ...\n  |\n  v\nrelease monitor(lock)",
+            code: {
+              language: "java",
+              code: `public class Bank {
+  private final Object lock = new Object();
+  private int bal = 0;
+  public void deposit(int x) {
+    synchronized (lock) { bal += x; } // narrow critical section
+    System.out.println("after");       // not synchronized
+  }
+}`,
+              caption: "A private lock object narrows the critical section."
+            },
+            notes: [
+              "Use a private final Object as the lock to avoid exposing 'this' as a public lock.",
+              "Reduces contention by synchronizing only the code that actually mutates shared state.",
+              "Re-entrant: the same thread can re-acquire a monitor it already holds."
+            ],
+            exampleOutput: "Two threads calling deposit() update 'bal' atomically; the println is unsynchronized."
+          },
+          {
+            name: "volatile",
+            definition: "The volatile keyword on a field guarantees that reads and writes go straight to main memory and are visible across threads; it does NOT make compound operations (++, +=) atomic.",
+            diagram: "volatile int flag = 0;\n  |\n  v\nwrites flush immediately\nreads bypass thread cache",
+            code: {
+              language: "java",
+              code: `public class Flag {
+  private volatile boolean stop = false;
+  public void run() { while (!stop) { /* work */ } }
+  public void halt() { stop = true; }
+}`,
+              caption: "volatile flag used as a stop signal between threads."
+            },
+            notes: [
+              "Provides visibility (writes are seen by other threads) but not atomicity for compound operations.",
+              "count++ is still a race even if count is volatile; use AtomicInteger or synchronized for that.",
+              "Establishes a happens-before relationship: a write to a volatile field happens-before any subsequent read."
+            ],
+            exampleOutput: "After halt() sets stop=true, the worker thread sees the new value and exits the loop."
+          }
+        ]
       },
       sixteenMark: {
         intro: "Synchronization coordinates access to shared data across threads, providing both mutual exclusion and memory visibility.",
@@ -505,7 +1283,128 @@ System.out.println(t.getState()); // TERMINATED`,
           "Connection or thread pools (metadata)",
           "Atomic state machines"
         ],
-        conclusion: "Synchronization is the foundation of safe multithreaded Java programs. Use synchronized for simplicity; graduate to java.util.concurrent.locks (ReentrantLock, ReadWriteLock) when you need tryLock, fairness, or interruptible locking. Always release locks in a finally block when using the Lock API."
+        conclusion: "Synchronization is the foundation of safe multithreaded Java programs. Use synchronized for simplicity; graduate to java.util.concurrent.locks (ReentrantLock, ReadWriteLock) when you need tryLock, fairness, or interruptible locking. Always release locks in a finally block when using the Lock API.",
+        types: [
+          {
+            name: "synchronized method",
+            definition: "Declaring a method with the synchronized keyword makes the JVM acquire the object's monitor lock (or the Class object lock for static methods) before the method body executes, releasing it on exit (normal or exceptional).",
+            diagram: "synchronized void m() { ... }\n  |\n  v\nacquire monitor(this)\n  |\n  v\n... body ...\n  |\n  v\nrelease monitor(this)",
+            code: {
+              language: "java",
+              code: `public class Counter {
+  private int n = 0;
+  public synchronized void inc() { n++; }
+  public synchronized int get() { return n; }
+}`,
+              caption: "Two synchronized instance methods share the same 'this' monitor."
+            },
+            notes: [
+              "Instance synchronized methods lock on 'this'; static synchronized methods lock on the Class object.",
+              "Only one thread can hold a given monitor at a time; other threads block until it's released.",
+              "Lock is released even if the body throws, because the JVM emits an implicit finally.",
+              "Re-entrant: a thread that already holds the monitor can re-enter synchronized code on the same monitor."
+            ],
+            exampleOutput: "Two threads calling inc() and get() safely interleave; 'n' is never lost or stale."
+          },
+          {
+            name: "synchronized block",
+            definition: "A finer-grained form of synchronization: synchronized(expr) { ... } acquires the monitor of the object denoted by expr for just the enclosed statements, instead of an entire method.",
+            diagram: "synchronized (lock) { ... }\n  |\n  v\nacquire monitor(lock)\n  |\n  v\n... block ...\n  |\n  v\nrelease monitor(lock)",
+            code: {
+              language: "java",
+              code: `public class Bank {
+  private final Object lock = new Object();
+  private int bal = 0;
+  public void deposit(int x) {
+    synchronized (lock) { bal += x; } // narrow critical section
+    System.out.println("after");       // not synchronized
+  }
+}`,
+              caption: "A private lock object narrows the critical section."
+            },
+            notes: [
+              "Use a private final Object as the lock to avoid exposing 'this' as a public lock.",
+              "Reduces contention by synchronizing only the code that actually mutates shared state.",
+              "Re-entrant: the same thread can re-acquire a monitor it already holds.",
+              "Avoid synchronizing on String literals or boxed primitives - they can be interned/shared."
+            ],
+            exampleOutput: "Two threads calling deposit() update 'bal' atomically; the println is unsynchronized."
+          },
+          {
+            name: "volatile",
+            definition: "The volatile keyword on a field guarantees that reads and writes go straight to main memory and are visible across threads; it does NOT make compound operations (++, +=) atomic.",
+            diagram: "volatile int flag = 0;\n  |\n  v\nwrites flush immediately\nreads bypass thread cache",
+            code: {
+              language: "java",
+              code: `public class Flag {
+  private volatile boolean stop = false;
+  public void run() { while (!stop) { /* work */ } }
+  public void halt() { stop = true; }
+}`,
+              caption: "volatile flag used as a stop signal between threads."
+            },
+            notes: [
+              "Provides visibility (writes are seen by other threads) but not atomicity for compound operations.",
+              "count++ is still a race even if count is volatile; use AtomicInteger or synchronized for that.",
+              "Establishes a happens-before relationship: a write to a volatile field happens-before any subsequent read.",
+              "Cheaper than synchronizing an entire block when only a single flag/bool is involved."
+            ],
+            exampleOutput: "After halt() sets stop=true, the worker thread sees the new value and exits the loop."
+          },
+          {
+            name: "static synchronized",
+            definition: "A static synchronized method locks on the Class object (e.g. MyClass.class) instead of an instance, so it serializes access to static state across all instances of the class.",
+            diagram: "static synchronized void m()\n  |\n  v\nacquire monitor(MyClass.class)\n  |\n  v\n... body ...\n  |\n  v\nrelease monitor(MyClass.class)",
+            code: {
+              language: "java",
+              code: `public class Counters {
+  private static int total = 0;
+  public static synchronized void inc() { total++; }
+  public static synchronized int get() { return total; }
+}`,
+              caption: "static synchronized locks the Class object."
+            },
+            notes: [
+              "Locks on Class object, not 'this'; all instances share the same lock.",
+              "Use to protect static (class-level) mutable state.",
+              "A static synchronized method and an instance synchronized method on the same class do NOT block each other (different monitors)."
+            ],
+            exampleOutput: "Two threads calling Counters.inc() update 'total' atomically, even across different Counters instances."
+          },
+          {
+            name: "wait/notify on a monitor",
+            definition: "Object.wait() releases the monitor and parks the current thread; Object.notify()/notifyAll() wakes one or all waiters on the same monitor. Must be called inside synchronized on that object.",
+            diagram: "synchronized(lock) { lock.wait(); ... lock.notify(); }",
+            code: {
+              language: "java",
+              code: `public class Q {
+  private final Object lock = new Object();
+  private boolean ready = false;
+
+  public void waitFor() throws InterruptedException {
+    synchronized (lock) {
+      while (!ready) lock.wait();
+      System.out.println("Ready!");
+    }
+  }
+  public void setReady() {
+    synchronized (lock) {
+      ready = true;
+      lock.notifyAll();
+    }
+  }
+}`,
+              caption: "Producer/consumer-style wait/notify guarded by a while loop."
+            },
+            notes: [
+              "Always use a while loop around wait() to guard against spurious wakeups.",
+              "wait() releases the monitor; the thread re-acquires it before returning from wait().",
+              "notify() wakes one waiting thread; notifyAll() wakes all. Prefer notifyAll() for safety.",
+              "wait/notify must be called inside synchronized on the same object."
+            ],
+            exampleOutput: "waitFor() blocks until setReady() sets the flag and calls notifyAll(); then 'Ready!' is printed."
+          }
+        ]
       }
     },
     viva: [
@@ -590,7 +1489,68 @@ System.out.println(t.getState()); // TERMINATED`,
         explanation: "These methods are inherited from Object so every Java object can act as a monitor/condition variable. They must be called inside a synchronized block on the same object — calling them outside throws IllegalMonitorStateException. wait() can throw InterruptedException. Spurious wakeups can occur (a thread returns from wait() without being notified), so always re-check the condition in a while loop. notify() picks an arbitrary thread from the wait set; notifyAll() wakes all of them and lets them re-contend for the lock. Prefer notifyAll() unless you are sure only one thread can make progress.",
         diagram: "Thread A: synchronized(lock) { while (!cond) lock.wait(); }\nThread B: synchronized(lock) { cond = true; lock.notify(); }\n\n        +-----+    wait()    +-----------+\n        |  A  | ------------> | wait set  |\n        +-----+              +-----------+\n                               ^\n        +-----+   notify()    |\n        |  B  | ---------------+\n        +-----+   A re-acquires lock and returns from wait()",
         example: "// Producer-Consumer with wait/notify\nclass Buffer {\n  private final List<Integer> list = new ArrayList<>();\n  private final int MAX = 5;\n\n  public synchronized void produce(int x) throws InterruptedException {\n    while (list.size() == MAX) wait();\n    list.add(x);\n    notifyAll();\n  }\n  public synchronized int consume() throws InterruptedException {\n    while (list.isEmpty()) wait();\n    int v = list.remove(0);\n    notifyAll();\n    return v;\n  }\n}",
-        conclusion: "wait/notify is a low-level coordination primitive in Java. Use it sparingly — prefer java.util.concurrent.BlockingQueue, Semaphore, or CountDownLatch in modern code."
+        conclusion: "wait/notify is a low-level coordination primitive in Java. Use it sparingly — prefer java.util.concurrent.BlockingQueue, Semaphore, or CountDownLatch in modern code.",
+        types: [
+          {
+            name: "wait()",
+            definition: "Object.wait() causes the current thread to release the monitor of the target object and park until another thread calls notify() or notifyAll() on the same object, or the thread is interrupted.",
+            diagram: "synchronized(lock) { lock.wait(); }",
+            code: {
+              language: "java",
+              code: `public class W {
+  public static void main(String[] args) throws InterruptedException {
+    final Object lock = new Object();
+    Thread waiter = new Thread(() -> {
+      synchronized (lock) {
+        try { lock.wait(); } catch (InterruptedException e) { return; }
+        System.out.println("woken");
+      }
+    });
+    waiter.start();
+    Thread.sleep(100);
+    synchronized (lock) { lock.notify(); }
+  }
+}`,
+              caption: "wait() blocks until notify() is called on the same monitor."
+            },
+            notes: [
+              "Must be called inside a synchronized block or method on the target object, or IllegalMonitorStateException is thrown.",
+              "Releases the monitor while waiting, allowing other threads to acquire it.",
+              "Always re-check the condition in a while loop when returning from wait() (spurious wakeups)."
+            ],
+            exampleOutput: "After notify() is called, 'woken' is printed once."
+          },
+          {
+            name: "notify() and notifyAll()",
+            definition: "Object.notify() wakes one arbitrarily-chosen thread waiting on the object's monitor; Object.notifyAll() wakes all of them. Both must be called inside synchronized on the target object.",
+            diagram: "synchronized(lock) { lock.notify(); }   // 1 waiter\nsynchronized(lock) { lock.notifyAll(); } // all waiters",
+            code: {
+              language: "java",
+              code: `public class N {
+  public static void main(String[] args) throws InterruptedException {
+    final Object lock = new Object();
+    Runnable task = () -> {
+      synchronized (lock) {
+        try { lock.wait(); } catch (InterruptedException e) { return; }
+        System.out.println(Thread.currentThread().getName());
+      }
+    };
+    Thread a = new Thread(task, "A"), b = new Thread(task, "B");
+    a.start(); b.start();
+    Thread.sleep(100);
+    synchronized (lock) { lock.notifyAll(); } // wakes both A and B
+  }
+}`,
+              caption: "notifyAll() wakes every waiting thread on the same monitor."
+            },
+            notes: [
+              "notify() wakes one waiter, but you cannot control which one.",
+              "notifyAll() is generally safer because it lets all waiters re-check their condition.",
+              "Like wait(), notify/notifyAll must be called inside synchronized on the same object."
+            ],
+            exampleOutput: "A and B are both printed (order unspecified) after notifyAll() is called."
+          }
+        ]
       },
       sixteenMark: {
         intro: "Inter-thread communication uses wait/notify/notifyAll to coordinate work between threads sharing a monitor.",
@@ -611,7 +1571,96 @@ System.out.println(t.getState()); // TERMINATED`,
           "Resource pools (connection pools, thread pools)",
           "Custom synchronisers (e.g. CountDownLatch-style)"
         ],
-        conclusion: "wait/notify/notifyAll are powerful but tricky. Always use a while loop to guard against spurious wakeups, always call them inside synchronized, and prefer higher-level concurrent utilities (BlockingQueue, Semaphore, CountDownLatch) in modern Java."
+        conclusion: "wait/notify/notifyAll are powerful but tricky. Always use a while loop to guard against spurious wakeups, always call them inside synchronized, and prefer higher-level concurrent utilities (BlockingQueue, Semaphore, CountDownLatch) in modern Java.",
+        types: [
+          {
+            name: "Object.wait()",
+            definition: "Object.wait() causes the current thread to release the monitor of the target object and park until another thread calls notify() or notifyAll() on the same object, or the thread is interrupted.",
+            diagram: "synchronized(lock) { lock.wait(); }",
+            code: {
+              language: "java",
+              code: `public class W {
+  public static void main(String[] args) throws InterruptedException {
+    final Object lock = new Object();
+    Thread waiter = new Thread(() -> {
+      synchronized (lock) {
+        try { lock.wait(); } catch (InterruptedException e) { return; }
+        System.out.println("woken");
+      }
+    });
+    waiter.start();
+    Thread.sleep(100);
+    synchronized (lock) { lock.notifyAll(); }
+  }
+}`,
+              caption: "wait() blocks until notify/notifyAll is called on the same monitor."
+            },
+            notes: [
+              "Must be called inside a synchronized block or method on the target object, or IllegalMonitorStateException is thrown.",
+              "Releases the monitor while waiting, allowing other threads to acquire it.",
+              "Always re-check the condition in a while loop when returning from wait() (spurious wakeups).",
+              "Three overloads: wait(), wait(long timeoutMillis), wait(long timeoutMillis, int nanos)."
+            ],
+            exampleOutput: "After notifyAll() is called, 'woken' is printed."
+          },
+          {
+            name: "Object.notify()",
+            definition: "Object.notify() wakes one arbitrarily-chosen thread that is currently waiting on the same object's monitor. Must be called inside synchronized on the target object.",
+            diagram: "synchronized(lock) { lock.notify(); }  // wakes 1 waiter",
+            code: {
+              language: "java",
+              code: `public class No {
+  public static void main(String[] args) throws InterruptedException {
+    final Object lock = new Object();
+    Thread a = new Thread(() -> { synchronized (lock) { try { lock.wait(); } catch (InterruptedException e) {} System.out.println("A"); } });
+    Thread b = new Thread(() -> { synchronized (lock) { try { lock.wait(); } catch (InterruptedException e) {} System.out.println("B"); } });
+    a.start(); b.start();
+    Thread.sleep(100);
+    synchronized (lock) { lock.notify(); } // wakes one of A or B, not both
+  }
+}`,
+              caption: "notify() wakes only one waiter; the other keeps waiting."
+            },
+            notes: [
+              "Wakes exactly one waiter; you cannot choose which.",
+              "If no thread is waiting, notify() is a no-op.",
+              "Must be called inside synchronized on the same object, or IllegalMonitorStateException is thrown.",
+              "Prefer notifyAll() unless you have a measured reason (e.g. all waiters wait on the same condition)."
+            ],
+            exampleOutput: "Only one of 'A' or 'B' is printed; the other thread stays parked."
+          },
+          {
+            name: "Object.notifyAll()",
+            definition: "Object.notifyAll() wakes every thread currently waiting on the same object's monitor. They all re-acquire the monitor one at a time and re-check their wait condition.",
+            diagram: "synchronized(lock) { lock.notifyAll(); }  // wakes all waiters",
+            code: {
+              language: "java",
+              code: `public class NA {
+  public static void main(String[] args) throws InterruptedException {
+    final Object lock = new Object();
+    Runnable r = () -> {
+      synchronized (lock) {
+        try { lock.wait(); } catch (InterruptedException e) {}
+        System.out.println(Thread.currentThread().getName());
+      }
+    };
+    Thread a = new Thread(r, "A"), b = new Thread(r, "B");
+    a.start(); b.start();
+    Thread.sleep(100);
+    synchronized (lock) { lock.notifyAll(); } // wakes both
+  }
+}`,
+              caption: "notifyAll() wakes every waiter; each re-checks its condition."
+            },
+            notes: [
+              "Wakes all waiters on the same monitor; they re-acquire the lock one at a time.",
+              "Safer than notify() because every waiter re-checks its condition.",
+              "Must be called inside synchronized on the same object, or IllegalMonitorStateException is thrown.",
+              "Use notifyAll() when waiters wait for different conditions; the spurious-wakeup-safe pattern is while (!condition) wait()."
+            ],
+            exampleOutput: "Both 'A' and 'B' are printed after notifyAll() is called."
+          }
+        ]
       }
     },
     viva: [
@@ -697,7 +1746,58 @@ System.out.println(c == d);  // true (cached)`,
         explanation: "Java has eight wrapper classes — Boolean, Byte, Character, Short, Integer, Long, Float, Double — one for each primitive type. The compiler inserts Integer.valueOf(int) for autoboxing and i.intValue() for unboxing. valueOf() uses a cache: Integer caches values from -128 to 127 by default (configurable via -Djava.lang.Integer.IntegerCache.high=N); Long, Short, Byte, Character, and Boolean also cache; Float and Double do not. Comparing wrappers with == compares references, not values, so always use .equals() for value comparison. Unboxing a null wrapper throws NullPointerException. Autoboxing also occurs in: varargs (Object...), method arguments, and the ternary operator, which can lead to surprising type rules.",
         diagram: "Primitive       Wrapper\nint       ⇄   Integer\nlong      ⇄   Long\ndouble    ⇄   Double\nfloat     ⇄   Float\nboolean   ⇄   Boolean\nchar      ⇄   Character\nbyte      ⇄   Byte\nshort     ⇄   Short",
         example: "Integer i = 5;          // autoboxing\nint n = i;                // unboxing\nList<Integer> nums = new ArrayList<>();\nnums.add(1); nums.add(2); nums.add(3);  // autoboxing\nint sum = 0;\nfor (Integer x : nums) sum += x;        // unboxing on '+='",
-        conclusion: "Autoboxing and unboxing simplify code and integrate primitives with the collections framework, but you must be aware of caching, ==, and the NPE risk from unboxing null."
+        conclusion: "Autoboxing and unboxing simplify code and integrate primitives with the collections framework, but you must be aware of caching, ==, and the NPE risk from unboxing null.",
+        types: [
+          {
+            name: "Autoboxing",
+            definition: "Autoboxing is the automatic conversion of a primitive value (int, long, double, ...) into an instance of its corresponding wrapper class (Integer, Long, Double, ...), performed by the compiler at the point of assignment, method call, or return.",
+            diagram: "int  ---->  Integer\n  (primitive)  (wrapper)",
+            code: {
+              language: "java",
+              code: `import java.util.*;
+
+public class A {
+  public static void main(String[] args) {
+    List<Integer> nums = new ArrayList<>();
+    nums.add(10); // int 10 autoboxed to Integer.valueOf(10)
+    int x = nums.get(0); // unboxed back to int
+    System.out.println(x);
+  }
+}`,
+              caption: "Autoboxing and unboxing in a List<Integer>."
+            },
+            notes: [
+              "Added in Java 5; the compiler inserts Integer.valueOf(int) (or the equivalent for the type).",
+              "Required wherever a primitive is used where a wrapper or Object is expected (e.g. generics, collections).",
+              "Each autoboxing may allocate a new object, which matters in hot paths."
+            ],
+            exampleOutput: "10"
+          },
+          {
+            name: "Unboxing",
+            definition: "Unboxing is the automatic conversion of a wrapper instance (Integer, Long, Double, ...) to its corresponding primitive (int, long, double, ...). Throws NullPointerException if the wrapper is null.",
+            diagram: "Integer  ---->  int\n  (wrapper)  (primitive)\n  (null)       (NPE!)",
+            code: {
+              language: "java",
+              code: `public class U {
+  public static void main(String[] args) {
+    Integer a = 1;        // autoboxed
+    int b = a;            // unboxed
+    Integer n = null;
+    try { int c = n; }    // NPE on unbox
+    catch (NullPointerException e) { System.out.println("NPE"); }
+  }
+}`,
+              caption: "Unboxing a null Integer throws NullPointerException."
+            },
+            notes: [
+              "Compiler inserts .intValue() (or equivalent) at the use site.",
+              "Throws NullPointerException if the wrapper reference is null.",
+              "Prefer primitive types in arithmetic to avoid repeated boxing/unboxing."
+            ],
+            exampleOutput: "NPE"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Autoboxing and unboxing seamlessly convert between primitives and wrappers, enabling primitives to be used in generic collections and the Stream API.",
@@ -720,7 +1820,115 @@ System.out.println(c == d);  // true (cached)`,
           "Reflection and generic APIs",
           "varargs (Object... args)"
         ],
-        conclusion: "Autoboxing and unboxing are convenient but require care: use .equals() for value comparison, beware of NullPointerException when unboxing null, and prefer primitive streams (IntStream/LongStream/DoubleStream) for numeric hot paths to avoid allocation overhead."
+        conclusion: "Autoboxing and unboxing are convenient but require care: use .equals() for value comparison, beware of NullPointerException when unboxing null, and prefer primitive streams (IntStream/LongStream/DoubleStream) for numeric hot paths to avoid allocation overhead.",
+        types: [
+          {
+            name: "Autoboxing",
+            definition: "Autoboxing is the automatic conversion of a primitive value (int, long, double, ...) into an instance of its corresponding wrapper class (Integer, Long, Double, ...), performed by the compiler at the point of assignment, method call, or return.",
+            diagram: "int  ---->  Integer\n  (primitive)  (wrapper)",
+            code: {
+              language: "java",
+              code: `import java.util.*;
+
+public class A {
+  public static void main(String[] args) {
+    List<Integer> nums = new ArrayList<>();
+    nums.add(10); // int 10 autoboxed to Integer.valueOf(10)
+    int x = nums.get(0); // unboxed back to int
+    System.out.println(x);
+  }
+}`,
+              caption: "Autoboxing and unboxing in a List<Integer>."
+            },
+            notes: [
+              "Added in Java 5; the compiler inserts Integer.valueOf(int) (or the equivalent for the type).",
+              "Required wherever a primitive is used where a wrapper or Object is expected (e.g. generics, collections).",
+              "Each autoboxing may allocate a new object, which matters in hot paths.",
+              "Method overload resolution prefers the more specific (primitive) overload when both apply."
+            ],
+            exampleOutput: "10"
+          },
+          {
+            name: "Unboxing",
+            definition: "Unboxing is the automatic conversion of a wrapper instance (Integer, Long, Double, ...) to its corresponding primitive (int, long, double, ...). Throws NullPointerException if the wrapper is null.",
+            diagram: "Integer  ---->  int\n  (wrapper)  (primitive)\n  (null)       (NPE!)",
+            code: {
+              language: "java",
+              code: `public class U {
+  public static void main(String[] args) {
+    Integer a = 1;        // autoboxed
+    int b = a;            // unboxed
+    Integer n = null;
+    try { int c = n; }    // NPE on unbox
+    catch (NullPointerException e) { System.out.println("NPE"); }
+  }
+}`,
+              caption: "Unboxing a null Integer throws NullPointerException."
+            },
+            notes: [
+              "Compiler inserts .intValue() (or equivalent) at the use site.",
+              "Throws NullPointerException if the wrapper reference is null.",
+              "Prefer primitive types in arithmetic to avoid repeated boxing/unboxing.",
+              "Expressions like a == b (where both are wrappers) perform reference comparison unless unboxed."
+            ],
+            exampleOutput: "NPE"
+          },
+          {
+            name: "Wrapper value caching",
+            definition: "Integer, Long, Short, Byte, Character, and Boolean cache commonly-used values. Integer caches -128..127 by default; the upper bound is configurable via -Djava.lang.Integer.IntegerCache.high=N.",
+            diagram: "Integer i = 127;  // cached\nInteger j = 127;  // same object\nInteger k = 200;  // NOT cached",
+            code: {
+              language: "java",
+              code: `public class C {
+  public static void main(String[] args) {
+    Integer a = 127, b = 127;
+    Integer c = 200, d = 200;
+    System.out.println(a == b); // true  (cached)
+    System.out.println(c == d); // false (different objects)
+    System.out.println(c.equals(d)); // true (value equality)
+  }
+}`,
+              caption: "Caching makes == work for small Integer values, but not for larger ones."
+            },
+            notes: [
+              "Integer.valueOf(int) returns cached instances in [-128, 127] by default.",
+              "The same caching applies to Long, Short, Byte, Character, and Boolean (only TRUE/FALSE).",
+              "Float and Double do NOT cache values.",
+              "Use .equals() for value comparison of wrappers; never use ==."
+            ],
+            exampleOutput: "true\nfalse\ntrue"
+          },
+          {
+            name: "Common pitfalls",
+            definition: "Frequent gotchas with autoboxing/unboxing: == on wrappers compares references (except for cached values), unboxing null throws NPE, repeated boxing in loops hurts performance, and == on mixed types is a compile error.",
+            diagram: "Integer x = null;\nint y = x; // NPE",
+            code: {
+              language: "java",
+              code: `public class P {
+  public static void main(String[] args) {
+    // Pitfall 1: == on wrappers
+    Integer a = 1000, b = 1000;
+    System.out.println(a == b); // false; use .equals()
+    // Pitfall 2: unboxing null
+    Integer n = null;
+    try { int x = n; } catch (NullPointerException e) { System.out.println("NPE"); }
+    // Pitfall 3: boxing in hot loop
+    Long sum = 0L;
+    for (long i = 0; i < 10; i++) sum += i; // boxes every iteration
+    System.out.println(sum);
+  }
+}`,
+              caption: "Three classic autoboxing pitfalls in one program."
+            },
+            notes: [
+              "Always use .equals() to compare wrapper values; never use ==.",
+              "Unboxing a null wrapper throws NullPointerException - guard or use Optional.",
+              "Boxing in tight loops allocates wrappers; use primitive types or IntStream/LongStream/DoubleStream.",
+              "When mixing types (Integer and Long), the compiler requires explicit casts or widening conversions."
+            ],
+            exampleOutput: "false\nNPE\n45"
+          }
+        ]
       }
     },
     viva: [

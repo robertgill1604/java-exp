@@ -178,6 +178,71 @@ public class Main {
         definition: "Encapsulation is the wrapping of data (variables) and the code that operates on that data (methods) into a single unit. It restricts direct access to some of the object's components, preventing unintended interference and misuse of the data.",
         explanation: "In Java, encapsulation is implemented using access modifiers: private, default (package-private), protected, and public. Data members are usually declared private and accessed through public getter and setter methods. This allows the class to control how its data is modified — for example, validating values in setters. It also makes the class independent — its internal representation can change without affecting external code that uses the class. A class can expose read-only access by providing only a getter, or write-only access by providing only a setter.",
         diagram: "  +----------------------+\n  |     Student          |\n  +----------------------+\n  | - name : String      |\n  | - age  : int         |\n  +----------------------+\n  | + setName(String)    |\n  | + getName() : String |\n  | + setAge(int)        |\n  | + getAge() : int     |\n  +----------------------+",
+        types: [
+          {
+            name: "Data Hiding",
+            definition: "Data hiding restricts direct access to an object's fields so all interaction must go through the class's own methods.",
+            diagram: "  +-----------+\n  | - balance |  <-- private\n  +-----------+\n         ^\n         |  only via methods\n         v\n  +-----------+\n  | get / set |\n  +-----------+",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    public double getBalance() { return balance; }
+
+    void deposit(double amt) { balance += amt; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account();
+        a.deposit(100);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "balance is hidden; access is via methods only."
+            },
+            notes: [
+              "Fields are declared with the private modifier so they are invisible outside the class.",
+              "Every read and write must use a method defined in the class, giving the class full control.",
+              "Access is enforced at compile time by the compiler and at runtime by access flags in the .class file."
+            ],
+            exampleOutput: "100.0"
+          },
+          {
+            name: "Controlled Access (getters/setters)",
+            definition: "Controlled access exposes private data through public getter and setter methods that can validate, transform, or log values.",
+            diagram: "  client --set()--> [ private field ]\n          <--get()--\n   (validation in set, transform in get)",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    public void setBalance(double b) {
+        if (b >= 0) this.balance = b;
+    }
+
+    public double getBalance() { return balance; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account();
+        a.setBalance(250);
+        a.setBalance(-5);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "Setter rejects negative values; getter returns the stored value."
+            },
+            notes: [
+              "Setters can validate inputs and reject invalid values, enforcing class invariants.",
+              "Getters can compute, format, or trigger events on the way out without changing the call site.",
+              "Internal representation can evolve freely; external code keeps working as long as the public API is stable."
+            ],
+            exampleOutput: "250.0"
+          }
+        ],
         example: "class Account { private double balance; public void deposit(double amt) { if (amt > 0) balance += amt; } public double getBalance() { return balance; } } // balance is hidden; only validated deposit and read access are exposed.",
         conclusion: "Encapsulation provides data hiding, increases flexibility, reusability, and makes code easier to test and maintain. Combined with abstraction, it forms the foundation of well-designed Java applications."
       },
@@ -187,6 +252,130 @@ public class Main {
         explanation: "In Java, encapsulation is realized by declaring fields as private and exposing them through public accessor (getter) and mutator (setter) methods. This hides the internal representation and enables validation, lazy initialization, change notification, and read-only or write-only access (by exposing only getter or only setter). Encapsulation is also the foundation for designing robust, evolving APIs: clients depend on the public methods, not on internal fields, so internal implementation can change freely.\n\nThree benefits follow: (1) data protection — invalid values are rejected in setters; (2) flexibility — the class can change internally without breaking callers; (3) testability — controlled inputs and outputs make unit testing straightforward.",
         working: "At compile time, the compiler checks access modifiers and generates accessor methods where required. At runtime, the JVM uses access flags stored in the .class file to enforce visibility between classes. Reflection can bypass encapsulation, but doing so is risky and should be avoided in production code.",
         diagram: "+----------------------+\n|        Class         |\n+----------------------+\n| - data1 : Type       |\n| - data2 : Type       |\n+----------------------+\n| + getData1() : Type  |\n| + setData1(Type)     |\n| + operation()        |\n+----------------------+\n         ^\n         |  access only through public methods\n         |\n      Caller",
+        types: [
+          {
+            name: "Data Hiding",
+            definition: "Data hiding restricts direct access to an object's fields so all interaction must go through the class's own methods.",
+            diagram: "  +-----------+\n  | - balance |  <-- private\n  +-----------+\n         ^\n         |  only via methods\n         v\n  +-----------+\n  | get / set |\n  +-----------+",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    public double getBalance() { return balance; }
+
+    void deposit(double amt) { balance += amt; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account();
+        a.deposit(100);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "balance is private; access is through methods only."
+            },
+            notes: [
+              "Fields are declared private and cannot be referenced from any other class.",
+              "The class becomes the sole owner of its state and decides how that state is read or changed.",
+              "Combined with private methods, this makes a class a self-contained black box."
+            ],
+            exampleOutput: "100.0"
+          },
+          {
+            name: "Controlled Access (getters/setters)",
+            definition: "Controlled access exposes private data only through public accessor (getter) and mutator (setter) methods that can validate, transform, or notify.",
+            diagram: "  client --set()--> [ private field ]\n          <--get()--\n   (validation in set, transform in get)",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    public void setBalance(double b) {
+        if (b >= 0) this.balance = b;
+    }
+
+    public double getBalance() { return balance; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account();
+        a.setBalance(250);
+        a.setBalance(-5);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "Setter rejects negative amounts; getter returns the stored value."
+            },
+            notes: [
+              "Setters can validate, reject invalid values, or trigger side-effects (events, logging).",
+              "Getters can compute, format, or lazy-initialize values on the way out.",
+              "Internal representation can change without breaking callers, as long as the public API is preserved."
+            ],
+            exampleOutput: "250.0"
+          },
+          {
+            name: "Read-Only Fields",
+            definition: "Read-only fields are private fields exposed only via a public getter with no setter, so external code can observe but never change the value.",
+            diagram: "  client  --get-->  [ private final field ]\n              X--set--X   (no setter)",
+            code: {
+              language: "java",
+              code: `class User {
+    private final String id;
+
+    User(String id) { this.id = id; }
+
+    public String getId() { return id; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        User u = new User("U1001");
+        System.out.println(u.getId());
+    }
+}`,
+              caption: "Final id field with only a getter — read-only from outside."
+            },
+            notes: [
+              "The field is commonly declared final and assigned exactly once in the constructor.",
+              "Read-only fields are the foundation of immutable classes such as String and Integer.",
+              "External code can read the value but cannot mutate it, preventing accidental changes."
+            ],
+            exampleOutput: "U1001"
+          },
+          {
+            name: "Write-Only Fields",
+            definition: "Write-only fields are private fields exposed only via a setter with no public getter, so callers can push values in but never read them back.",
+            diagram: "  client  --set-->  [ private field ]\n              X--get--X   (no getter)",
+            code: {
+              language: "java",
+              code: `class SecureSink {
+    private String token;
+
+    public void setToken(String t) { this.token = t; }
+
+    void flush() { System.out.println("flushed"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        SecureSink s = new SecureSink();
+        s.setToken("abc");
+        s.flush();
+    }
+}`,
+              caption: "token can be set but never read from outside the class."
+            },
+            notes: [
+              "Useful for security-sensitive inputs such as passwords, tokens, or audit messages.",
+              "The field is consumed by an internal method rather than returned to the caller.",
+              "Read access can still be granted internally to trusted code paths within the class."
+            ],
+            exampleOutput: "flushed"
+          }
+        ],
         example: "class Employee {\n    private String name;\n    private double salary;\n\n    public void setSalary(double s) {\n        if (s >= 0) salary = s;\n    }\n    public String getName() { return name; }\n    public void setName(String n) { this.name = n; }\n    public double getSalary() { return salary; }\n}",
         output: "External code cannot read or modify name/salary directly. They are only accessed via getters/setters, and invalid salaries are rejected.",
         advantages: [
@@ -301,6 +490,73 @@ public class Main {
         definition: "Abstraction is the concept of exposing only the required characteristics of an entity and hiding the implementation details. In Java, it is implemented using abstract classes (0 to 100% abstraction) and interfaces (100% abstraction, with allowances for default methods in Java 8+).",
         explanation: "An abstract class may contain abstract methods (declared but not implemented) and concrete methods. A class that extends an abstract class must implement all abstract methods, otherwise it must also be declared abstract. Interfaces (pre-Java 8) only had abstract methods; from Java 8, they can have default and static methods, and from Java 9, private methods as well. Abstraction enables loose coupling and easier maintenance.",
         diagram: "         <<abstract>> Shape\n        +-----------------+\n        | + area() : dbl  | <-- abstract\n        | + display()     | <-- concrete\n        +-----------------+\n            ^\n            |\n     +------+------+\n     |             |\n   Circle       Rectangle\n     |             |\n     +-- area() override in each",
+        types: [
+          {
+            name: "Abstract Classes",
+            definition: "An abstract class is declared with the abstract keyword; it can mix abstract and concrete methods and may have constructors, but cannot be instantiated directly.",
+            diagram: "  <<abstract>> Shape\n  +------------------+\n  | + area()         | <-- abstract\n  | + display()      | <-- concrete\n  +------------------+\n        ^\n   +----+----+\n Circle   Square",
+            code: {
+              language: "java",
+              code: `abstract class Shape {
+    abstract double area();
+    void display() { System.out.println("A shape"); }
+}
+
+class Circle extends Shape {
+    double r;
+    Circle(double r) { this.r = r; }
+    @Override
+    double area() { return Math.PI * r * r; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Shape s = new Circle(5);
+        System.out.println(s.area());
+    }
+}`,
+              caption: "Shape is abstract; Circle supplies the concrete area()."
+            },
+            notes: [
+              "Abstract classes can declare constructors, instance fields, and any mix of abstract and concrete methods.",
+              "A non-abstract subclass must implement every inherited abstract method, or it must itself be declared abstract.",
+              "Abstract classes support partial abstraction (0 to 100%) and are useful when subclasses share code and state."
+            ],
+            exampleOutput: "78.53981633974483"
+          },
+          {
+            name: "Interfaces",
+            definition: "An interface is a reference type that declares a contract of abstract methods; from Java 8 it can also hold default and static methods, and from Java 9 private methods too.",
+            diagram: "  <<interface>> Vehicle\n  +------------------+\n  | + start()        |\n  | + stop()         |\n  +------------------+\n       ^ implements\n  +----+----+\n  Car     Bike",
+            code: {
+              language: "java",
+              code: `interface Vehicle {
+    void start();
+    void stop();
+}
+
+class Car implements Vehicle {
+    public void start() { System.out.println("Car start"); }
+    public void stop()  { System.out.println("Car stop"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Vehicle v = new Car();
+        v.start();
+        v.stop();
+    }
+}`,
+              caption: "Vehicle defines a contract; Car implements it."
+            },
+            notes: [
+              "Before Java 8, interfaces could only declare abstract methods and public static final constants.",
+              "From Java 8, interfaces can have default and static methods; from Java 9, they can also have private methods.",
+              "A class can implement any number of interfaces, providing Java's form of multiple inheritance of type."
+            ],
+            exampleOutput: "Car start\nCar stop"
+          }
+        ],
         example: "abstract class Animal { abstract void sound(); } class Dog extends Animal { @Override void sound() { System.out.println(\"Bark\"); } } // Animal defines the contract; Dog provides concrete behavior.",
         conclusion: "Abstraction simplifies complex systems by exposing only the relevant parts and is key to designing scalable, maintainable systems."
       },
@@ -310,6 +566,103 @@ public class Main {
         explanation: "Abstract classes can have constructors, instance variables, abstract methods, and concrete methods. They are used when classes share code. Interfaces (before Java 8) were pure abstract; from Java 8, they can have default and static methods with bodies. From Java 9, they can also have private methods. A class can implement multiple interfaces, providing Java's way of supporting multiple inheritance of type. Abstract data types (ADTs) like List, Set, Map are practical examples.\n\nChoosing between an abstract class and an interface: use an abstract class when classes share code (state + behavior); use an interface to define a contract that many unrelated classes can implement, or to mix in capabilities.",
         working: "The compiler ensures that any non-abstract subclass provides implementations for all inherited abstract methods. At runtime, the JVM uses dynamic dispatch (vtable lookup) to call the correct overridden method on the actual object type.",
         diagram: "      <<interface>> Drawable\n      +-----------------+\n      | + draw()        |\n      +-----------------+\n             ^\n      +------+------+\n      |             |\n   Circle        Square\n      |             |\n      +-- draw() override in each",
+        types: [
+          {
+            name: "Abstract Classes",
+            definition: "An abstract class is declared with the abstract keyword; it can hold constructors, instance state, and any mix of abstract and concrete methods, but cannot be instantiated directly.",
+            diagram: "  <<abstract>> Shape\n  +------------------+\n  | + area()         | <-- abstract\n  | + display()      | <-- concrete\n  +------------------+\n        ^\n   +----+----+\n Circle   Square",
+            code: {
+              language: "java",
+              code: `abstract class Shape {
+    abstract double area();
+    void display() { System.out.println("A shape"); }
+}
+
+class Circle extends Shape {
+    double r;
+    Circle(double r) { this.r = r; }
+    @Override
+    double area() { return Math.PI * r * r; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Shape s = new Circle(5);
+        System.out.println(s.area());
+    }
+}`,
+              caption: "Shape is abstract; Circle supplies the concrete area()."
+            },
+            notes: [
+              "Abstract classes can declare constructors that are invoked by subclass constructors via super().",
+              "An abstract class can have zero abstract methods; the 'abstract' modifier alone is enough to block instantiation.",
+              "Subclasses must implement all inherited abstract methods or be declared abstract themselves."
+            ],
+            exampleOutput: "78.53981633974483"
+          },
+          {
+            name: "Interfaces",
+            definition: "An interface is a reference type that declares an abstract contract; from Java 8 it can also hold default and static methods, and from Java 9 private methods too.",
+            diagram: "  <<interface>> Vehicle\n  +------------------+\n  | + start()        |\n  | + stop()         |\n  +------------------+\n       ^ implements\n  +----+----+\n  Car     Bike",
+            code: {
+              language: "java",
+              code: `interface Vehicle {
+    void start();
+    void stop();
+}
+
+class Car implements Vehicle {
+    public void start() { System.out.println("Car start"); }
+    public void stop()  { System.out.println("Car stop"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Vehicle v = new Car();
+        v.start();
+        v.stop();
+    }
+}`,
+              caption: "Vehicle defines a contract; Car implements it."
+            },
+            notes: [
+              "Pre-Java 8, interfaces could contain only abstract methods and public static final constants.",
+              "Java 8 added default and static methods; Java 9 added private methods to share code inside the interface.",
+              "A class can implement any number of interfaces, providing Java's form of multiple inheritance of type."
+            ],
+            exampleOutput: "Car start\nCar stop"
+          },
+          {
+            name: "Abstract Methods",
+            definition: "An abstract method is declared without a body; every concrete subclass must provide its own implementation, forming the contract enforced at compile time.",
+            diagram: "  abstract void draw();   // declaration\n  -----------------------\n  class Circle {\n      void draw() { ... }  // implementation\n  }",
+            code: {
+              language: "java",
+              code: `abstract class Animal {
+    abstract void sound();
+}
+
+class Dog extends Animal {
+    @Override
+    void sound() { System.out.println("Bark"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a = new Dog();
+        a.sound();
+    }
+}`,
+              caption: "sound() is abstract in Animal; Dog provides the body."
+            },
+            notes: [
+              "An abstract method has a signature but no body; only the abstract modifier and a semicolon are required.",
+              "Abstract methods cannot be private, static, or final because they must be visible and overridable by subclasses.",
+              "If a subclass does not implement an inherited abstract method, it must be declared abstract too."
+            ],
+            exampleOutput: "Bark"
+          }
+        ],
         example: "interface Vehicle { void start(); void stop(); }\nclass Car implements Vehicle {\n    @Override public void start() { System.out.println(\"Car start\"); }\n    @Override public void stop()  { System.out.println(\"Car stop\"); }\n}\nclass Bike implements Vehicle {\n    @Override public void start() { System.out.println(\"Bike start\"); }\n    @Override public void stop()  { System.out.println(\"Bike stop\"); }\n}",
         output: "Car start\nCar stop",
         advantages: [
@@ -440,6 +793,65 @@ public class Main {
         explanation: "Java supports several types of inheritance:\n1. Single inheritance — a class extends one parent (Java allows only this for classes).\n2. Multilevel inheritance — a chain: A -> B -> C.\n3. Hierarchical inheritance — multiple subclasses share one parent.\n4. Multiple inheritance (of type) — a class implements multiple interfaces.\n\nJava does NOT support multiple inheritance of classes (to avoid the diamond problem). Constructors are not inherited, but the subclass constructor must call super(...) as its first statement (explicitly or implicitly). Private members of the parent are not directly accessible in the child, but they are inherited as part of the object. The 'super' keyword refers to the parent class.",
         diagram: "           Vehicle\n          +--------+\n          | honk() |\n          +--------+\n              ^  extends\n              |\n            Car\n        +--------+\n        | doors  |\n        | honk() | (overridden)\n        +--------+",
         example: "class Animal { String name; void eat() { System.out.println(name + \" eats\"); } } class Dog extends Animal { void bark() { System.out.println(name + \" barks\"); } } Dog d = new Dog(); d.name = \"Rex\"; d.eat(); d.bark();",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is the case where one class extends exactly one superclass, forming a direct parent-child relationship.",
+            diagram: "  Animal\n    ^\n    | extends\n    |\n    Dog",
+            code: {
+              language: "java",
+              code: `class Animal {
+    void eat() { System.out.println("eat"); }
+}
+
+class Dog extends Animal {
+    void bark() { System.out.println("bark"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        d.eat();
+        d.bark();
+    }
+}`,
+              caption: "Dog inherits from Animal via single inheritance."
+            },
+            notes: [
+              "Every class in Java is part of a single-inheritance chain ending at java.lang.Object.",
+              "A subclass automatically gains all non-private members of its single superclass.",
+              "If no superclass is specified, the class implicitly extends Object."
+            ],
+            exampleOutput: "eat\nbark"
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance is a chain of single inheritance where a class extends another, which itself extends a third, building an ancestor chain.",
+            diagram: "  Animal\n    ^\n    |\n   Dog\n    ^\n    |\n  Puppy",
+            code: {
+              language: "java",
+              code: `class Animal { void eat() { System.out.println("eat"); } }
+class Dog extends Animal { void bark() { System.out.println("bark"); } }
+class Puppy extends Dog { void weep() { System.out.println("weep"); } }
+
+public class Main {
+    public static void main(String[] args) {
+        Puppy p = new Puppy();
+        p.eat();
+        p.bark();
+        p.weep();
+    }
+}`,
+              caption: "Puppy inherits Dog, which inherits Animal."
+            },
+            notes: [
+              "Members accumulate as the chain deepens; Puppy has access to eat(), bark(), and weep().",
+              "The constructor chain calls super() implicitly at each level, finally reaching Object().",
+              "Java forbids multiple-inheritance of classes, so this kind of chain is the only way to share state across levels."
+            ],
+            exampleOutput: "eat\nbark\nweep"
+          }
+        ],
         conclusion: "Inheritance enables code reuse and polymorphism, but it should be used only when there is a true 'is-a' relationship. Overuse leads to fragile hierarchies; many modern designs prefer composition over inheritance."
       },
       sixteenMark: {
@@ -450,6 +862,154 @@ public class Main {
         diagram: "        +-------------+\n        |   Vehicle   |\n        +-------------+\n        | brand       |\n        | year        |\n        | honk()      |\n        +-------------+\n              ^  extends\n              |\n        +-------------+\n        |     Car     |\n        +-------------+\n        | doors       |\n        | honk() { ... }  <-- overridden\n        +-------------+",
         example: "class Employee {\n    String name;\n    double salary;\n    Employee(String name, double salary) {\n        this.name = name; this.salary = salary;\n    }\n    double computeBonus() { return salary * 0.10; }\n}\nclass Manager extends Employee {\n    Manager(String n, double s) { super(n, s); }\n    @Override\n    double computeBonus() { return salary * 0.20 + 5000; }\n}",
         output: "Manager gets a higher bonus than a regular Employee due to the overridden computeBonus().",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is the case where one class extends exactly one superclass, forming a direct parent-child relationship.",
+            diagram: "  Animal\n    ^\n    | extends\n    |\n    Dog",
+            code: {
+              language: "java",
+              code: `class Animal {
+    void eat() { System.out.println("eat"); }
+}
+
+class Dog extends Animal {
+    void bark() { System.out.println("bark"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        d.eat();
+        d.bark();
+    }
+}`,
+              caption: "Dog inherits from Animal via single inheritance."
+            },
+            notes: [
+              "Every class in Java is part of a single-inheritance chain ending at java.lang.Object.",
+              "A subclass automatically gains all non-private members of its single superclass.",
+              "If no superclass is specified, the class implicitly extends Object."
+            ],
+            exampleOutput: "eat\nbark"
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance is a chain of single inheritance where a class extends another, which itself extends a third, building an ancestor chain.",
+            diagram: "  Animal\n    ^\n    |\n   Dog\n    ^\n    |\n  Puppy",
+            code: {
+              language: "java",
+              code: `class Animal { void eat() { System.out.println("eat"); } }
+class Dog extends Animal { void bark() { System.out.println("bark"); } }
+class Puppy extends Dog { void weep() { System.out.println("weep"); } }
+
+public class Main {
+    public static void main(String[] args) {
+        Puppy p = new Puppy();
+        p.eat();
+        p.bark();
+        p.weep();
+    }
+}`,
+              caption: "Puppy inherits Dog, which inherits Animal."
+            },
+            notes: [
+              "Members accumulate as the chain deepens; Puppy has access to eat(), bark(), and weep().",
+              "The constructor chain calls super() implicitly at each level, finally reaching Object().",
+              "Java forbids multiple-inheritance of classes, so this kind of chain is the only way to share state across levels."
+            ],
+            exampleOutput: "eat\nbark\nweep"
+          },
+          {
+            name: "Hierarchical Inheritance",
+            definition: "Hierarchical inheritance is the case where multiple subclasses share the same superclass, each extending it independently.",
+            diagram: "       Animal\n   +-----+-----+\n   |     |     |\n  Dog   Cat   Cow",
+            code: {
+              language: "java",
+              code: `class Animal { void eat() { System.out.println("eat"); } }
+class Dog  extends Animal { void sound() { System.out.println("bark"); } }
+class Cat  extends Animal { void sound() { System.out.println("meow"); } }
+class Cow  extends Animal { void sound() { System.out.println("moo");  } }
+
+public class Main {
+    public static void main(String[] args) {
+        new Dog().eat();  new Dog().sound();
+        new Cat().eat();  new Cat().sound();
+        new Cow().eat();  new Cow().sound();
+    }
+}`,
+              caption: "Dog, Cat, and Cow each extend Animal independently."
+            },
+            notes: [
+              "Each subclass inherits the parent's members and may add or override its own.",
+              "This pattern models a shared abstraction with many concrete variants in the real world.",
+              "A change in the parent class automatically affects all subclasses, so design parent APIs carefully."
+            ],
+            exampleOutput: "eat\nbark\neat\nmeow\neat\nmoo"
+          },
+          {
+            name: "Multiple Inheritance (via Interfaces)",
+            definition: "Java does not allow a class to extend more than one class, but a class can implement any number of interfaces, providing multiple inheritance of type.",
+            diagram: "  I1  I2\n   ^   ^\n   |   |\n   +---+---+\n       |\n       C",
+            code: {
+              language: "java",
+              code: `interface Flyable { void fly(); }
+interface Swimmable { void swim(); }
+
+class Duck implements Flyable, Swimmable {
+    public void fly()  { System.out.println("flying");  }
+    public void swim() { System.out.println("swimming"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Duck d = new Duck();
+        d.fly();
+        d.swim();
+    }
+}`,
+              caption: "Duck implements both Flyable and Swimmable."
+            },
+            notes: [
+              "If two interfaces declare the same default method, the implementing class must override it to disambiguate.",
+              "Interfaces solve the diamond problem by allowing only one default implementation of any given method.",
+              "This is Java's way of expressing 'is-a' relationships with more than one capability."
+            ],
+            exampleOutput: "flying\nswimming"
+          },
+          {
+            name: "Hybrid Inheritance",
+            definition: "Hybrid inheritance combines more than one of the previous forms, typically using interfaces to overcome Java's no-multiple-inheritance restriction.",
+            diagram: "   I1  I2\n    ^   ^\n    |   |\n    +---+---+\n        |\n        C extends B  (B is a class)\n        +-- implements I1, I2",
+            code: {
+              language: "java",
+              code: `class Animal { void eat() { System.out.println("eat"); } }
+interface Pet    { void play();   }
+interface Trainable { void learn(); }
+
+class Dog extends Animal implements Pet, Trainable {
+    public void play()  { System.out.println("play");  }
+    public void learn() { System.out.println("learn"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        d.eat();
+        d.play();
+        d.learn();
+    }
+}`,
+              caption: "Dog extends Animal and implements Pet and Trainable."
+            },
+            notes: [
+              "This is the practical 'best of all worlds' form: single class inheritance plus multiple interface implementation.",
+              "Use this when a class is genuinely 'a kind of X' and additionally 'is also Y and Z'.",
+              "The result resembles a hybrid of hierarchical and multiple inheritance without the diamond problem."
+            ],
+            exampleOutput: "eat\nplay\nlearn"
+          }
+        ],
         advantages: [
           "Promotes code reuse — common code lives in the parent",
           "Models real-world hierarchical relationships (is-a)",
@@ -566,6 +1126,63 @@ public class Main {
         explanation: "1. Compile-time (static) polymorphism — achieved through method overloading. The compiler picks the correct method based on argument types at compile time. Return type alone does not disambiguate.\n\n2. Run-time (dynamic) polymorphism — achieved through method overriding. A subclass provides a specific implementation of a method already defined in its parent. The JVM uses dynamic dispatch to call the most specific version based on the actual object type at runtime.\n\nPolymorphism enables code like: Animal a = new Dog(); a.sound(); — the same call behaves differently based on the actual object. This is the foundation of flexible, extensible design.",
         diagram: "Compile-time                 Run-time\n(overloading)               (overriding)\n   |                            |\n   v                            v\nadd(int, int)              Animal a;\nadd(double, double)        a = new Dog();   // a.sound() -> \"Bark\"\nadd(int, int, int)         a = new Cat();   // a.sound() -> \"Meow\"",
         example: "class Shape { void draw() { System.out.println(\"Drawing shape\"); } } class Circle extends Shape { @Override void draw() { System.out.println(\"Drawing circle\"); } } Shape s = new Circle(); s.draw(); // Output: Drawing circle",
+        types: [
+          {
+            name: "Compile-time Polymorphism (Overloading)",
+            definition: "Compile-time polymorphism is achieved by method overloading: multiple methods share the same name but differ in parameter list, so the compiler selects the right one based on argument types at compile time.",
+            diagram: "  add(int,int)     --> resolved by compiler\n  add(double,double) --> resolved by compiler\n  add(int,int,int)   --> resolved by compiler",
+            code: {
+              language: "java",
+              code: `class Math {
+    int add(int a, int b)        { return a + b; }
+    double add(double a, double b){ return a + b; }
+    int add(int a, int b, int c) { return a + b + c; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Math m = new Math();
+        System.out.println(m.add(1, 2));
+        System.out.println(m.add(1.5, 2.5));
+        System.out.println(m.add(1, 2, 3));
+    }
+}`,
+              caption: "add() is overloaded with different parameter lists."
+            },
+            notes: [
+              "The compiler picks the method at compile time using the static types of the arguments.",
+              "Return type alone does NOT distinguish overloads; the parameter list must differ.",
+              "There is zero runtime cost; the binding is already fixed in the .class file."
+            ],
+            exampleOutput: "3\n4.0\n6"
+          },
+          {
+            name: "Run-time Polymorphism (Overriding)",
+            definition: "Run-time polymorphism is achieved by method overriding: a subclass provides a specific implementation of a method inherited from its superclass, and the JVM picks the actual object's version at runtime via dynamic dispatch.",
+            diagram: "  Animal a = new Dog();\n  a.sound(); ---> Dog.sound()  (chosen at runtime)\n  a = new Cat();\n  a.sound(); ---> Cat.sound()  (chosen at runtime)",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("..."); } }
+class Dog  extends Animal { @Override void sound() { System.out.println("Bark"); } }
+class Cat  extends Animal { @Override void sound() { System.out.println("Meow"); } }
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a;
+        a = new Dog(); a.sound();
+        a = new Cat(); a.sound();
+    }
+}`,
+              caption: "Parent reference, child object — dynamic dispatch picks the child's version."
+            },
+            notes: [
+              "Static binding uses the reference type; dynamic dispatch uses the actual object type.",
+              "Only instance methods are dispatched dynamically; static, final, and private methods are statically bound.",
+              "The @Override annotation helps the compiler verify that you are overriding rather than overloading."
+            ],
+            exampleOutput: "Bark\nMeow"
+          }
+        ],
         conclusion: "Polymorphism is the key to flexible, decoupled systems. Compile-time polymorphism is resolved by the compiler; runtime polymorphism is resolved by the JVM via dynamic dispatch. Together they make Java a powerful language for extensibility."
       },
       sixteenMark: {
@@ -576,6 +1193,63 @@ public class Main {
         diagram: "Compile-time (overloading)         Run-time (overriding)\n+-------------------+             +-------------------+\n| print(int)        |             |   Animal          |\n| print(String)     |             |   sound()         |\n| print(double)     |             +-------------------+\n+-------------------+                       ^\n   Selected at compile time             +-----+-----+\n                                        |           |\n                                      Dog         Cat\n                                   sound()=B   sound()=M\n                                        |           |\n                                Selected at run time",
         example: "class Bank { double rate() { return 5.0; } }\nclass SBI extends Bank { @Override double rate() { return 6.5; } }\nclass HDFC extends Bank { @Override double rate() { return 7.0; } }\n\npublic static void main(String[] args) {\n    Bank b;\n    b = new SBI();   System.out.println(\"SBI rate: \" + b.rate() + \"%\");\n    b = new HDFC();  System.out.println(\"HDFC rate: \" + b.rate() + \"%\");\n}",
         output: "SBI rate: 6.5%\nHDFC rate: 7.0%",
+        types: [
+          {
+            name: "Compile-time Polymorphism (Overloading)",
+            definition: "Compile-time polymorphism is achieved by method overloading: multiple methods share the same name but differ in parameter list, so the compiler selects the right one based on argument types at compile time.",
+            diagram: "  add(int,int)     --> resolved by compiler\n  add(double,double) --> resolved by compiler\n  add(int,int,int)   --> resolved by compiler",
+            code: {
+              language: "java",
+              code: `class Math {
+    int add(int a, int b)         { return a + b; }
+    double add(double a, double b){ return a + b; }
+    int add(int a, int b, int c)  { return a + b + c; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Math m = new Math();
+        System.out.println(m.add(1, 2));
+        System.out.println(m.add(1.5, 2.5));
+        System.out.println(m.add(1, 2, 3));
+    }
+}`,
+              caption: "add() is overloaded with different parameter lists."
+            },
+            notes: [
+              "The compiler picks the method at compile time using the static types of the arguments.",
+              "Return type alone does NOT distinguish overloads; the parameter list must differ.",
+              "There is zero runtime cost; the binding is already fixed in the .class file."
+            ],
+            exampleOutput: "3\n4.0\n6"
+          },
+          {
+            name: "Run-time Polymorphism (Overriding)",
+            definition: "Run-time polymorphism is achieved by method overriding: a subclass provides a specific implementation of a method inherited from its superclass, and the JVM picks the actual object's version at runtime via dynamic dispatch.",
+            diagram: "  Animal a = new Dog();\n  a.sound(); ---> Dog.sound()  (chosen at runtime)\n  a = new Cat();\n  a.sound(); ---> Cat.sound()  (chosen at runtime)",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("..."); } }
+class Dog  extends Animal { @Override void sound() { System.out.println("Bark"); } }
+class Cat  extends Animal { @Override void sound() { System.out.println("Meow"); } }
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a;
+        a = new Dog(); a.sound();
+        a = new Cat(); a.sound();
+    }
+}`,
+              caption: "Parent reference, child object — dynamic dispatch picks the child's version."
+            },
+            notes: [
+              "Static binding uses the reference type; dynamic dispatch uses the actual object type.",
+              "Only instance methods are dispatched dynamically; static, final, and private methods are statically bound.",
+              "The @Override annotation helps the compiler verify that you are overriding rather than overloading."
+            ],
+            exampleOutput: "Bark\nMeow"
+          }
+        ],
         advantages: [
           "Single interface for multiple types",
           "Easy to extend — add new subclasses without changing existing code",
@@ -684,6 +1358,68 @@ public class Main {
         explanation: "Key points about classes and objects:\n1. Class declaration: contains fields, methods, constructors, and possibly nested classes.\n2. Object creation: 'new ClassName(args)' allocates memory, calls a constructor, and returns a reference.\n3. Reference variables: hold the address of an object, not the object itself. Stored on the stack.\n4. Anonymous objects: 'new Student(...)' used immediately without assigning to a variable.\n5. The 'this' keyword: refers to the current object inside instance methods/constructors.\n6. Memory: class metadata goes to the method area; each object goes to the heap.\n7. Multiple references can point to the same object; modifying it via one reference is visible to all.\n8. Garbage collection reclaims objects when no live references remain.",
         diagram: "      Class: Student              Heap\n     +----------------+      +-------------------+\n     | name : String  |      | s1 -> name=Alice  |\n     | rollNo : int   |      |      rollNo=101   |\n     | introduce()    |      +-------------------+\n     +----------------+      +-------------------+\n                             | s2 -> name=Bob    |\n     s1 = new Student(...)   |      rollNo=102   |\n     s2 = new Student(...)   +-------------------+\n                             (two distinct objects)",
         example: "class Box { int length, width; Box(int l, int w) { length = l; width = w; } int area() { return length * width; } } Box b1 = new Box(5, 3); Box b2 = new Box(7, 2); System.out.println(b1.area()); // 15",
+        types: [
+          {
+            name: "Class Members (static)",
+            definition: "Class members are declared with the static modifier and belong to the class itself, not to any particular object; there is exactly one copy per class, regardless of how many objects are created.",
+            diagram: "  static int count;  -->  one per class\n  static void inc()  -->  one per class\n  shared by all objects",
+            code: {
+              language: "java",
+              code: `class Counter {
+    static int count;
+
+    Counter() { count++; }
+
+    static void show() { System.out.println("count=" + count); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        new Counter();
+        Counter.show();
+    }
+}`,
+              caption: "count is shared by all Counter objects."
+            },
+            notes: [
+              "Static members are accessed via ClassName.member, not via an object reference.",
+              "They are loaded into the method area when the class is initialized, before any object is created.",
+              "Static methods cannot use 'this' or 'super' and can only call other static members directly."
+            ],
+            exampleOutput: "count=3"
+          },
+          {
+            name: "Instance Members",
+            definition: "Instance members are declared without the static modifier and belong to individual objects; every object has its own copy of every instance field.",
+            diagram: "  int value;   --> one per object\n  void set()   --> one per object\n  each object has its own state",
+            code: {
+              language: "java",
+              code: `class Box {
+    int size;
+
+    Box(int s) { this.size = s; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box a = new Box(10);
+        Box b = new Box(20);
+        System.out.println(a.size);
+        System.out.println(b.size);
+    }
+}`,
+              caption: "Each Box has its own size value."
+            },
+            notes: [
+              "Instance fields are initialized to default values (0, false, null) before any constructor runs.",
+              "Instance methods implicitly receive 'this' — the object on which the method was called.",
+              "Two instances of the same class are independent: changing one does not affect the other."
+            ],
+            exampleOutput: "10\n20"
+          }
+        ],
         conclusion: "Classes are blueprints; objects are the concrete things built from them. Java programs create objects dynamically, call methods on them, and the JVM manages their lifetime in the heap."
       },
       sixteenMark: {
@@ -694,6 +1430,126 @@ public class Main {
         diagram: "+---------------------------+\n|  Stack                   |\n|  +---------------------+ |\n|  | s1 (ref)            | |\n|  | s2 (ref)            | |\n|  +---------------------+ |\n+-------------|-----------+\n              v\n+---------------------------+\n|  Heap                     |\n|  +-----------+ +---------+|\n|  | Object s1 | | Object s2||\n|  | name=A   | | name=B   ||\n|  | roll=101 | | roll=102 ||\n|  +-----------+ +---------+|\n+---------------------------+\n              ^\n              |\n+---------------------------+\n|  Method Area              |\n|  Class: Student           |\n|  - field signatures       |\n|  - method bytecode        |\n+---------------------------+",
         example: "class Point {\n    int x, y;\n    Point(int x, int y) {\n        this.x = x;     // 'this.x' refers to the field, x refers to the parameter\n        this.y = y;\n    }\n    void print() {\n        System.out.println(\"(\" + x + \", \" + y + \")\");\n    }\n}\nPoint p = new Point(3, 4);\np.print();",
         output: "(3, 4)",
+        types: [
+          {
+            name: "Class Members (static)",
+            definition: "Class members are declared with the static modifier and belong to the class itself, not to any particular object; there is exactly one copy per class, regardless of how many objects are created.",
+            diagram: "  static int count;  -->  one per class\n  static void inc()  -->  one per class\n  shared by all objects",
+            code: {
+              language: "java",
+              code: `class Counter {
+    static int count;
+
+    Counter() { count++; }
+
+    static void show() { System.out.println("count=" + count); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        new Counter();
+        Counter.show();
+    }
+}`,
+              caption: "count is shared by all Counter objects."
+            },
+            notes: [
+              "Static members are accessed via ClassName.member, not via an object reference.",
+              "They are loaded into the method area when the class is initialized, before any object is created.",
+              "Static methods cannot use 'this' or 'super' and can only call other static members directly."
+            ],
+            exampleOutput: "count=3"
+          },
+          {
+            name: "Instance Members",
+            definition: "Instance members are declared without the static modifier and belong to individual objects; every object has its own copy of every instance field.",
+            diagram: "  int value;   --> one per object\n  void set()   --> one per object\n  each object has its own state",
+            code: {
+              language: "java",
+              code: `class Box {
+    int size;
+
+    Box(int s) { this.size = s; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box a = new Box(10);
+        Box b = new Box(20);
+        System.out.println(a.size);
+        System.out.println(b.size);
+    }
+}`,
+              caption: "Each Box has its own size value."
+            },
+            notes: [
+              "Instance fields are initialized to default values (0, false, null) before any constructor runs.",
+              "Instance methods implicitly receive 'this' — the object on which the method was called.",
+              "Two instances of the same class are independent: changing one does not affect the other."
+            ],
+            exampleOutput: "10\n20"
+          },
+          {
+            name: "Local Variables",
+            definition: "Local variables are declared inside a method, constructor, or block; they live on the stack for the duration of the call and have no default value, so they must be definitely assigned before use.",
+            diagram: "  void m() {\n      int x = 5;  <-- local, on stack\n      System.out.println(x);\n  }",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show() {
+        int x = 10;
+        if (x > 0) {
+            int y = 20;
+            System.out.println(x + y);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Demo().show();
+    }
+}`,
+              caption: "x and y are local variables inside methods/blocks."
+            },
+            notes: [
+              "Local variables are stored in the stack frame of the current method call.",
+              "They have no default value; reading an uninitialized local is a compile-time error.",
+              "Block-scoped: a variable declared inside { } is visible only up to the closing brace."
+            ],
+            exampleOutput: "30"
+          },
+          {
+            name: "Block Types",
+            definition: "Java has several kinds of blocks: instance initializer blocks, static initializer blocks, and plain code blocks inside methods; each runs at a well-defined moment in the object or class lifecycle.",
+            diagram: "  class C {\n      static { ... }   <-- once, on class load\n      { ... }          <-- per object, before ctor body\n      C() { ... }      <-- ctor body\n  }",
+            code: {
+              language: "java",
+              code: `class Trace {
+    static { System.out.println("static block"); }
+
+    { System.out.println("instance block"); }
+
+    Trace() { System.out.println("constructor"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Trace();
+    }
+}`,
+              caption: "Static block runs once, instance block and constructor run per object."
+            },
+            notes: [
+              "Static blocks run once when the class is initialized, in the order they appear.",
+              "Instance initializer blocks run on every object creation, before the constructor body.",
+              "Plain code blocks in methods are simply used to scope local variables."
+            ],
+            exampleOutput: "static block\ninstance block\nconstructor"
+          }
+        ],
         advantages: [
           "Classes provide reusability — one class, many objects",
           "Objects model real-world entities naturally",
@@ -820,6 +1676,99 @@ public class Main {
         explanation: "Types of constructors in Java:\n1. Default constructor — no-arg, provided automatically by the compiler if no constructor is defined.\n2. Parameterized constructor — accepts arguments to set initial values.\n3. Copy constructor — not built-in but commonly written by accepting an object of the same type and copying its fields.\n4. Private constructor — restricts instantiation; used in singleton pattern and utility classes.\n5. Constructor chaining — this() calls another constructor in the same class; super() calls the parent constructor.\n\nRules: the first statement of a constructor is either this() or super() (explicit or implicit). Constructors are not inherited, but a subclass constructor implicitly calls super() if no explicit super(...) is provided.",
         diagram: "Student s = new Student(\"John\", 20);\n          |\n          +--> Constructor Student(String, int) is invoked\n                  |\n                  +--> super() (Object) called implicitly\n                  +--> Initializes name and age\n                  +--> Returns reference to s",
         example: "class Box { int l, b; Box() { l = 0; b = 0; } Box(int x, int y) { l = x; b = y; } Box(Box o) { l = o.l; b = o.b; } } // Default, parameterized, and copy constructors.",
+        types: [
+          {
+            name: "Default Constructor",
+            definition: "A default constructor is a no-argument constructor the compiler provides automatically only when a class defines no constructor at all.",
+            diagram: "  class Box { }\n  Box b = new Box();   <-- default ctor synthesized",
+            code: {
+              language: "java",
+              code: `class Box {
+    int x;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box b = new Box();
+        System.out.println(b.x);
+    }
+}`,
+              caption: "Compiler provides the no-arg constructor automatically."
+            },
+            notes: [
+              "The default constructor has no parameters and simply calls super().",
+              "It is added only when the class has no other constructor; defining any constructor removes it.",
+              "Fields are initialized to their default values (0, false, null) before the constructor body runs."
+            ],
+            exampleOutput: "0"
+          },
+          {
+            name: "Parameterized Constructor",
+            definition: "A parameterized constructor accepts arguments so that the caller can supply initial values for the new object's fields at creation time.",
+            diagram: "  Box(int l, int w)  --> ctor with parameters\n  Box b = new Box(5, 3);  <-- values passed in",
+            code: {
+              language: "java",
+              code: `class Box {
+    int l, w;
+
+    Box(int l, int w) {
+        this.l = l;
+        this.w = w;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box b = new Box(5, 3);
+        System.out.println(b.l * b.w);
+    }
+}`,
+              caption: "Parameterized ctor initializes l and w from arguments."
+            },
+            notes: [
+              "Parameters can be any number or type, allowing flexible object creation.",
+              "Using 'this.field' disambiguates shadowing when parameter names match field names.",
+              "A class can declare many parameterized constructors; the compiler picks the one matching the arguments."
+            ],
+            exampleOutput: "15"
+          },
+          {
+            name: "Copy Constructor",
+            definition: "A copy constructor takes another object of the same class and copies its field values into the new object, producing a field-by-field clone.",
+            diagram: "  Box(Box other)  --> copies other.l, other.w\n  Box b2 = new Box(b1);",
+            code: {
+              language: "java",
+              code: `class Box {
+    int l, w;
+
+    Box(int l, int w) {
+        this.l = l;
+        this.w = w;
+    }
+
+    Box(Box other) {
+        this.l = other.l;
+        this.w = other.w;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box a = new Box(2, 3);
+        Box b = new Box(a);
+        System.out.println(b.l + "," + b.w);
+    }
+}`,
+              caption: "Box(Box) copies fields from another Box."
+            },
+            notes: [
+              "Java does not auto-generate a copy constructor; you must write it yourself.",
+              "The result is a shallow copy: object fields are shared, not deep-cloned.",
+              "Useful when you want a new object with the same starting state as an existing one."
+            ],
+            exampleOutput: "2,3"
+          }
+        ],
         conclusion: "Constructors ensure objects are always initialized in a valid state, support encapsulation of initialization logic, and enable flexible object creation through overloading and chaining."
       },
       sixteenMark: {
@@ -830,6 +1779,160 @@ public class Main {
         diagram: "ClassLoader loads class\n            |\n         new MyClass()\n            |\n    Heap: allocate object\n            |\n    Initialize fields to defaults\n            |\n    Invoke constructor body\n            |\n    Return reference",
         example: "class Employee {\n    String name;\n    double salary;\n\n    Employee() { this(\"Unknown\", 0); }   // chains to parameterized\n\n    Employee(String n, double s) {\n        name = n;\n        salary = s;\n    }\n}",
         output: "Constructors can be chained via this() and super() to avoid duplication.",
+        types: [
+          {
+            name: "Default Constructor",
+            definition: "A default constructor is a no-argument constructor the compiler provides automatically only when a class defines no constructor at all.",
+            diagram: "  class Box { }\n  Box b = new Box();   <-- default ctor synthesized",
+            code: {
+              language: "java",
+              code: `class Box {
+    int x;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box b = new Box();
+        System.out.println(b.x);
+    }
+}`,
+              caption: "Compiler provides the no-arg constructor automatically."
+            },
+            notes: [
+              "The default constructor has no parameters and simply calls super().",
+              "It is added only when the class has no other constructor; defining any constructor removes it.",
+              "Fields are initialized to their default values (0, false, null) before the constructor body runs."
+            ],
+            exampleOutput: "0"
+          },
+          {
+            name: "Parameterized Constructor",
+            definition: "A parameterized constructor accepts arguments so that the caller can supply initial values for the new object's fields at creation time.",
+            diagram: "  Box(int l, int w)  --> ctor with parameters\n  Box b = new Box(5, 3);  <-- values passed in",
+            code: {
+              language: "java",
+              code: `class Box {
+    int l, w;
+
+    Box(int l, int w) {
+        this.l = l;
+        this.w = w;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box b = new Box(5, 3);
+        System.out.println(b.l * b.w);
+    }
+}`,
+              caption: "Parameterized ctor initializes l and w from arguments."
+            },
+            notes: [
+              "Parameters can be any number or type, allowing flexible object creation.",
+              "Using 'this.field' disambiguates shadowing when parameter names match field names.",
+              "A class can declare many parameterized constructors; the compiler picks the one matching the arguments."
+            ],
+            exampleOutput: "15"
+          },
+          {
+            name: "Copy Constructor",
+            definition: "A copy constructor takes another object of the same class and copies its field values into the new object, producing a field-by-field clone.",
+            diagram: "  Box(Box other)  --> copies other.l, other.w\n  Box b2 = new Box(b1);",
+            code: {
+              language: "java",
+              code: `class Box {
+    int l, w;
+
+    Box(int l, int w) {
+        this.l = l;
+        this.w = w;
+    }
+
+    Box(Box other) {
+        this.l = other.l;
+        this.w = other.w;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Box a = new Box(2, 3);
+        Box b = new Box(a);
+        System.out.println(b.l + "," + b.w);
+    }
+}`,
+              caption: "Box(Box) copies fields from another Box."
+            },
+            notes: [
+              "Java does not auto-generate a copy constructor; you must write it yourself.",
+              "The result is a shallow copy: object fields are shared, not deep-cloned.",
+              "Useful when you want a new object with the same starting state as an existing one."
+            ],
+            exampleOutput: "2,3"
+          },
+          {
+            name: "Private Constructor",
+            definition: "A private constructor has private access and blocks external instantiation; it is the standard way to implement singletons and static-only utility classes.",
+            diagram: "  class Util {\n      private Util() {}   <-- no one can 'new Util()'\n      static int add(...){...}\n  }",
+            code: {
+              language: "java",
+              code: `class Singleton {
+    private static final Singleton I = new Singleton();
+
+    private Singleton() {}
+
+    static Singleton get() { return I; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Singleton.get() == Singleton.get());
+    }
+}`,
+              caption: "Private ctor + static field enforces a single instance."
+            },
+            notes: [
+              "A private constructor prevents 'new' from outside the class, so the class controls how it is created.",
+              "Used in the Singleton pattern to guarantee exactly one instance in the JVM.",
+              "Utility classes such as java.util.Collections also use a private constructor to prevent instantiation."
+            ],
+            exampleOutput: "true"
+          },
+          {
+            name: "Constructor Chaining (this() / super())",
+            definition: "Constructor chaining lets one constructor call another in the same class via this(...) or a parent constructor via super(...), avoiding duplicated initialization code.",
+            diagram: "  Student()          --> this(\"Unknown\", 0)\n  Student(String, int) --> super(); set fields\n  A subclass ctor     --> super() to its parent",
+            code: {
+              language: "java",
+              code: `class Person {
+    String name;
+    Person() { this("Anonymous"); }
+    Person(String n) { this.name = n; }
+}
+
+class Student extends Person {
+    int roll;
+    Student() { super(); this.roll = 0; }
+    Student(String n, int r) { super(n); this.roll = r; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s = new Student("Alice", 101);
+        System.out.println(s.name + " " + s.roll);
+    }
+}`,
+              caption: "this() chains within Student; super() chains up to Person."
+            },
+            notes: [
+              "this() and super() must be the first statement of a constructor; they cannot both appear.",
+              "If neither is written, the compiler inserts a call to super() (the parent's no-arg ctor).",
+              "Chaining keeps each constructor focused on one specific set of initial values."
+            ],
+            exampleOutput: "Alice 101"
+          }
+        ],
         advantages: [
           "Guarantees objects are created in a valid state",
           "Encapsulates initialization logic",
@@ -949,6 +2052,90 @@ public class Main {
         explanation: "static can be applied to:\n- Variables: shared across all instances; one copy per class.\n- Methods: called via ClassName.method(); cannot use 'this' or access non-static members directly.\n- Blocks: static { ... } run once at class loading.\n- Nested classes: nested static class doesn't need an outer instance.\n\nfinal can be applied to:\n- Variables: must be initialized exactly once; cannot be reassigned.\n- Methods: cannot be overridden in subclasses.\n- Classes: cannot be extended (e.g., String, Math).\n- Parameters: the parameter cannot be reassigned inside the method.\n\nA 'final static' variable is a compile-time constant (e.g., Math.PI, Integer.MAX_VALUE).",
         diagram: "Class: MathUtils\n+----------------------+\n| - PI : double (final static)\n| - counter : int (static)\n| - square(int) : int (static)\n+----------------------+\n   ^\n   | accessed via MathUtils.PI, MathUtils.square(5)\n   |\nObject 1, Object 2, ...  share the same 'counter' and access 'PI'",
         example: "class Config { public static final int MAX_USERS = 100; public static final String APP_NAME = \"MyApp\"; } class Counter { static int count = 0; Counter() { count++; } }",
+        types: [
+          {
+            name: "Static Variables",
+            definition: "A static variable is declared with the static keyword and is shared by every instance of the class; exactly one copy exists per class, regardless of how many objects are created.",
+            diagram: "  class Counter {\n      static int count;  <-- one per class\n  }\n  obj1, obj2, obj3  -->  all see the same count",
+            code: {
+              language: "java",
+              code: `class Counter {
+    static int count;
+
+    Counter() { count++; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        new Counter();
+        System.out.println(Counter.count);
+    }
+}`,
+              caption: "count is a single shared variable across all objects."
+            },
+            notes: [
+              "Static fields are allocated in the method area (metaspace in Java 8+) when the class is initialized.",
+              "They are accessed via ClassName.variable, not via an object reference.",
+              "They are not thread-safe by default; synchronization or AtomicXxx classes are required for shared mutable state."
+            ],
+            exampleOutput: "3"
+          },
+          {
+            name: "Static Methods",
+            definition: "A static method is declared with the static keyword and belongs to the class; it can be called without creating an object and cannot use 'this' or call non-static members directly.",
+            diagram: "  static int add(int a, int b)  -->  Math.add(2, 3)\n  no 'this' available inside the body",
+            code: {
+              language: "java",
+              code: `class MathUtil {
+    static int square(int n) { return n * n; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(MathUtil.square(5));
+    }
+}`,
+              caption: "square() is called on the class, not on an object."
+            },
+            notes: [
+              "Static methods are bound at compile time and not subject to dynamic dispatch.",
+              "Inside a static method, you cannot use 'this' or 'super'.",
+              "The main() method itself is static so the JVM can call it without creating an instance."
+            ],
+            exampleOutput: "25"
+          },
+          {
+            name: "Static Blocks",
+            definition: "A static block is a block of code marked static that runs once when the class is first loaded, used to initialize static fields or perform one-time setup.",
+            diagram: "  class C {\n      static { System.out.println(\"loaded\"); }\n  }\n  <-- runs once, on first reference to C",
+            code: {
+              language: "java",
+              code: `class Config {
+    static int mode;
+
+    static {
+        mode = 1;
+        System.out.println("Config loaded");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Config.mode);
+    }
+}`,
+              caption: "Static block sets mode before any code uses Config."
+            },
+            notes: [
+              "Static blocks run in the order they appear in the source file.",
+              "They are typically used to load native libraries or initialize complex static fields.",
+              "They run only once per class loader, no matter how many times the class is referenced."
+            ],
+            exampleOutput: "Config loaded\n1"
+          }
+        ],
         conclusion: "static enables class-level data and behavior; final enforces immutability and prevents unwanted modification. Together they are essential for writing robust, predictable Java code."
       },
       sixteenMark: {
@@ -959,6 +2146,169 @@ public class Main {
         diagram: "        +-------------------------+\n        |      Class Loader       |\n        +-------------------------+\n                  |\n                  v\n+-----------------------------------+\n|         Method Area              |\n|  - static fields                 |\n|  - method bytecode               |\n+-----------------------------------+\n                  |\n                  v\n+-----------------------------------+\n|         Heap (objects)           |\n|  - instance fields per object    |\n+-----------------------------------+\nfinal variable: cannot be reassigned\nfinal method: cannot be overridden\nfinal class: cannot be extended",
         example: "final class Constants {\n    public static final double PI = 3.14159;\n    public static final int MAX = 100;\n}\nclass Parent {\n    public final void show() { System.out.println(\"Cannot override\"); }\n}\nclass Child extends Parent {\n    // public void show() {} // COMPILE ERROR — cannot override final method\n}",
         output: "Static members are shared; final members cannot be changed.",
+        types: [
+          {
+            name: "Static Variables",
+            definition: "A static variable is declared with the static keyword and is shared by every instance of the class; exactly one copy exists per class, regardless of how many objects are created.",
+            diagram: "  class Counter {\n      static int count;  <-- one per class\n  }\n  obj1, obj2, obj3  -->  all see the same count",
+            code: {
+              language: "java",
+              code: `class Counter {
+    static int count;
+
+    Counter() { count++; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Counter();
+        new Counter();
+        new Counter();
+        System.out.println(Counter.count);
+    }
+}`,
+              caption: "count is a single shared variable across all objects."
+            },
+            notes: [
+              "Static fields are allocated in the method area (metaspace in Java 8+) when the class is initialized.",
+              "They are accessed via ClassName.variable, not via an object reference.",
+              "They are not thread-safe by default; synchronization or AtomicXxx classes are required for shared mutable state."
+            ],
+            exampleOutput: "3"
+          },
+          {
+            name: "Static Methods",
+            definition: "A static method is declared with the static keyword and belongs to the class; it can be called without creating an object and cannot use 'this' or call non-static members directly.",
+            diagram: "  static int add(int a, int b)  -->  Math.add(2, 3)\n  no 'this' available inside the body",
+            code: {
+              language: "java",
+              code: `class MathUtil {
+    static int square(int n) { return n * n; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(MathUtil.square(5));
+    }
+}`,
+              caption: "square() is called on the class, not on an object."
+            },
+            notes: [
+              "Static methods are bound at compile time and not subject to dynamic dispatch.",
+              "Inside a static method, you cannot use 'this' or 'super'.",
+              "The main() method itself is static so the JVM can call it without creating an instance."
+            ],
+            exampleOutput: "25"
+          },
+          {
+            name: "Static Blocks",
+            definition: "A static block is a block of code marked static that runs once when the class is first loaded, used to initialize static fields or perform one-time setup.",
+            diagram: "  class C {\n      static { System.out.println(\"loaded\"); }\n  }\n  <-- runs once, on first reference to C",
+            code: {
+              language: "java",
+              code: `class Config {
+    static int mode;
+
+    static {
+        mode = 1;
+        System.out.println("Config loaded");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Config.mode);
+    }
+}`,
+              caption: "Static block sets mode before any code uses Config."
+            },
+            notes: [
+              "Static blocks run in the order they appear in the source file.",
+              "They are typically used to load native libraries or initialize complex static fields.",
+              "They run only once per class loader, no matter how many times the class is referenced."
+            ],
+            exampleOutput: "Config loaded\n1"
+          },
+          {
+            name: "Final Variables",
+            definition: "A final variable can be assigned exactly once and cannot be reassigned; for primitives the value is constant, for references the binding is constant but the object's state can still change.",
+            diagram: "  final int MAX = 10;   <-- constant primitive\n  final List L = new ArrayList();  <-- reference is constant",
+            code: {
+              language: "java",
+              code: `class App {
+    public static final int MAX = 100;
+    public static final String NAME = "Demo";
+
+    public static void main(String[] args) {
+        System.out.println(MAX);
+        System.out.println(NAME);
+    }
+}`,
+              caption: "MAX and NAME are compile-time constants."
+            },
+            notes: [
+              "A final field must be definitely assigned exactly once (in its declaration or in every constructor).",
+              "public static final fields are typically written UPPER_SNAKE_CASE as compile-time constants.",
+              "Marking a reference final does not freeze the object it points to — only the reference itself."
+            ],
+            exampleOutput: "100\nDemo"
+          },
+          {
+            name: "Final Methods",
+            definition: "A final method is declared with the final keyword and cannot be overridden by any subclass; the compiler can also inline it as a small optimization.",
+            diagram: "  class P { final void m() {} }\n  class C extends P {\n      // void m() {}   <-- COMPILE ERROR\n  }",
+            code: {
+              language: "java",
+              code: `class Parent {
+    public final void show() { System.out.println("Parent"); }
+}
+
+class Child extends Parent {
+    // public void show() {}   // would not compile
+
+    public void print() { System.out.println("Child"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Child().show();
+        new Child().print();
+    }
+}`,
+              caption: "show() is final and cannot be overridden."
+            },
+            notes: [
+              "Final methods are statically bound, so they participate less in dynamic dispatch.",
+              "They are useful to lock down critical behavior that subclasses must not change.",
+              "All methods in a final class are implicitly final, but only when the class itself is final."
+            ],
+            exampleOutput: "Parent\nChild"
+          },
+          {
+            name: "Final Classes",
+            definition: "A final class is declared with the final keyword and cannot be extended; this is how String, Math, and the wrapper classes in java.lang are designed.",
+            diagram: "  final class String\n  class Sub extends String { }   <-- COMPILE ERROR",
+            code: {
+              language: "java",
+              code: `final class Constants {
+    public static final int MAX = 100;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Constants.MAX);
+    }
+}`,
+              caption: "Constants is final — no subclass can be created."
+            },
+            notes: [
+              "All methods in a final class are implicitly final because they cannot be overridden anyway.",
+              "Examples in the JDK: String, Math, all primitive wrapper classes (Integer, Long, Double, ...).",
+              "Final classes are a deliberate design choice to prevent extension and preserve invariants."
+            ],
+            exampleOutput: "100"
+          }
+        ],
         advantages: [
           "static: shared state, memory efficient (one copy)",
           "static: utility/helper methods callable without an instance",
@@ -1068,6 +2418,97 @@ public class Main {
         explanation: "Overloading rules:\n1. Methods must differ in parameter list. Return type alone is NOT enough to disambiguate.\n2. Access modifiers and exception lists can vary freely.\n3. The compiler picks the best match based on argument types.\n4. If no exact match, Java applies automatic type promotion (byte -> short -> int -> long -> float -> double) to find a match.\n5. Varargs (...) can be used; a method with a fixed-arity match is preferred over a varargs method.\n6. Overloading can occur within a class or across parent and child (subclass can overload parent's methods).",
         diagram: "add(int, int)\nadd(double, double)\nadd(int, int, int)\nadd(String, String)\n   ^\n   |  all share the name 'add' in the same class\n   |  selected at compile time",
         example: "class Demo { void show(int a) { System.out.println(\"int: \" + a); } void show(String s) { System.out.println(\"str: \" + s); } void show(double d) { System.out.println(\"dbl: \" + d); } } Demo d = new Demo(); d.show(10); d.show(\"Hi\"); d.show(3.14);",
+        types: [
+          {
+            name: "Different Number of Parameters",
+            definition: "Overloading by number means defining methods with the same name that accept a different count of parameters.",
+            diagram: "  show(int)         --> 1 parameter\n  show(int, int)     --> 2 parameters\n  show(int, int, int) --> 3 parameters",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show(int a)               { System.out.println("one: " + a); }
+    void show(int a, int b)         { System.out.println("two: " + a + "," + b); }
+    void show(int a, int b, int c)  { System.out.println("three: " + a + "," + b + "," + c); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d.show(1);
+        d.show(1, 2);
+        d.show(1, 2, 3);
+    }
+}`,
+              caption: "show() is overloaded by arity."
+            },
+            notes: [
+              "The compiler picks the method whose parameter count matches the call site exactly.",
+              "Adding or removing parameters gives a brand new signature.",
+              "This form is heavily used in constructors and variadic-style APIs."
+            ],
+            exampleOutput: "one: 1\ntwo: 1,2\nthree: 1,2,3"
+          },
+          {
+            name: "Different Types of Parameters",
+            definition: "Overloading by type means defining methods with the same name and arity but different parameter types, so callers can pass different kinds of data.",
+            diagram: "  show(int)     --> int call site\n  show(String)  --> String call site\n  show(double)  --> double call site",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show(int n)    { System.out.println("int " + n); }
+    void show(double d) { System.out.println("dbl " + d); }
+    void show(String s) { System.out.println("str " + s); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d.show(5);
+        d.show(2.5);
+        d.show("hi");
+    }
+}`,
+              caption: "show() is overloaded by parameter type."
+            },
+            notes: [
+              "The compiler uses the static type of the argument to choose the best match.",
+              "If no exact match exists, Java applies automatic type promotion (e.g., int -> long -> double).",
+              "Autoboxing is also considered, but exact match always wins over boxing."
+            ],
+            exampleOutput: "int 5\ndbl 2.5\nstr hi"
+          },
+          {
+            name: "Different Order of Parameters",
+            definition: "Overloading by order means defining methods with the same name and number of parameters but with the types in a different sequence.",
+            diagram: "  register(String, int)  --> name, age\n  register(int, String)  --> age, name",
+            code: {
+              language: "java",
+              code: `class Reg {
+    void register(String name, int age) {
+        System.out.println("name=" + name + " age=" + age);
+    }
+    void register(int age, String name) {
+        System.out.println("age=" + age + " name=" + name);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Reg r = new Reg();
+        r.register("Alice", 20);
+        r.register(20, "Alice");
+    }
+}`,
+              caption: "register() is overloaded by parameter order."
+            },
+            notes: [
+              "Order matters: (String, int) and (int, String) are distinct signatures.",
+              "Use this carefully — it can confuse readers at the call site.",
+              "Pick distinct names when the meaning of the parameters changes, to keep APIs readable."
+            ],
+            exampleOutput: "name=Alice age=20\nage=20 name=Alice"
+          }
+        ],
         conclusion: "Method overloading increases API usability by letting one name represent logically similar operations. The compiler resolves the right method at compile time, so it is fast and predictable."
       },
       sixteenMark: {
@@ -1078,6 +2519,156 @@ public class Main {
         diagram: "Source code:\n  calc.add(2, 3)        -->  add(int, int)\n  calc.add(2.5, 3.5)    -->  add(double, double)\n  calc.add(1, 2, 3)     -->  add(int, int, int)\n  calc.add(\"Hi\", \"Bye\") -->  add(String, String)\n\n  Compiler picks one method per call site at compile time.",
         example: "class Account { String name; double bal;\n  Account() { this(\"Default\", 0); }\n  Account(String n) { this(n, 0); }\n  Account(String n, double b) { name = n; bal = b; }\n}",
         output: "All three constructors create an Account with appropriate initial values, demonstrating constructor overloading (a special form of method overloading).",
+        types: [
+          {
+            name: "Different Number of Parameters",
+            definition: "Overloading by number means defining methods with the same name that accept a different count of parameters.",
+            diagram: "  show(int)         --> 1 parameter\n  show(int, int)     --> 2 parameters\n  show(int, int, int) --> 3 parameters",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show(int a)               { System.out.println("one: " + a); }
+    void show(int a, int b)         { System.out.println("two: " + a + "," + b); }
+    void show(int a, int b, int c)  { System.out.println("three: " + a + "," + b + "," + c); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d.show(1);
+        d.show(1, 2);
+        d.show(1, 2, 3);
+    }
+}`,
+              caption: "show() is overloaded by arity."
+            },
+            notes: [
+              "The compiler picks the method whose parameter count matches the call site exactly.",
+              "Adding or removing parameters gives a brand new signature.",
+              "This form is heavily used in constructors and variadic-style APIs."
+            ],
+            exampleOutput: "one: 1\ntwo: 1,2\nthree: 1,2,3"
+          },
+          {
+            name: "Different Types of Parameters",
+            definition: "Overloading by type means defining methods with the same name and arity but different parameter types, so callers can pass different kinds of data.",
+            diagram: "  show(int)     --> int call site\n  show(String)  --> String call site\n  show(double)  --> double call site",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show(int n)    { System.out.println("int " + n); }
+    void show(double d) { System.out.println("dbl " + d); }
+    void show(String s) { System.out.println("str " + s); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d.show(5);
+        d.show(2.5);
+        d.show("hi");
+    }
+}`,
+              caption: "show() is overloaded by parameter type."
+            },
+            notes: [
+              "The compiler uses the static type of the argument to choose the best match.",
+              "If no exact match exists, Java applies automatic type promotion (e.g., int -> long -> double).",
+              "Autoboxing is also considered, but exact match always wins over boxing."
+            ],
+            exampleOutput: "int 5\ndbl 2.5\nstr hi"
+          },
+          {
+            name: "Different Order of Parameters",
+            definition: "Overloading by order means defining methods with the same name and number of parameters but with the types in a different sequence.",
+            diagram: "  register(String, int)  --> name, age\n  register(int, String)  --> age, name",
+            code: {
+              language: "java",
+              code: `class Reg {
+    void register(String name, int age) {
+        System.out.println("name=" + name + " age=" + age);
+    }
+    void register(int age, String name) {
+        System.out.println("age=" + age + " name=" + name);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Reg r = new Reg();
+        r.register("Alice", 20);
+        r.register(20, "Alice");
+    }
+}`,
+              caption: "register() is overloaded by parameter order."
+            },
+            notes: [
+              "Order matters: (String, int) and (int, String) are distinct signatures.",
+              "Use this carefully — it can confuse readers at the call site.",
+              "Pick distinct names when the meaning of the parameters changes, to keep APIs readable."
+            ],
+            exampleOutput: "name=Alice age=20\nage=20 name=Alice"
+          },
+          {
+            name: "Type Promotion in Overloading",
+            definition: "When no exact type match exists, the compiler promotes a smaller primitive to a larger one to find a compatible overload (e.g., int -> long -> float -> double).",
+            diagram: "  int arg --> long, float, or double overload\n  byte/short arg --> int, long, float, double overload",
+            code: {
+              language: "java",
+              code: `class Promo {
+    void show(int a)    { System.out.println("int " + a); }
+    void show(double d) { System.out.println("dbl " + d); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Promo p = new Promo();
+        p.show(10);
+        p.show(10L);
+        p.show(10.5);
+    }
+}`,
+              caption: "int is exact-matched, long promotes to double, double is exact."
+            },
+            notes: [
+              "Promotion order: byte -> short -> int -> long -> float -> double.",
+              "char also promotes to int, long, float, or double.",
+              "If two overloads both match via promotion, the compiler picks the most specific (widest reachable) one."
+            ],
+            exampleOutput: "int 10\ndbl 10.0\ndbl 10.5"
+          },
+          {
+            name: "Varargs Overloading",
+            definition: "A method that accepts varargs (Type... args) can be matched by zero or more arguments; a fixed-arity overload is preferred over a varargs match when both apply.",
+            diagram: "  show(int...)  --> 0..N ints\n  show(int, int) --> exactly 2 ints  (preferred over varargs)",
+            code: {
+              language: "java",
+              code: `class Demo {
+    void show(int... a) {
+        System.out.print("varargs: ");
+        for (int x : a) System.out.print(x + " ");
+        System.out.println();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Demo d = new Demo();
+        d.show();
+        d.show(1);
+        d.show(1, 2, 3);
+    }
+}`,
+              caption: "show(int...) is the only overload, so it matches all calls."
+            },
+            notes: [
+              "Varargs syntax is just an array passed by the caller, with a small syntactic sugar.",
+              "When both a fixed-arity method and a varargs method match, the fixed-arity method is chosen.",
+              "You can have only one varargs parameter per method, and it must be the last parameter."
+            ],
+            exampleOutput: "varargs: \nvarargs: 1 \nvarargs: 1 2 3"
+          }
+        ],
         advantages: [
           "Multiple ways to call the same logical operation",
           "Improves readability — same name for similar actions",
@@ -1191,6 +2782,67 @@ public class Main {
         explanation: "Rules of overriding:\n1. Method name, parameter list must match exactly.\n2. Return type must be the same or a covariant subtype (Java 5+).\n3. Access level cannot be more restrictive (can be less restrictive).\n4. Cannot override final, static, or private methods.\n5. Cannot throw new or broader checked exceptions; can throw fewer or narrower.\n6. The @Override annotation tells the compiler to verify these rules.\n\nWhen a method is called on a parent reference that actually holds a child object, the JVM uses dynamic dispatch to call the child's overridden version. This is runtime polymorphism.",
         diagram: "   Bank\n  +--------+\n  | rate() |\n  +--------+\n     ^  (overridden by)\n     |\n  +----+----+\n  |         |\n SBI      HDFC\n rate()=6.5 rate()=7.0\n\n Bank b = new SBI();   b.rate();  --> 6.5 (dynamic dispatch)",
         example: "class Animal { void sound() { System.out.println(\"...\"); } } class Dog extends Animal { @Override void sound() { System.out.println(\"Bark\"); } } Animal a = new Dog(); a.sound(); // Output: Bark",
+        types: [
+          {
+            name: "Standard Overriding",
+            definition: "Standard overriding is when a subclass redefines a non-final, non-static, non-private method with the exact same name, parameter list, and return type as the parent.",
+            diagram: "  Animal\n  +---------+\n  | sound() |\n  +---------+\n       ^ overrides\n       |\n     Dog\n   sound() = \"Bark\"",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("..."); } }
+
+class Dog extends Animal {
+    @Override
+    void sound() { System.out.println("Bark"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a = new Dog();
+        a.sound();
+    }
+}`,
+              caption: "Dog.sound() overrides Animal.sound()."
+            },
+            notes: [
+              "The overriding method must have the same name and parameter list as the parent's method.",
+              "The @Override annotation is recommended: the compiler will reject the method if it does not actually override anything.",
+              "The call is resolved at runtime via dynamic dispatch, so the child's version is chosen."
+            ],
+            exampleOutput: "Bark"
+          },
+          {
+            name: "Covariant Return Type",
+            definition: "An overriding method may declare a return type that is a subtype of the parent's return type; this is called a covariant return and was introduced in Java 5.",
+            diagram: "  Animal clone()  --> child can return Dog",
+            code: {
+              language: "java",
+              code: `class Animal {
+    Animal copy() { return new Animal(); }
+}
+
+class Dog extends Animal {
+    @Override
+    Dog copy() { return new Dog(); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        Dog c = d.copy();
+        System.out.println(c.getClass().getSimpleName());
+    }
+}`,
+              caption: "Dog.copy() returns Dog, a subtype of Animal."
+            },
+            notes: [
+              "The overriding return type must be the same as, or a subtype of, the parent's return type.",
+              "This lets callers use the more specific returned type without an extra cast.",
+              "Java 5 introduced this feature; before that, return types had to match exactly."
+            ],
+            exampleOutput: "Dog"
+          }
+        ],
         conclusion: "Method overriding enables runtime polymorphism — the same call behaves differently based on the actual object type. It is a cornerstone of flexible, extensible OOP design."
       },
       sixteenMark: {
@@ -1201,6 +2853,130 @@ public class Main {
         diagram: "      Animal\n     +--------+\n     | sound()|\n     +--------+\n          ^\n          | overrides\n     +----+----+\n     |         |\n    Dog       Cat\n   sound()   sound()\n   =\"Bark\"   =\"Meow\"\n\n Animal a = new Dog();\n a.sound();   --> \"Bark\"  (via dynamic dispatch)\n\n Animal a = new Cat();\n a.sound();   --> \"Meow\"",
         example: "class Shape { double area() { return 0; } }\nclass Circle extends Shape {\n    double r;\n    Circle(double r) { this.r = r; }\n    @Override\n    double area() { return Math.PI * r * r; }\n}\nclass Square extends Shape {\n    double s;\n    Square(double s) { this.s = s; }\n    @Override\n    double area() { return s * s; }\n}",
         output: "Same call shape.area() returns the area of the actual shape — circle, square, etc.",
+        types: [
+          {
+            name: "Standard Overriding",
+            definition: "Standard overriding is when a subclass redefines a non-final, non-static, non-private method with the exact same name, parameter list, and return type as the parent.",
+            diagram: "  Animal\n  +---------+\n  | sound() |\n  +---------+\n       ^ overrides\n       |\n     Dog\n   sound() = \"Bark\"",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("..."); } }
+
+class Dog extends Animal {
+    @Override
+    void sound() { System.out.println("Bark"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Animal a = new Dog();
+        a.sound();
+    }
+}`,
+              caption: "Dog.sound() overrides Animal.sound()."
+            },
+            notes: [
+              "The overriding method must have the same name and parameter list as the parent's method.",
+              "The @Override annotation is recommended: the compiler will reject the method if it does not actually override anything.",
+              "The call is resolved at runtime via dynamic dispatch, so the child's version is chosen."
+            ],
+            exampleOutput: "Bark"
+          },
+          {
+            name: "Covariant Return Type",
+            definition: "An overriding method may declare a return type that is a subtype of the parent's return type; this is called a covariant return and was introduced in Java 5.",
+            diagram: "  Animal clone()  --> child can return Dog",
+            code: {
+              language: "java",
+              code: `class Animal {
+    Animal copy() { return new Animal(); }
+}
+
+class Dog extends Animal {
+    @Override
+    Dog copy() { return new Dog(); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog d = new Dog();
+        Dog c = d.copy();
+        System.out.println(c.getClass().getSimpleName());
+    }
+}`,
+              caption: "Dog.copy() returns Dog, a subtype of Animal."
+            },
+            notes: [
+              "The overriding return type must be the same as, or a subtype of, the parent's return type.",
+              "This lets callers use the more specific returned type without an extra cast.",
+              "Java 5 introduced this feature; before that, return types had to match exactly."
+            ],
+            exampleOutput: "Dog"
+          },
+          {
+            name: "Exception Narrowing",
+            definition: "An overriding method may declare fewer or narrower checked exceptions than the parent; it cannot throw new or broader checked exceptions.",
+            diagram: "  parent: throws IOException\n  child : throws FileNotFoundException  (subtype, OK)\n  child : throws SQLException           (broader, NOT OK)",
+            code: {
+              language: "java",
+              code: `import java.io.IOException;
+import java.io.FileNotFoundException;
+
+class Parent {
+    void read() throws IOException { throw new IOException("p"); }
+}
+
+class Child extends Parent {
+    @Override
+    void read() throws FileNotFoundException { throw new FileNotFoundException("c"); }
+}
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Parent p = new Child();
+        p.read();
+    }
+}`,
+              caption: "Child.read() throws a narrower checked exception than Parent.read()."
+            },
+            notes: [
+              "Checked exceptions in the override must be the same as, or a subtype of, the parent's throws clause.",
+              "Unchecked (Runtime) exceptions are unrestricted — you can throw any of them in the override.",
+              "This rule preserves Liskov Substitution: callers using the parent's signature should not see new checked exceptions."
+            ],
+            exampleOutput: "(throws FileNotFoundException at runtime)"
+          },
+          {
+            name: "Access Level Widening",
+            definition: "An overriding method can be declared with a wider (less restrictive) access level than the parent, but never with a narrower one.",
+            diagram: "  parent: protected  --> child: public  (OK)\n  parent: public      --> child: private  (ERROR)",
+            code: {
+              language: "java",
+              code: `class Parent {
+    protected void show() { System.out.println("p"); }
+}
+
+class Child extends Parent {
+    @Override
+    public void show() { System.out.println("c"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();
+        p.show();
+    }
+}`,
+              caption: "Child widens the parent's protected method to public."
+            },
+            notes: [
+              "Widening is allowed because callers using the parent's type can still invoke the method.",
+              "Narrowing would break the parent's contract, so the compiler rejects it.",
+              "Common pattern: parents declare a method protected and subclasses expose it as public via override."
+            ],
+            exampleOutput: "c"
+          }
+        ],
         advantages: [
           "Enables runtime polymorphism (one interface, many behaviors)",
           "Allows subclasses to customize inherited behavior",
@@ -1323,6 +3099,89 @@ public class Helper {
         explanation: "Access modifiers in Java:\n- private: accessible only within the same class.\n- default (no modifier): accessible within the same package.\n- protected: accessible within the same package AND by subclasses (even in other packages).\n- public: accessible from anywhere.\n\nFor top-level classes, only public and default are allowed (a class cannot be private or protected at the top level).\n\nPackages:\n- Declared with the 'package' keyword at the top of the file.\n- Convention: reverse domain, e.g., com.example.project.\n- Subpackages (com.example.project.utils) are separate packages for access purposes — they are not 'inside' the parent.\n- The import statement brings types into scope; import java.util.* imports all classes from java.util.",
         diagram: "Visibility Matrix\n+----------------+--------+--------+--------+--------+\n| Modifier        | Same   | Same   | Sub-   | Other  |\n|                 | Class  | Pkg    | class  |        |\n+----------------+--------+--------+--------+--------+\n| private         |  YES   |  no    |  no    |  no    |\n| default         |  YES   |  YES   |  no    |  no    |\n| protected       |  YES   |  YES   |  YES   |  no    |\n| public          |  YES   |  YES   |  YES   |  YES   |\n+----------------+--------+--------+--------+--------+",
         example: "package com.example.school;\npublic class Student {\n    private int rollNo;          // only Student\n    String name;                 // same package only (default)\n    protected int age;           // same package or subclass\n    public String getName() { return name; }  // everywhere\n}",
+        types: [
+          {
+            name: "public",
+            definition: "The public modifier exposes a class or member to every other class in every package, with no restriction.",
+            diagram: "  public class Api  <-- visible everywhere\n  public void serve()  <-- callable from any package",
+            code: {
+              language: "java",
+              code: `public class App {
+    public int version = 1;
+
+    public void run() { System.out.println("running"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        App a = new App();
+        System.out.println(a.version);
+        a.run();
+    }
+}`,
+              caption: "Public members are accessible from anywhere."
+            },
+            notes: [
+              "Top-level classes are usually declared public so they can be used by other packages.",
+              "Public members form the documented API of a class; they should be carefully designed and stable.",
+              "Exposing too much as public breaks encapsulation, so prefer the most restrictive modifier that still works."
+            ],
+            exampleOutput: "1\nrunning"
+          },
+          {
+            name: "private",
+            definition: "The private modifier hides a member so it is accessible only inside the class that declares it, enforcing the strongest encapsulation.",
+            diagram: "  private int balance;  <-- visible only inside Account\n  same package: NO\n  subclass:     NO\n  other class:  NO",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    Account(double b) { balance = b; }
+
+    public double getBalance() { return balance; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account(100);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "balance is private; only getBalance() exposes it."
+            },
+            notes: [
+              "private is the most restrictive access modifier and the default choice for fields.",
+              "Accessor methods (getters/setters) are how external code interacts with private state.",
+              "Inner classes can access the private members of their enclosing class and vice versa."
+            ],
+            exampleOutput: "100.0"
+          },
+          {
+            name: "default (package-private)",
+            definition: "When no access modifier is written, the member is package-private: visible to every class in the same package but hidden from all other packages.",
+            diagram: "  String name;  <-- same package: YES\n                <-- other package: NO",
+            code: {
+              language: "java",
+              code: `class Helper {
+    String greet() { return "hello"; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(new Helper().greet());
+    }
+}`,
+              caption: "Helper and Main in the same package; greet() is default-accessible."
+            },
+            notes: [
+              "Default access is sometimes written as 'package-private' to be explicit.",
+              "Useful for grouping tightly coupled classes that should not be used outside the package.",
+              "Subpackages are NOT considered part of the same package for access purposes."
+            ],
+            exampleOutput: "hello"
+          }
+        ],
         conclusion: "Packages and access modifiers are foundational to organizing Java code and enforcing encapsulation. Choosing the right visibility is essential for maintainable, secure APIs."
       },
       sixteenMark: {
@@ -1333,6 +3192,117 @@ public class Helper {
         diagram: "Java Project Structure\n\nmyapp/\n├── Main.java          (package myapp;)\n└── utils/\n    └── Helper.java    (package myapp.utils;)\n\n   +----------------+\n   |   myapp        |\n   +----------------+\n         |\n   +----------------+\n   | myapp.utils    |\n   +----------------+   default members visible to both\n\nAccess from myapp.Main:\n  public  -> YES\n  default -> YES (same package)\n  protected -> YES (same package or subclass)\n  private -> NO",
         example: "// File: com/example/shape/Shape.java\npackage com.example.shape;\npublic class Shape {\n    public void draw() { System.out.println(\"Drawing\"); }\n    protected void resize() { System.out.println(\"Resizing\"); }\n}\n\n// File: com/example/Circle.java\npackage com.example;\nimport com.example.shape.Shape;\npublic class Circle extends Shape {\n    void demo() {\n        draw();          // OK - public\n        resize();        // OK - protected + subclass (different package)\n    }\n}",
         output: "Public members are visible everywhere. Default members are only visible within the same package. Protected members extend visibility to subclasses in any package. Private members are only visible inside the declaring class.",
+        types: [
+          {
+            name: "public",
+            definition: "The public modifier exposes a class or member to every other class in every package, with no restriction.",
+            diagram: "  public class Api  <-- visible everywhere\n  public void serve()  <-- callable from any package",
+            code: {
+              language: "java",
+              code: `public class App {
+    public int version = 1;
+
+    public void run() { System.out.println("running"); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        App a = new App();
+        System.out.println(a.version);
+        a.run();
+    }
+}`,
+              caption: "Public members are accessible from anywhere."
+            },
+            notes: [
+              "Top-level classes are usually declared public so they can be used by other packages.",
+              "Public members form the documented API of a class; they should be carefully designed and stable.",
+              "Exposing too much as public breaks encapsulation, so prefer the most restrictive modifier that still works."
+            ],
+            exampleOutput: "1\nrunning"
+          },
+          {
+            name: "private",
+            definition: "The private modifier hides a member so it is accessible only inside the class that declares it, enforcing the strongest encapsulation.",
+            diagram: "  private int balance;  <-- visible only inside Account\n  same package: NO\n  subclass:     NO\n  other class:  NO",
+            code: {
+              language: "java",
+              code: `class Account {
+    private double balance;
+
+    Account(double b) { balance = b; }
+
+    public double getBalance() { return balance; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Account a = new Account(100);
+        System.out.println(a.getBalance());
+    }
+}`,
+              caption: "balance is private; only getBalance() exposes it."
+            },
+            notes: [
+              "private is the most restrictive access modifier and the default choice for fields.",
+              "Accessor methods (getters/setters) are how external code interacts with private state.",
+              "Inner classes can access the private members of their enclosing class and vice versa."
+            ],
+            exampleOutput: "100.0"
+          },
+          {
+            name: "default (package-private)",
+            definition: "When no access modifier is written, the member is package-private: visible to every class in the same package but hidden from all other packages.",
+            diagram: "  String name;  <-- same package: YES\n                <-- other package: NO",
+            code: {
+              language: "java",
+              code: `class Helper {
+    String greet() { return "hello"; }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(new Helper().greet());
+    }
+}`,
+              caption: "Helper and Main in the same package; greet() is default-accessible."
+            },
+            notes: [
+              "Default access is sometimes written as 'package-private' to be explicit.",
+              "Useful for grouping tightly coupled classes that should not be used outside the package.",
+              "Subpackages are NOT considered part of the same package for access purposes."
+            ],
+            exampleOutput: "hello"
+          },
+          {
+            name: "protected",
+            definition: "The protected modifier makes a member visible within the same package AND to subclasses (even in other packages), giving subclasses controlled access to inherited internals.",
+            diagram: "  protected int age;  <-- same package: YES\n                       <-- subclass (any pkg): YES\n                       <-- other pkg, non-subclass: NO",
+            code: {
+              language: "java",
+              code: `class Person {
+    protected String name = "Alice";
+}
+
+class Student extends Person {
+    void show() { System.out.println(name); }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        new Student().show();
+    }
+}`,
+              caption: "name is protected; Student (a subclass) can read it."
+            },
+            notes: [
+              "protected combines default access with subclass access, across package boundaries.",
+              "A subclass can only access protected members through its own type, not through a sibling subclass instance.",
+              "Top-level classes cannot be protected; only members and inner classes can."
+            ],
+            exampleOutput: "Alice"
+          }
+        ],
         advantages: [
           "Prevents naming conflicts between classes",
           "Enables modular code organization",

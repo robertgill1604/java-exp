@@ -23,10 +23,24 @@ export type Quiz = { mcqs: Mcq[]; trueFalse?: TrueFalse[]; match?: { prompt: str
 
 export type VivaQA = { q: string; a: string };
 
+// A structured sub-classification of a topic — e.g., 5 types of inheritance.
+// Each type renders as its own card with definition, optional diagram,
+// a code snippet (using the standard CodeBlock component), and key notes.
+export type TypeSection = {
+  name: string;                          // e.g., "Single Inheritance"
+  definition: string;                    // one-sentence definition
+  diagram?: string;                      // optional ASCII diagram
+  code: CodeBlock;                       // code snippet for this type
+  notes: string[];                       // bullet list of key points / rules
+  pros?: string[];                       // optional advantages
+  cons?: string[];                       // optional disadvantages
+  exampleOutput?: string;                // optional output of the code snippet
+};
+
 export type ExamAnswer = {
   twoMark: string;
-  thirteenMark: { intro: string; definition: string; explanation: string; diagram?: string; example: string; conclusion: string };
-  sixteenMark: { intro: string; definition: string; explanation: string; working: string; diagram?: string; example: string; output: string; advantages: string[]; applications: string[]; conclusion: string };
+  thirteenMark: { intro: string; definition: string; explanation: string; diagram?: string; example: string; conclusion: string; types?: TypeSection[] };
+  sixteenMark: { intro: string; definition: string; explanation: string; working: string; diagram?: string; example: string; output: string; advantages: string[]; applications: string[]; conclusion: string; types?: TypeSection[] };
 };
 
 export type RevisionNote = {

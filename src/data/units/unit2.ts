@@ -39,7 +39,54 @@ class Dog extends Animal {
         explanation: "Java supports single inheritance for classes (a class can extend only one parent) but multiple inheritance of type through interfaces. Subclasses inherit all non-private members (public, protected, and package-private members), can override methods, and can add new members. The 'super' keyword refers to the parent. Constructors are not inherited but are invoked via super() as the first line of a subclass constructor. If no super() is written, the compiler inserts a call to the no-argument parent constructor. Static methods are not inherited in the override sense; they are hidden, not overridden. The Object class sits at the root of every class hierarchy.",
         diagram: "        +-----------------+\n        |     Object      |  <- java.lang.Object (root)\n        +-----------------+\n                ^\n        +-----------------+\n        |     Animal      |  <- parent (superclass)\n        |  + speak()      |\n        +-----------------+\n           ^          ^\n   +-------------+  +-------------+\n   |     Dog     |  |     Cat     |  <- children (subclasses)\n   |  + speak()  |  |  + speak()  |\n   |  + fetch()  |  |             |\n   +-------------+  +-------------+",
         example: "class Vehicle {\n  int speed;\n  void run() { System.out.println(\"running\"); }\n}\nclass Car extends Vehicle {\n  int wheels = 4;\n  void honk() { System.out.println(\"beep\"); }\n}",
-        conclusion: "Inheritance is a powerful mechanism for code reuse, hierarchical design, and runtime polymorphism. Use it only when a true 'is-a' relationship exists; otherwise prefer composition."
+        conclusion: "Inheritance is a powerful mechanism for code reuse, hierarchical design, and runtime polymorphism. Use it only when a true 'is-a' relationship exists; otherwise prefer composition.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance occurs when a class inherits from exactly one direct parent class, forming a linear chain of ancestors.",
+            diagram: "+-------+\n|   A   |\n+-------+\n    ^\n+-------+\n|   B   |\n+-------+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {\n  void show() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    B b = new B();\n    b.show();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent class per subclass.",
+              "Forms a straight-line hierarchy.",
+              "Most common form in Java code.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance forms a chain where a class inherits from a subclass that itself inherits from another class, producing grandparent-parent-child relations.",
+            diagram: "+-------+\n|   A   |\n+-------+\n    ^\n+-------+\n|   B   |\n+-------+\n    ^\n+-------+\n|   C   |\n+-------+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {}\nclass C extends B {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "Each class has exactly one direct parent.",
+              "Members are inherited transitively down the chain.",
+              "Dynamic dispatch picks the most-specific override.",
+            ],
+            exampleOutput: "A",
+          },
+          {
+            name: "Hierarchical Inheritance",
+            definition: "Hierarchical inheritance is when multiple subclasses inherit from a single common parent, forming a tree branching from one root.",
+            diagram: "+-------+\n|   A   |\n+-------+\n ^     ^\n+---+ +---+\n| B | | C |\n+---+ +---+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {}\nclass C extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "One parent, many children.",
+              "Siblings share the parent's public and protected members.",
+              "Common pattern for abstract base classes.",
+            ],
+            exampleOutput: "A",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Inheritance enables hierarchical class relationships and is a foundation of OOP design, code reuse, and polymorphism.",
@@ -63,7 +110,84 @@ class Dog extends Animal {
           "Design patterns: Template Method, Strategy, Factory",
           "Java standard library: Throwable -> Exception -> IOException, etc."
         ],
-        conclusion: "Inheritance is central to OOP in Java. It enables code reuse, polymorphism, and clean hierarchical design. Use it carefully — favor composition over inheritance unless a true 'is-a' relationship exists."
+        conclusion: "Inheritance is central to OOP in Java. It enables code reuse, polymorphism, and clean hierarchical design. Use it carefully — favor composition over inheritance unless a true 'is-a' relationship exists.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance occurs when a class inherits from exactly one direct parent class, forming a linear chain.",
+            diagram: "+-------+\n|   A   |\n+-------+\n    ^\n+-------+\n|   B   |\n+-------+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {\n  void show() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    B b = new B();\n    b.show();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent class per subclass.",
+              "Forms a straight-line hierarchy.",
+              "Default and most common form in Java.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance forms a chain where a class inherits from a subclass that itself inherits from another class.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^\n+---+\n| C |\n+---+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {}\nclass C extends B {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "Each class has exactly one direct parent.",
+              "Members are inherited transitively down the chain.",
+              "Grandparent methods are accessible to grandchildren.",
+            ],
+            exampleOutput: "A",
+          },
+          {
+            name: "Hierarchical Inheritance",
+            definition: "Hierarchical inheritance is when multiple subclasses inherit from a single common parent.",
+            diagram: "+---+\n| A |\n+---+\n ^  ^\n+-+ +-+\n|B| |C|\n+-+ +-+",
+            code: {
+              language: "java",
+              code: `class A {\n  void show() { System.out.println("A"); }\n}\nclass B extends A {}\nclass C extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "One parent, many children.",
+              "Siblings share the parent's public and protected members.",
+              "Common pattern for abstract base classes.",
+            ],
+            exampleOutput: "A",
+          },
+          {
+            name: "Multiple Inheritance (via Interfaces)",
+            definition: "Multiple inheritance of type is when a class implements more than one interface, inheriting several type contracts at once.",
+            diagram: "+-----+   +-----+\n| I1  |   | I2  |\n+--+--+   +--+--+\n   ^         ^\n   +----+----+\n        |\n       +---+\n       | C |\n       +---+",
+            code: {
+              language: "java",
+              code: `interface I1 { void a(); }\ninterface I2 { void b(); }\nclass C implements I1, I2 {\n  public void a() { System.out.println("a"); }\n  public void b() { System.out.println("b"); }\n}\npublic class Demo {\n  public static void main(String[] s) {\n    C c = new C();\n    c.a();\n    c.b();\n  }\n}`,
+            },
+            notes: [
+              "Classes can implement many interfaces but extend only one class.",
+              "Inherits type contracts, not state, so the diamond problem is avoided.",
+              "Any field is implicitly public static final in an interface.",
+            ],
+            exampleOutput: "a\nb",
+          },
+          {
+            name: "Hybrid Inheritance",
+            definition: "Hybrid inheritance combines two or more of the other forms in one class hierarchy, typically multilevel plus multiple, all realized through interfaces.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^   ^\n+-+ +---+\n|C| | I |\n+-+ +---+\n     ^\n    +---+\n    | D |\n    +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\nclass A { void a() { System.out.println("a"); } }\nclass B extends A {}\nclass C extends B implements I {\n  public void i() { System.out.println("i"); }\n}\nclass D extends C {}\npublic class Demo {\n  public static void main(String[] s) {\n    D d = new D();\n    d.a();\n    d.i();\n  }\n}`,
+            },
+            notes: [
+              "Mixes multilevel, hierarchical, and multiple in one design.",
+              "In Java only interfaces provide the multiple-inheritance leg.",
+              "Resolves cleanly because interfaces carry no instance state.",
+            ],
+            exampleOutput: "a\ni",
+          },
+        ]
       }
     },
     viva: [
@@ -150,7 +274,54 @@ class C extends B implements I1 {}`,
         explanation: "Java does not support multiple inheritance of classes to avoid ambiguity (the diamond problem), where the compiler and runtime cannot decide which parent's method implementation to use. Java achieves multiple inheritance of type through interfaces — classes can implement several interfaces, combining their type contracts. Hybrid inheritance is achieved by combining class inheritance with interface implementation, e.g., a class extends one class and implements multiple interfaces. With Java 8 default methods, conflicts between interfaces must be explicitly resolved by the implementing class. Cyclic inheritance (A extends B, B extends A) is a compile-time error.",
         diagram: "Single:        Multilevel:     Hierarchical:    Multiple:        Hybrid:\n  A                A                  A          I1   I2        A      I1\n  |                |                  |           \\  /          |     /\n  B                B                  |            C             B    I2\n                   |               +--+--+                       |\n                   C               |     |                       C\n                                  B1    B2                     (extends B,\n                                                              implements I1)",
         example: "class A {}\nclass B extends A {}      // Single\nclass C extends B {}      // Multilevel (A -> B -> C)\nclass D extends A {}      // Hierarchical (A -> B, A -> D)\ninterface I1 { void m1(); }\ninterface I2 { void m2(); }\nclass E implements I1, I2 { // Multiple (via interfaces)\n  public void m1() {}\n  public void m2() {}\n}",
-        conclusion: "Java's design of inheritance types balances expressiveness with safety. Multiple inheritance is supported safely through interfaces, eliminating the diamond problem for instance state."
+        conclusion: "Java's design of inheritance types balances expressiveness with safety. Multiple inheritance is supported safely through interfaces, eliminating the diamond problem for instance state.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is when a class extends exactly one direct parent class, forming a linear chain of ancestors.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void hi() { System.out.println("hi"); } }\nclass B extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    B b = new B();\n    b.hi();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent class per subclass.",
+              "Forms a straight-line hierarchy.",
+              "Default and most common form in Java code.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance forms a chain where a class inherits from a subclass that itself inherits from another class.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^\n+---+\n| C |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void show() { System.out.println("A"); } }\nclass B extends A {}\nclass C extends B {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "Each class has exactly one direct parent.",
+              "Members are inherited transitively down the chain.",
+              "C inherits from B, which inherits from A.",
+            ],
+            exampleOutput: "A",
+          },
+          {
+            name: "Hierarchical Inheritance",
+            definition: "Hierarchical inheritance is when multiple subclasses inherit from a single common parent, forming a tree branching from one root.",
+            diagram: "+---+\n| A |\n+---+\n ^  ^\n+-+ +-+\n|B| |C|\n+-+ +-+",
+            code: {
+              language: "java",
+              code: `class A { void show() { System.out.println("A"); } }\nclass B extends A {}\nclass C extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().show();\n    new C().show();\n  }\n}`,
+            },
+            notes: [
+              "One parent, many children.",
+              "Siblings share the parent's public and protected members.",
+              "Common pattern for abstract base classes.",
+            ],
+            exampleOutput: "A\nA",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Java provides five types of inheritance, balancing expressiveness, code reuse, and type safety.",
@@ -172,7 +343,89 @@ class C extends B implements I1 {}`,
           "Domain hierarchies: combine abstract base + role interfaces (e.g., Employee extends Person implements Payable, Trainable)",
           "Event systems: multiple listener interfaces"
         ],
-        conclusion: "Understanding the five types of inheritance equips developers to choose the right structure for any class design, balancing reuse, polymorphism, and safety."
+        conclusion: "Understanding the five types of inheritance equips developers to choose the right structure for any class design, balancing reuse, polymorphism, and safety.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is when a class extends exactly one direct parent class, forming a linear chain of ancestors.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void hi() { System.out.println("hi"); } }\nclass B extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().hi();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent class per subclass.",
+              "Forms a straight-line hierarchy.",
+              "Default and most common form in Java code.",
+              "Every class extends Object directly or transitively.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Multilevel Inheritance",
+            definition: "Multilevel inheritance forms a chain where a class inherits from a subclass that itself inherits from another class.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^\n+---+\n| C |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void show() { System.out.println("A"); } }\nclass B extends A {}\nclass C extends B {}\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.show();\n  }\n}`,
+            },
+            notes: [
+              "Each class has exactly one direct parent.",
+              "Members are inherited transitively down the chain.",
+              "Grandparent methods are accessible to grandchildren.",
+              "Used for deep domain hierarchies.",
+            ],
+            exampleOutput: "A",
+          },
+          {
+            name: "Hierarchical Inheritance",
+            definition: "Hierarchical inheritance is when multiple subclasses inherit from a single common parent.",
+            diagram: "+---+\n| A |\n+---+\n ^  ^\n+-+ +-+\n|B| |C|\n+-+ +-+",
+            code: {
+              language: "java",
+              code: `class A { void show() { System.out.println("A"); } }\nclass B extends A {}\nclass C extends A {}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().show();\n    new C().show();\n  }\n}`,
+            },
+            notes: [
+              "One parent, many children.",
+              "Siblings share the parent's public and protected members.",
+              "Common pattern for abstract base classes.",
+              "Enables polymorphic collections of sibling types.",
+            ],
+            exampleOutput: "A\nA",
+          },
+          {
+            name: "Multiple Inheritance (via Interfaces)",
+            definition: "Multiple inheritance of type is when a class implements more than one interface, inheriting several type contracts at once.",
+            diagram: "+---+   +---+\n| I |   | J |\n+---+   +---+\n  ^       ^\n  +---+---+\n      |\n     +---+\n     | C |\n     +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\ninterface J { void j(); }\nclass C implements I, J {\n  public void i() { System.out.println("i"); }\n  public void j() { System.out.println("j"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    C c = new C();\n    c.i();\n    c.j();\n  }\n}`,
+            },
+            notes: [
+              "Classes can implement any number of interfaces.",
+              "State is never inherited from interfaces, so the diamond problem is avoided.",
+              "A class may still extend only one class.",
+              "Common pattern: role-based design with many small interfaces.",
+            ],
+            exampleOutput: "i\nj",
+          },
+          {
+            name: "Hybrid Inheritance",
+            definition: "Hybrid inheritance combines multiple forms in one design, typically multilevel plus multiple, all realized through interfaces in Java.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^   ^\n+-+ +---+\n|C| | I |\n+-+ +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\nclass A { void a() { System.out.println("a"); } }\nclass B extends A {}\nclass C extends B implements I {\n  public void i() { System.out.println("i"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    C c = new C();\n    c.a();\n    c.i();\n  }\n}`,
+            },
+            notes: [
+              "Mixes multilevel, hierarchical, and multiple in one design.",
+              "Java provides the multiple leg only through interfaces.",
+              "Resolves cleanly because interfaces carry no instance state.",
+              "Common in real-world domain models.",
+            ],
+            exampleOutput: "a\ni",
+          },
+        ]
       }
     },
     viva: [
@@ -251,7 +504,54 @@ class Circle extends Shape {
         explanation: "Abstract classes can have constructors (invoked by subclasses via super()), instance variables, static members, abstract methods (no body, declared with abstract), and concrete methods. A subclass must provide implementations for all inherited abstract methods, unless it is itself declared abstract. Abstract classes are used to capture common state and behavior, while leaving specific behavior to subclasses. An abstract class can extend another abstract or concrete class. From Java 8, abstract classes can also have default and static methods (in the sense of instance/static concrete methods), and from Java 9, private concrete methods too. An abstract class cannot be final (they are opposites), and an abstract method cannot be final, static, or private.",
         diagram: "+-----------------------+\n| abstract class Shape  |\n+-----------------------+\n|  # color : String      |  <- shared state\n|  + Shape(c:String)    |  <- constructor\n|  + display() : void    |  <- concrete method\n|  + area() : double     |  <- ABSTRACT (no body)\n+-----------------------+\n          ^\n          |\n+-----------------------+\n| class Circle : Shape   |\n+-----------------------+\n|  - r : double          |\n|  + Circle(r)           |\n|  + area() : double     |  <- implements area()\n+-----------------------+",
         example: "abstract class Animal {\n  String name;\n  Animal(String n) { this.name = n; }\n  abstract void sound();                 // contract\n  void sleep() { System.out.println(\"zzz\"); }  // shared code\n}\nclass Dog extends Animal {\n  Dog() { super(\"Dog\"); }\n  void sound() { System.out.println(\"Bark\"); }\n}",
-        conclusion: "Abstract classes are a key tool for partial abstraction and code reuse. They provide shared state and behavior plus a contract that subclasses must fulfill."
+        conclusion: "Abstract classes are a key tool for partial abstraction and code reuse. They provide shared state and behavior plus a contract that subclasses must fulfill.",
+        types: [
+          {
+            name: "Abstract Class",
+            definition: "An abstract class is a class declared with the abstract keyword that cannot be instantiated and may declare abstract methods for subclasses to implement.",
+            diagram: "+------------------+\n| <<abstract>>    |\n|     Shape        |\n|  + area()        |\n+------------------+\n        ^\n+------------------+\n|     Circle       |\n|  + area()        |\n+------------------+",
+            code: {
+              language: "java",
+              code: `abstract class Shape {\n  abstract double area();\n}\nclass Circle extends Shape {\n  double r = 2.0;\n  double area() { return 3.14 * r * r; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Shape s = new Circle();\n    System.out.println(s.area());\n  }\n}`,
+            },
+            notes: [
+              "Declared with the abstract keyword.",
+              "Cannot be instantiated with new.",
+              "May contain zero or more abstract methods.",
+            ],
+            exampleOutput: "12.56",
+          },
+          {
+            name: "Abstract Method",
+            definition: "An abstract method is a method declared without a body in an abstract class or interface, whose implementation is supplied by a concrete subclass.",
+            diagram: "abstract double area();\n        ^\n   overridden in Circle",
+            code: {
+              language: "java",
+              code: `abstract class Animal {\n  abstract void speak();\n}\nclass Dog extends Animal {\n  void speak() { System.out.println("Bark"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Animal x = new Dog();\n    x.speak();\n  }\n}`,
+            },
+            notes: [
+              "Ends with a semicolon, no curly braces.",
+              "Has no implementation in the declaring class.",
+              "Forces every concrete subclass to provide an implementation.",
+            ],
+            exampleOutput: "Bark",
+          },
+          {
+            name: "Concrete Class",
+            definition: "A concrete class is a regular class that provides implementations for all inherited abstract methods and can therefore be instantiated.",
+            diagram: "+---------------+\n|     Circle    |\n|  + area()  <-- implemented\n+---------------+",
+            code: {
+              language: "java",
+              code: `abstract class Shape {\n  abstract double area();\n}\nclass Circle extends Shape {\n  double r = 1.0;\n  double area() { return 3.14 * r * r; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Circle c = new Circle();\n    System.out.println(c.area());\n  }\n}`,
+            },
+            notes: [
+              "Provides bodies for every inherited abstract method.",
+              "May be instantiated with new.",
+              "May itself be declared abstract to defer implementation further.",
+            ],
+            exampleOutput: "3.14",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Abstract classes provide a balance between full abstraction (interfaces) and full implementation (concrete classes). They are the standard tool for partial abstraction in Java.",
@@ -275,7 +575,86 @@ class Circle extends Shape {
           "Game entity hierarchies (Entity, Player, Enemy)",
           "Frameworks providing hooks for clients to override"
         ],
-        conclusion: "Abstract classes are the go-to tool for partial abstraction in Java, enabling shared code plus enforced contracts. Prefer interfaces when you only need a contract with no shared state, and abstract classes when you need both shared state and a contract."
+        conclusion: "Abstract classes are the go-to tool for partial abstraction in Java, enabling shared code plus enforced contracts. Prefer interfaces when you only need a contract with no shared state, and abstract classes when you need both shared state and a contract.",
+        types: [
+          {
+            name: "Abstract Class",
+            definition: "An abstract class is a class declared with the abstract keyword that cannot be instantiated and may declare abstract methods for subclasses to implement.",
+            diagram: "+-----------------+\n| <<abstract>>   |\n|     Shape       |\n|  + area()       |\n+-----------------+\n        ^\n+-----------------+\n|     Circle      |\n|  + area()       |\n+-----------------+",
+            code: {
+              language: "java",
+              code: `abstract class Shape {\n  abstract double area();\n}\nclass Circle extends Shape {\n  double r = 2.0;\n  double area() { return 3.14 * r * r; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Shape s = new Circle();\n    System.out.println(s.area());\n  }\n}`,
+            },
+            notes: [
+              "Declared with the abstract keyword.",
+              "Cannot be instantiated with new.",
+              "May contain zero or more abstract methods.",
+              "May define constructors, used via super() in subclasses.",
+            ],
+            exampleOutput: "12.56",
+          },
+          {
+            name: "Abstract Method",
+            definition: "An abstract method is a method declared without a body that defers implementation to a concrete subclass.",
+            diagram: "abstract double area();\n        ^\n  implemented in subclass",
+            code: {
+              language: "java",
+              code: `abstract class Animal {\n  abstract void speak();\n}\nclass Dog extends Animal {\n  void speak() { System.out.println("Bark"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Animal x = new Dog();\n    x.speak();\n  }\n}`,
+            },
+            notes: [
+              "Ends with a semicolon, no curly braces.",
+              "Has no implementation in the declaring class.",
+              "Forces every concrete subclass to provide an implementation.",
+              "Cannot be private, static, or final.",
+            ],
+            exampleOutput: "Bark",
+          },
+          {
+            name: "Concrete Class",
+            definition: "A concrete class is a regular class that provides implementations for all inherited abstract methods and can therefore be instantiated.",
+            diagram: "+--------------+\n|   Circle     |\n| + area()     |\n+--------------+",
+            code: {
+              language: "java",
+              code: `abstract class Shape {\n  abstract double area();\n}\nclass Circle extends Shape {\n  double r = 1.0;\n  double area() { return 3.14 * r * r; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Circle c = new Circle();\n    System.out.println(c.area());\n  }\n}`,
+            },
+            notes: [
+              "Provides bodies for every inherited abstract method.",
+              "May be instantiated with new.",
+              "May itself be declared abstract to defer implementation further.",
+            ],
+            exampleOutput: "3.14",
+          },
+          {
+            name: "Constructors in Abstract Class",
+            definition: "Abstract classes can declare constructors; they are not inherited but are invoked through super() calls from concrete subclass constructors.",
+            diagram: "new Circle()\n    |\n    v\nsuper(radius) ----> Shape(radius)\n                       |\n                       v\n                Circle body runs",
+            code: {
+              language: "java",
+              code: `abstract class Shape {\n  double r;\n  Shape(double r) { this.r = r; }\n  abstract double area();\n}\nclass Circle extends Shape {\n  Circle(double r) { super(r); }\n  double area() { return 3.14 * r * r; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Circle c = new Circle(2.0);\n    System.out.println(c.area());\n  }\n}`,
+            },
+            notes: [
+              "Used to initialize shared state on the parent portion of the object.",
+              "Invoked implicitly by the compiler if no explicit super() is written.",
+              "Useful for enforcing required parameters in subclasses.",
+            ],
+            exampleOutput: "12.56",
+          },
+          {
+            name: "Subclass Implementation Requirement",
+            definition: "A concrete subclass must implement every abstract method inherited from its abstract parent, or it must itself be declared abstract.",
+            diagram: "Shape (abstract)\n   ^\n   |\nCircle -- implements all\n   |\n   v\ninstantiable",
+            code: {
+              language: "java",
+              code: `abstract class A {\n  abstract void f();\n}\nabstract class B extends A {}\nclass C extends B {\n  void f() { System.out.println("done"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new C();\n    x.f();\n  }\n}`,
+            },
+            notes: [
+              "The compiler error is 'class must implement abstract method'.",
+              "Workaround: declare the intermediate class abstract too.",
+              "Implements relationship requires a non-abstract leaf class to compile.",
+            ],
+            exampleOutput: "done",
+          },
+        ]
       }
     },
     viva: [
@@ -356,7 +735,54 @@ class Circle implements Drawable {
         explanation: "Before Java 8, interfaces could only have abstract methods and public static final fields. From Java 8, default methods (concrete methods with 'default' keyword) and static methods with bodies are allowed, providing backward-compatible evolution. From Java 9, private methods (concrete helpers) are allowed for code reuse within the interface. Interfaces support multiple inheritance of type: a class can implement many interfaces. All interface members are implicitly public — abstract methods are public abstract, fields are public static final, and nested types are public static. Marker interfaces (e.g., Serializable, Cloneable) have no members and just mark a class as having a property. A functional interface is an interface with exactly one abstract method and can be used as the target of a lambda expression (e.g., Runnable, Comparator).",
         diagram: "<<interface>>\n   Drawable\n   -----------------\n   + draw() : void         <- public abstract\n   + show() : void         <- public default\n   -----------------\n       ^ implements\n       |\n   +-----------+\n   |  Circle   |\n   +-----------+\n   | + draw()  |\n   +-----------+",
         example: "interface Vehicle {\n  void start();                            // abstract\n  default void honk() {                    // Java 8 default\n    System.out.println(\"Beep!\");\n  }\n  static int getWheels() { return 2; }     // Java 8 static\n}\nclass Car implements Vehicle {\n  public void start() { System.out.println(\"Car start\"); }\n}",
-        conclusion: "Interfaces are a core Java feature for defining contracts and supporting multiple inheritance of type. They evolved from pure contracts (Java 7 and earlier) to flexible APIs with default and static methods."
+        conclusion: "Interfaces are a core Java feature for defining contracts and supporting multiple inheritance of type. They evolved from pure contracts (Java 7 and earlier) to flexible APIs with default and static methods.",
+        types: [
+          {
+            name: "Regular Interface",
+            definition: "A regular interface is a reference type that declares abstract methods and constants; classes implement it to inherit its contract.",
+            diagram: "<<interface>>\n   IRun\n   + run()\n     ^\n     |\n   Robot",
+            code: {
+              language: "java",
+              code: `interface IRun {\n  void run();\n}\nclass Robot implements IRun {\n  public void run() { System.out.println("running"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    IRun r = new Robot();\n    r.run();\n  }\n}`,
+            },
+            notes: [
+              "All methods are implicitly public and abstract (pre-Java 8).",
+              "All fields are implicitly public, static, and final.",
+              "A class can implement any number of interfaces.",
+            ],
+            exampleOutput: "running",
+          },
+          {
+            name: "Functional Interface",
+            definition: "A functional interface is an interface with exactly one abstract method, suitable for use with lambda expressions and method references.",
+            diagram: "<<functional>>\n  Runnable\n  + run()  <-- single abstract method",
+            code: {
+              language: "java",
+              code: `interface Greet {\n  void hello();\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Greet g = () -> System.out.println("hi");\n    g.hello();\n  }\n}`,
+            },
+            notes: [
+              "Exactly one abstract method; the others, if any, are default or static.",
+              "Common examples: Runnable, Comparable, Comparator, ActionListener.",
+              "Optionally annotated with @FunctionalInterface for compiler checks.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Marker Interface",
+            definition: "A marker interface is an interface with no methods or constants; it tags a class with metadata for the JVM or frameworks to detect.",
+            diagram: "<<marker>>\n Serializable\n   ^\n   |\n MyClass",
+            code: {
+              language: "java",
+              code: `import java.io.*;\nclass Note implements Serializable {}\npublic class Demo {\n  public static void main(String[] a) {\n    Note n = new Note();\n    System.out.println(n instanceof Serializable);\n  }\n}`,
+            },
+            notes: [
+              "Contains zero methods; its mere presence conveys intent.",
+              "Common examples: Serializable, Cloneable, Remote.",
+              "Modern Java prefers annotations such as @Serializable for new designs.",
+            ],
+            exampleOutput: "true",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Interfaces are Java's primary mechanism for defining type contracts and supporting multiple inheritance of type. They have evolved significantly from Java 7 to Java 9 and beyond.",
@@ -380,7 +806,86 @@ class Circle implements Drawable {
           "Strategy pattern (sortable strategies as functional interfaces)",
           "Dependency injection frameworks (Spring beans implement injection interfaces)"
         ],
-        conclusion: "Interfaces are essential to modern Java. They define contracts, support multiple inheritance of type, enable lambda-based functional programming, and are the backbone of many design patterns and frameworks."
+        conclusion: "Interfaces are essential to modern Java. They define contracts, support multiple inheritance of type, enable lambda-based functional programming, and are the backbone of many design patterns and frameworks.",
+        types: [
+          {
+            name: "Regular Interface",
+            definition: "A regular interface is a reference type that declares abstract methods and constants; classes implement it to inherit its contract.",
+            diagram: "<<interface>>\n   IRun\n   + run()\n     ^\n     |\n   Robot",
+            code: {
+              language: "java",
+              code: `interface IRun {\n  void run();\n}\nclass Robot implements IRun {\n  public void run() { System.out.println("running"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    IRun r = new Robot();\n    r.run();\n  }\n}`,
+            },
+            notes: [
+              "All methods are implicitly public and abstract (pre-Java 8).",
+              "All fields are implicitly public, static, and final.",
+              "A class can implement any number of interfaces.",
+              "Cannot be instantiated with new.",
+            ],
+            exampleOutput: "running",
+          },
+          {
+            name: "Functional Interface",
+            definition: "A functional interface is an interface with exactly one abstract method, suitable for use with lambda expressions and method references.",
+            diagram: "<<functional>>\n  Runnable\n  + run()  <-- single abstract method",
+            code: {
+              language: "java",
+              code: `interface Greet {\n  void hello();\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Greet g = () -> System.out.println("hi");\n    g.hello();\n  }\n}`,
+            },
+            notes: [
+              "Exactly one abstract method; the rest, if any, are default or static.",
+              "Common examples: Runnable, Comparable, Comparator, ActionListener.",
+              "Optionally annotated with @FunctionalInterface for compiler checks.",
+              "Target type for lambda expressions and method references.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Marker Interface",
+            definition: "A marker interface is an interface with no methods or constants; it tags a class with metadata for the JVM or frameworks to detect.",
+            diagram: "<<marker>>\n Serializable\n   ^\n   |\n MyClass",
+            code: {
+              language: "java",
+              code: `import java.io.*;\nclass Note implements Serializable {}\npublic class Demo {\n  public static void main(String[] a) {\n    Note n = new Note();\n    System.out.println(n instanceof Serializable);\n  }\n}`,
+            },
+            notes: [
+              "Contains zero methods; its mere presence conveys intent.",
+              "Common examples: Serializable, Cloneable, Remote.",
+              "Modern Java prefers annotations such as @Serializable for new designs.",
+            ],
+            exampleOutput: "true",
+          },
+          {
+            name: "Default Methods (Java 8+)",
+            definition: "A default method is a concrete method declared in an interface with the default keyword, providing a reusable implementation that implementers may override.",
+            diagram: "<<interface>>\n  Log\n  + info(s)  <-- default body",
+            code: {
+              language: "java",
+              code: `interface Log {\n  default void info(String s) { System.out.println("INFO: " + s); }\n}\nclass S implements Log {}\npublic class Demo {\n  public static void main(String[] a) {\n    S s = new S();\n    s.info("ready");\n  }\n}`,
+            },
+            notes: [
+              "Introduced in Java 8 to evolve APIs without breaking implementers.",
+              "If two interfaces supply the same default, the implementing class must override it.",
+              "The override can disambiguate with InterfaceName.super.method().",
+            ],
+            exampleOutput: "INFO: ready",
+          },
+          {
+            name: "Static Methods in Interfaces",
+            definition: "A static method in an interface is a utility method associated with the interface type, called via the interface name and not inherited by implementers.",
+            diagram: "Math\n  + static max(a, b)  <-- utility",
+            code: {
+              language: "java",
+              code: `interface Math {\n  static int max(int a, int b) { return a > b ? a : b; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    System.out.println(Math.max(3, 7));\n  }\n}`,
+            },
+            notes: [
+              "Called as InterfaceName.method(), never on instances.",
+              "Not inherited by classes that implement the interface.",
+              "Common use: grouping related helper functions under a type name.",
+            ],
+            exampleOutput: "7",
+          },
+        ]
       }
     },
     viva: [
@@ -457,7 +962,39 @@ class A implements Printable, Showable {
         explanation: "A class can 'implement' any number of interfaces, separated by commas in the implements clause. It must provide implementations for all abstract methods of all interfaces (or be declared abstract itself). Since interfaces (pre-Java 8) had no instance state and no method bodies, there was no ambiguity. From Java 8, default methods can cause conflicts — when two interfaces have a default method with the same signature, the implementing class must override the method and may invoke a specific super version using InterfaceName.super.method(). Interfaces can also extend multiple other interfaces (multiple interface inheritance).",
         diagram: "        I1   I2\n         \\   /\n          \\ /\n           C          <- implements I1, I2\n\nConflict resolution:\n        I1 (default m())   I2 (default m())\n                \\         /\n                 \\       /\n                   C\n                   |\n              overrides m()\n              may call I1.super.m() or I2.super.m()",
         example: "interface Camera { void click(); }\ninterface Music  { void play();  }\nclass Phone implements Camera, Music {\n  public void click() { System.out.println(\"click\"); }\n  public void play()  { System.out.println(\"play\");  }\n}",
-        conclusion: "Multiple inheritance via interfaces is Java's safe way to combine multiple type contracts. It avoids the diamond problem of state and supports role-based design."
+        conclusion: "Multiple inheritance via interfaces is Java's safe way to combine multiple type contracts. It avoids the diamond problem of state and supports role-based design.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is when a class extends one and only one parent class, inheriting its fields and methods.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void hi() { System.out.println("hi"); } }\nclass B extends A {}\npublic class Demo {\n  public static void main(String[] s) {\n    new B().hi();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent per class.",
+              "Default model in Java for classes.",
+              "State and behavior are inherited transitively.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Multiple Inheritance",
+            definition: "Multiple inheritance is when a class inherits type contracts from more than one parent, realized in Java only through interfaces.",
+            diagram: "+---+   +---+\n| I |   | J |\n+---+   +---+\n  ^       ^\n  +---+---+\n      |\n     +---+\n     | C |\n     +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\ninterface J { void j(); }\nclass C implements I, J {\n  public void i() { System.out.println("i"); }\n  public void j() { System.out.println("j"); }\n}\npublic class Demo {\n  public static void main(String[] s) {\n    C c = new C();\n    c.i();\n    c.j();\n  }\n}`,
+            },
+            notes: [
+              "Classes can implement many interfaces.",
+              "State is never inherited from interfaces, avoiding the diamond problem.",
+              "A class may still extend only one class.",
+            ],
+            exampleOutput: "i\nj",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Java deliberately excluded multiple class inheritance but compensated with powerful interface-based multiple inheritance.",
@@ -481,7 +1018,70 @@ class A implements Printable, Showable {
           "Stream APIs (functional interfaces like Function, Predicate, Consumer)",
           "Adapter and Decorator patterns"
         ],
-        conclusion: "Multiple inheritance through interfaces is the foundation of Java's flexible, modular type system. It allows classes to combine many role contracts safely while keeping state single-inherited."
+        conclusion: "Multiple inheritance through interfaces is the foundation of Java's flexible, modular type system. It allows classes to combine many role contracts safely while keeping state single-inherited.",
+        types: [
+          {
+            name: "Single Inheritance",
+            definition: "Single inheritance is when a class extends one and only one parent class, inheriting its fields and methods.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+",
+            code: {
+              language: "java",
+              code: `class A { void hi() { System.out.println("hi"); } }\nclass B extends A {}\npublic class Demo {\n  public static void main(String[] s) {\n    new B().hi();\n  }\n}`,
+            },
+            notes: [
+              "One direct parent per class.",
+              "Default model in Java for classes.",
+              "State and behavior are inherited transitively.",
+              "Every class extends Object directly or transitively.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Multiple Inheritance (via Interfaces)",
+            definition: "Multiple inheritance of type is when a class implements more than one interface, inheriting several type contracts at once.",
+            diagram: "+---+   +---+\n| I |   | J |\n+---+   +---+\n  ^       ^\n  +---+---+\n      |\n     +---+\n     | C |\n     +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\ninterface J { void j(); }\nclass C implements I, J {\n  public void i() { System.out.println("i"); }\n  public void j() { System.out.println("j"); }\n}\npublic class Demo {\n  public static void main(String[] s) {\n    C c = new C();\n    c.i();\n    c.j();\n  }\n}`,
+            },
+            notes: [
+              "A class may implement any number of interfaces.",
+              "State is never inherited from interfaces, avoiding the diamond problem.",
+              "Common pattern: a class plays many roles (Runnable, Comparable, Serializable).",
+            ],
+            exampleOutput: "i\nj",
+          },
+          {
+            name: "Hybrid Inheritance",
+            definition: "Hybrid inheritance combines multiple forms in one design, typically multilevel plus multiple, all realized through interfaces in Java.",
+            diagram: "+---+\n| A |\n+---+\n ^\n+---+\n| B |\n+---+\n ^   ^\n+-+ +---+\n|C| | I |\n+-+ +---+",
+            code: {
+              language: "java",
+              code: `interface I { void i(); }\nclass A { void a() { System.out.println("a"); } }\nclass B extends A {}\nclass C extends B implements I {\n  public void i() { System.out.println("i"); }\n}\npublic class Demo {\n  public static void main(String[] s) {\n    C c = new C();\n    c.a();\n    c.i();\n  }\n}`,
+            },
+            notes: [
+              "Mixes multilevel, hierarchical, and multiple in one design.",
+              "Java provides the multiple leg only through interfaces.",
+              "Resolves cleanly because interfaces carry no instance state.",
+            ],
+            exampleOutput: "a\ni",
+          },
+          {
+            name: "Diamond Problem",
+            definition: "The diamond problem occurs when a class inherits the same method from two parents that share a common ancestor, making the implementation ambiguous.",
+            diagram: "   I\n  / \\\n J   K\n  \\ /\n   C  <-- which version?",
+            code: {
+              language: "java",
+              code: `interface I { default void f() { System.out.println("I.f"); } }\ninterface J extends I {}\ninterface K extends I {}\nclass C implements J, K {\n  public void f() { I.super.f(); System.out.println("C.f"); }\n}\npublic class Demo {\n  public static void main(String[] s) {\n    new C().f();\n  }\n}`,
+            },
+            notes: [
+              "Java avoids state-level ambiguity by disallowing multiple class inheritance.",
+              "For interfaces, a class with conflicting defaults must override and disambiguate.",
+              "InterfaceName.super.method() selects a specific inherited default.",
+            ],
+            exampleOutput: "I.f\nC.f",
+          },
+        ]
       }
     },
     viva: [
@@ -552,7 +1152,54 @@ obj.show();   // B — dynamic dispatch`,
         explanation: "When a superclass reference variable holds a subclass object, and an overridden method is called, the JVM looks at the actual object's class to decide which method to invoke. This is done via vtable (virtual method table) lookup — each class has a vtable mapping method names to actual code addresses. Static methods, private methods, and final methods are not subject to dynamic dispatch (they use static/early binding). The compiler emits 'invokevirtual' or 'invokeinterface' bytecode for dynamically dispatched calls. The actual object's class is read from the heap at call time, and the vtable is consulted to find the method to invoke. Field access is not polymorphic — the field is resolved at compile time based on the reference type.",
         diagram: "    A ref = new B();\n        ref.show();\n            |\n            v\n    +-----------------+\n    |   JVM step      |\n    |  1. read object's class (B)\n    |  2. look up show() in B's vtable\n    |  3. invoke B.show()\n    +-----------------+",
         example: "class Animal { void sound() { System.out.println(\"...\"); } }\nclass Dog extends Animal { void sound() { System.out.println(\"Bark\"); } }\nAnimal a = new Dog();  // upcast\na.sound();             // dynamic dispatch -> Dog.sound()",
-        conclusion: "Dynamic method dispatch enables flexible, polymorphic behavior and is a cornerstone of OOP in Java. The JVM always picks the actual object's method, never the reference-type's."
+        conclusion: "Dynamic method dispatch enables flexible, polymorphic behavior and is a cornerstone of OOP in Java. The JVM always picks the actual object's method, never the reference-type's.",
+        types: [
+          {
+            name: "Upcasting",
+            definition: "Upcasting is the implicit conversion of a subclass reference to a superclass reference; it is always safe and requires no cast.",
+            diagram: "Dog  --->  Animal  (upcast, safe)",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("?"); } }\nclass Dog extends Animal {\n  void sound() { System.out.println("Bark"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Animal x = new Dog();\n    x.sound();\n  }\n}`,
+            },
+            notes: [
+              "Always safe because the subclass is-a superclass.",
+              "Only supertype members are accessible through the reference.",
+              "Required when passing objects to methods that take a supertype parameter.",
+            ],
+            exampleOutput: "Bark",
+          },
+          {
+            name: "Method Overriding",
+            definition: "Method overriding is when a subclass provides a new implementation for an inherited method with the same name, parameters, and compatible return type.",
+            diagram: "Animal.sound()\n   ^\n   |\nDog.sound()  <-- overrides",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A { void f() { System.out.println("B"); } }\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    x.f();\n  }\n}`,
+            },
+            notes: [
+              "Same name and parameter list as the parent method.",
+              "Return type may be the same or covariant (a subtype).",
+              "Access modifier may be widened but not narrowed.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Virtual Method Invocation",
+            definition: "Virtual method invocation is the JVM's runtime decision of which overridden method to execute, based on the actual object's class rather than the reference type.",
+            diagram: "ref: A\n   |\nactual: B\n   v\ndispatches to B.f()",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A { void f() { System.out.println("B"); } }\nclass C extends B { void f() { System.out.println("C"); } }\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.f();\n  }\n}`,
+            },
+            notes: [
+              "All non-static, non-final, non-private methods are virtual by default.",
+              "Decision is made at runtime by walking the vtable from the actual class.",
+              "Static methods are not virtual; they are resolved at compile time.",
+            ],
+            exampleOutput: "C",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Dynamic method dispatch enables runtime polymorphism, a key feature of OOP and the foundation of many design patterns and frameworks.",
@@ -575,7 +1222,85 @@ obj.show();   // B — dynamic dispatch`,
           "Collections.sort() sorting arbitrary Comparable implementations",
           "Java I/O streams (InputStream references hold subclass instances)"
         ],
-        conclusion: "Dynamic method dispatch is the runtime engine that makes polymorphism work in Java. It allows supertype references to invoke subtype-specific behavior, which is essential for flexible, decoupled, and extensible designs."
+        conclusion: "Dynamic method dispatch is the runtime engine that makes polymorphism work in Java. It allows supertype references to invoke subtype-specific behavior, which is essential for flexible, decoupled, and extensible designs.",
+        types: [
+          {
+            name: "Upcasting",
+            definition: "Upcasting is the implicit conversion of a subclass reference to a superclass reference; it is always safe and requires no cast.",
+            diagram: "Dog  --->  Animal  (upcast, safe)",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("?"); } }\nclass Dog extends Animal {\n  void sound() { System.out.println("Bark"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Animal x = new Dog();\n    x.sound();\n  }\n}`,
+            },
+            notes: [
+              "Always safe because the subclass is-a superclass.",
+              "Only supertype members are accessible through the reference.",
+              "Required when passing objects to methods that take a supertype parameter.",
+            ],
+            exampleOutput: "Bark",
+          },
+          {
+            name: "Method Overriding",
+            definition: "Method overriding is when a subclass provides a new implementation for an inherited method with the same name, parameters, and compatible return type.",
+            diagram: "Animal.sound()\n   ^\n   |\nDog.sound()  <-- overrides",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A { void f() { System.out.println("B"); } }\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    x.f();\n  }\n}`,
+            },
+            notes: [
+              "Same name and parameter list as the parent method.",
+              "Return type may be the same or covariant (a subtype).",
+              "Access modifier may be widened but not narrowed.",
+              "Static and final methods cannot be overridden.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Virtual Method Invocation",
+            definition: "Virtual method invocation is the JVM's runtime decision of which overridden method to execute, based on the actual object's class rather than the reference type.",
+            diagram: "ref: A\n   |\nactual: B\n   v\ndispatches to B.f()",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A { void f() { System.out.println("B"); } }\nclass C extends B { void f() { System.out.println("C"); } }\npublic class Demo {\n  public static void main(String[] a) {\n    A ref = new C();\n    ref.f();\n  }\n}`,
+            },
+            notes: [
+              "All non-static, non-final, non-private methods are virtual by default.",
+              "Decision is made at runtime by walking the vtable from the actual class.",
+              "Static methods are not virtual; they are resolved at compile time.",
+            ],
+            exampleOutput: "C",
+          },
+          {
+            name: "Field Hiding vs Method Overriding",
+            definition: "Field hiding occurs when a subclass declares a field with the same name as an inherited field; methods are overridden, fields are only hidden.",
+            diagram: "A.n   (compile-time ref)\n   |\nB.n   (hidden, accessed via B.n)",
+            code: {
+              language: "java",
+              code: `class A { int n = 1; }\nclass B extends A { int n = 2; }\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    System.out.println(x.n);\n  }\n}`,
+            },
+            notes: [
+              "Field access uses the reference type, not the actual object.",
+              "Method access uses the actual object (virtual dispatch).",
+              "Use super.field to disambiguate when fields are hidden.",
+            ],
+            exampleOutput: "1",
+          },
+          {
+            name: "Polymorphic Arguments",
+            definition: "Polymorphic arguments are parameters declared as a supertype, so any subtype instance can be passed and dynamic dispatch will pick the right method.",
+            diagram: "feed(Animal a)\n   ^\n   |\nfeed(new Dog())",
+            code: {
+              language: "java",
+              code: `class Animal { void sound() { System.out.println("?"); } }\nclass Dog extends Animal { void sound() { System.out.println("Bark"); } }\nclass Cat extends Animal { void sound() { System.out.println("Meow"); } }\npublic class Demo {\n  static void feed(Animal a) { a.sound(); }\n  public static void main(String[] x) {\n    feed(new Dog());\n    feed(new Cat());\n  }\n}`,
+            },
+            notes: [
+              "Lets one method work with any future subtype.",
+              "The chosen method is resolved per call at runtime.",
+              "Underpins framework design and dependency injection.",
+            ],
+            exampleOutput: "Bark\nMeow",
+          },
+        ]
       }
     },
     viva: [
@@ -647,7 +1372,54 @@ obj.show();   // B — dynamic dispatch`,
         explanation: "Methods can be overloaded by changing the number of parameters, the types of parameters, or the order of types. The return type alone is not enough to distinguish overloaded methods — the compiler would not know which to call. Overloading is resolved at compile time using the most-specific applicable method. Constructors can also be overloaded. Overloading improves readability and usability of APIs (println has 10 overloads). It also plays nicely with autoboxing and varargs in Java 5+, though those can introduce ambiguity if not used carefully.",
         diagram: "add(int, int)        -> int\nadd(double, double)  -> double\nadd(String, String)  -> String\n\nCompile-time resolution:\n  add(1, 2)         -> add(int, int)\n  add(1.0, 2.0)     -> add(double, double)\n  add(\"a\", \"b\")     -> add(String, String)",
         example: "class Printer {\n  void print(int i)        { System.out.println(\"int: \"    + i); }\n  void print(double d)     { System.out.println(\"double: \" + d); }\n  void print(String s)     { System.out.println(\"String: \" + s); }\n  void print(String s, int n) { for (int i = 0; i < n; i++) System.out.println(s); }\n}",
-        conclusion: "Method overloading is essential for clean, expressive APIs. The compiler picks the best match at compile time, so it is also called static polymorphism."
+        conclusion: "Method overloading is essential for clean, expressive APIs. The compiler picks the best match at compile time, so it is also called static polymorphism.",
+        types: [
+          {
+            name: "Different Number of Parameters",
+            definition: "Overloading by number varies the count of parameters in methods that share the same name within a class.",
+            diagram: "add(a, b)\nadd(a, b, c)  <-- extra parameter",
+            code: {
+              language: "java",
+              code: `class Calc {\n  int add(int a, int b) { return a + b; }\n  int add(int a, int b, int c) { return a + b + c; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Calc c = new Calc();\n    System.out.println(c.add(1, 2));\n    System.out.println(c.add(1, 2, 3));\n  }\n}`,
+            },
+            notes: [
+              "Same name, different parameter count.",
+              "Return type alone cannot disambiguate overloads.",
+              "Resolved at compile time.",
+            ],
+            exampleOutput: "3\n6",
+          },
+          {
+            name: "Different Types of Parameters",
+            definition: "Overloading by type varies the data types of parameters in methods that share the same name within a class.",
+            diagram: "print(int)\nprint(String)  <-- different type",
+            code: {
+              language: "java",
+              code: `class P {\n  void show(int n) { System.out.println("int " + n); }\n  void show(String s) { System.out.println("str " + s); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    P p = new P();\n    p.show(5);\n    p.show("hi");\n  }\n}`,
+            },
+            notes: [
+              "Same number of parameters, different types.",
+              "The compiler picks the most specific applicable match.",
+              "Autoboxing and widening can both apply; the rules prefer widening.",
+            ],
+            exampleOutput: "int 5\nstr hi",
+          },
+          {
+            name: "Different Order of Parameters",
+            definition: "Overloading by order varies the sequence of distinct parameter types in methods that share the same name within a class.",
+            diagram: "show(int, String)\nshow(String, int)  <-- swapped order",
+            code: {
+              language: "java",
+              code: `class P {\n  void show(int n, String s) { System.out.println(n + ":" + s); }\n  void show(String s, int n) { System.out.println(s + ":" + n); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    P p = new P();\n    p.show(1, "x");\n    p.show("x", 1);\n  }\n}`,
+            },
+            notes: [
+              "Order must differ in a way the compiler can detect.",
+              "Ambiguous calls are flagged at compile time.",
+              "Useful for builders and fluent APIs.",
+            ],
+            exampleOutput: "1:x\nx:1",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Overloading is one of the most commonly used features in Java for creating flexible, intuitive APIs.",
@@ -670,7 +1442,84 @@ obj.show();   // B — dynamic dispatch`,
           "Builder pattern (wither-style overloaded setters)",
           "Stream APIs (collect, toList, etc.)"
         ],
-        conclusion: "Overloading is a fundamental Java feature that makes APIs more usable and expressive. Remember: same name, different parameter list, compile-time resolution, return type alone is not enough."
+        conclusion: "Overloading is a fundamental Java feature that makes APIs more usable and expressive. Remember: same name, different parameter list, compile-time resolution, return type alone is not enough.",
+        types: [
+          {
+            name: "Different Number of Parameters",
+            definition: "Overloading by number varies the count of parameters in methods that share the same name within a class.",
+            diagram: "add(a, b)\nadd(a, b, c)  <-- extra parameter",
+            code: {
+              language: "java",
+              code: `class Calc {\n  int add(int a, int b) { return a + b; }\n  int add(int a, int b, int c) { return a + b + c; }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Calc c = new Calc();\n    System.out.println(c.add(1, 2));\n    System.out.println(c.add(1, 2, 3));\n  }\n}`,
+            },
+            notes: [
+              "Same name, different parameter count.",
+              "Return type alone cannot disambiguate overloads.",
+              "Resolved at compile time.",
+            ],
+            exampleOutput: "3\n6",
+          },
+          {
+            name: "Different Types of Parameters",
+            definition: "Overloading by type varies the data types of parameters in methods that share the same name within a class.",
+            diagram: "print(int)\nprint(String)  <-- different type",
+            code: {
+              language: "java",
+              code: `class P {\n  void show(int n) { System.out.println("int " + n); }\n  void show(String s) { System.out.println("str " + s); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    P p = new P();\n    p.show(5);\n    p.show("hi");\n  }\n}`,
+            },
+            notes: [
+              "Same number of parameters, different types.",
+              "The compiler picks the most specific applicable match.",
+              "Autoboxing and widening can both apply; widening is preferred.",
+            ],
+            exampleOutput: "int 5\nstr hi",
+          },
+          {
+            name: "Different Order of Parameters",
+            definition: "Overloading by order varies the sequence of distinct parameter types in methods that share the same name within a class.",
+            diagram: "show(int, String)\nshow(String, int)  <-- swapped order",
+            code: {
+              language: "java",
+              code: `class P {\n  void show(int n, String s) { System.out.println(n + ":" + s); }\n  void show(String s, int n) { System.out.println(s + ":" + n); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    P p = new P();\n    p.show(1, "x");\n    p.show("x", 1);\n  }\n}`,
+            },
+            notes: [
+              "Order must differ in a way the compiler can detect.",
+              "Ambiguous calls are flagged at compile time.",
+              "Useful for builders and fluent APIs.",
+            ],
+            exampleOutput: "1:x\nx:1",
+          },
+          {
+            name: "Type Promotion in Overloading",
+            definition: "Type promotion is the implicit widening of an argument's type when no exact-match overload exists, so the call can still be resolved.",
+            diagram: "byte --> int --> long --> float --> double",
+            code: {
+              language: "java",
+              code: `class P {\n  void show(int n) { System.out.println("int"); }\n  void show(double n) { System.out.println("double"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    P p = new P();\n    p.show(5);\n    p.show(5.0f);\n  }\n}`,
+            },
+            notes: [
+              "Widening chain: byte -> short -> int -> long -> float -> double.",
+              "Autoboxing is applied only after widening fails.",
+              "Varargs is the last resort in overload resolution.",
+            ],
+            exampleOutput: "int\ndouble",
+          },
+          {
+            name: "Varargs Overloading",
+            definition: "Varargs overloading uses a variable-arity parameter (...) so a method can accept any number of arguments, including zero, of a given type.",
+            diagram: "sum(int... xs)  <-- 0..n ints",
+            code: {
+              language: "java",
+              code: `class Calc {\n  int sum(int... xs) {\n    int t = 0;\n    for (int x : xs) t += x;\n    return t;\n  }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    Calc c = new Calc();\n    System.out.println(c.sum(1, 2, 3));\n    System.out.println(c.sum());\n  }\n}`,
+            },
+            notes: [
+              "Treated as an array of the element type inside the method.",
+              "Lower priority than fixed-arity overloads during resolution.",
+              "Only one varargs parameter is allowed per method.",
+            ],
+            exampleOutput: "6\n0",
+          },
+        ]
       }
     },
     viva: [
@@ -741,7 +1590,54 @@ class Dog extends Animal {
         explanation: "Overriding methods are resolved at runtime using dynamic dispatch. The @Override annotation is recommended for safety — the compiler will reject an attempt that does not actually override a parent method. Access modifier can be widened but not narrowed. Cannot override static methods (only hide them), private methods (not visible), or final methods. Constructors cannot be overridden. The overriding method can throw fewer or narrower checked exceptions than the parent. From Java 5, the return type can be covariant — a subtype of the parent's return type.",
         diagram: "Animal.sound()        [parent]\n    ^\n    | overridden by\n    v\nDog.sound()             [child]\n\nAt runtime:\n  Animal a = new Dog();\n  a.sound();  --> Dog.sound() runs (vtable lookup)",
         example: "class Vehicle {\n  void run() { System.out.println(\"running\"); }\n}\nclass Bike extends Vehicle {\n  @Override\n  void run() { System.out.println(\"Bike running safely\"); }\n}",
-        conclusion: "Overriding enables flexible, polymorphic code. Use @Override for safety and follow the rules: same signature, same or covariant return, equal or wider access, no narrowing of checked exceptions."
+        conclusion: "Overriding enables flexible, polymorphic code. Use @Override for safety and follow the rules: same signature, same or covariant return, equal or wider access, no narrowing of checked exceptions.",
+        types: [
+          {
+            name: "Standard Overriding",
+            definition: "Standard overriding is when a subclass redefines an inherited method with the same name, parameter list, and a compatible return type.",
+            diagram: "A.f()\n   ^\nB.f()  <-- same signature",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override void f() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    x.f();\n  }\n}`,
+            },
+            notes: [
+              "Same name and parameter list as the parent.",
+              "Use the @Override annotation so the compiler can verify.",
+              "JVM picks the actual object's method at runtime.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Covariant Return Type",
+            definition: "A covariant return is an overriding method whose return type is a subtype of the parent's return type, permitted since Java 5.",
+            diagram: "A.make() : Animal\n   ^\nB.make() : Dog   <-- subtype",
+            code: {
+              language: "java",
+              code: `class Animal {}\nclass Dog extends Animal {}\nclass A {\n  Animal make() { return new Animal(); }\n}\nclass B extends A {\n  @Override Dog make() { return new Dog(); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    System.out.println(x.make().getClass().getSimpleName());\n  }\n}`,
+            },
+            notes: [
+              "Return type must be the same or a subtype.",
+              "Available since Java 5.",
+              "Commonly used in factory and clone patterns.",
+            ],
+            exampleOutput: "Dog",
+          },
+          {
+            name: "Access Modifier Widening",
+            definition: "Access widening in overriding lets a subclass declare the override with the same or a more permissive access level than the parent.",
+            diagram: "A.f()  protected\n   ^\nB.f()  public  <-- wider",
+            code: {
+              language: "java",
+              code: `class A { protected void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override public void f() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    B b = new B();\n    b.f();\n  }\n}`,
+            },
+            notes: [
+              "Allowed order: private < default < protected < public.",
+              "Narrowing the access is a compile-time error.",
+              "Does not change runtime dispatch behavior.",
+            ],
+            exampleOutput: "B",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Overriding is the primary mechanism for runtime polymorphism in Java. It lets subclasses tailor inherited behavior.",
@@ -764,7 +1660,86 @@ class Dog extends Animal {
           "Strategy and State patterns",
           "Frameworks exposing extension points (Spring's ApplicationContext callbacks)"
         ],
-        conclusion: "Overriding is essential for OOP and Java polymorphism. Follow the rules carefully, use @Override, and remember that the JVM picks the actual object's method at runtime."
+        conclusion: "Overriding is essential for OOP and Java polymorphism. Follow the rules carefully, use @Override, and remember that the JVM picks the actual object's method at runtime.",
+        types: [
+          {
+            name: "Standard Overriding",
+            definition: "Standard overriding is when a subclass redefines an inherited method with the same name, parameter list, and a compatible return type.",
+            diagram: "A.f()\n   ^\nB.f()  <-- same signature",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override void f() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    x.f();\n  }\n}`,
+            },
+            notes: [
+              "Same name and parameter list as the parent.",
+              "Use the @Override annotation so the compiler can verify.",
+              "JVM picks the actual object's method at runtime.",
+              "Static, final, and private methods cannot be overridden.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Covariant Return Type",
+            definition: "A covariant return is an overriding method whose return type is a subtype of the parent's return type, permitted since Java 5.",
+            diagram: "A.make() : Animal\n   ^\nB.make() : Dog   <-- subtype",
+            code: {
+              language: "java",
+              code: `class Animal {}\nclass Dog extends Animal {}\nclass A {\n  Animal make() { return new Animal(); }\n}\nclass B extends A {\n  @Override Dog make() { return new Dog(); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    System.out.println(x.make().getClass().getSimpleName());\n  }\n}`,
+            },
+            notes: [
+              "Return type must be the same or a subtype.",
+              "Available since Java 5.",
+              "Commonly used in factory and clone patterns.",
+              "Does not change the JVM dispatch rules.",
+            ],
+            exampleOutput: "Dog",
+          },
+          {
+            name: "Access Modifier Widening",
+            definition: "Access widening in overriding lets a subclass declare the override with the same or a more permissive access level than the parent.",
+            diagram: "A.f()  protected\n   ^\nB.f()  public  <-- wider",
+            code: {
+              language: "java",
+              code: `class A { protected void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override public void f() { System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    B b = new B();\n    b.f();\n  }\n}`,
+            },
+            notes: [
+              "Allowed order: private < default < protected < public.",
+              "Narrowing the access is a compile-time error.",
+              "Does not change runtime dispatch behavior.",
+            ],
+            exampleOutput: "B",
+          },
+          {
+            name: "Exception Restriction in Overriding",
+            definition: "An overriding method may declare the same, fewer, or narrower checked exceptions than the parent method, but not new or broader ones.",
+            diagram: "A.f() throws IOException\n   ^\nB.f() throws FileNotFoundException  <-- narrower",
+            code: {
+              language: "java",
+              code: `import java.io.*;\nclass A { void f() throws IOException {} }\nclass B extends A {\n  @Override void f() throws FileNotFoundException {}\n}\npublic class Demo {\n  public static void main(String[] a) {\n    A x = new B();\n    try { x.f(); } catch (IOException e) {}\n    System.out.println("ok");\n  }\n}`,
+            },
+            notes: [
+              "Unchecked (Runtime) exceptions may be added freely.",
+              "The override's checked exception set must be a subset.",
+              "Enforced at compile time, not at runtime.",
+            ],
+            exampleOutput: "ok",
+          },
+          {
+            name: "Final Methods Cannot Be Overridden",
+            definition: "A final method is locked from further overriding in subclasses, preserving the parent's exact behavior for that method.",
+            diagram: "A.f() final  <-- locked\n   ^\nB cannot override",
+            code: {
+              language: "java",
+              code: `class A { final void f() { System.out.println("A"); } }\nclass B extends A {\n  void g() { f(); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().g();\n  }\n}`,
+            },
+            notes: [
+              "Marked with the final keyword on the method signature.",
+              "Compiler error if a subclass attempts to override it.",
+              "Used to seal critical behavior in frameworks.",
+            ],
+            exampleOutput: "A",
+          },
+        ]
       }
     },
     viva: [
@@ -836,7 +1811,54 @@ class B extends A {
         explanation: "Three uses of super: 1) super.field — access hidden parent field (when child declares a same-named field). 2) super.method() — call the parent's overridden method (typically inside an override). 3) super(args) — call a specific parent constructor; this must be the first line in a subclass constructor. If neither super() nor this() is written, the compiler inserts super() with no args. super cannot be used in static context. super is implicitly 'this.super' — the parent portion of the current object.",
         diagram: "        super\n          |\n          v\n   +---------------+\n   |   Parent      |\n   +---------------+\n          ^\n          | extends\n   +---------------+\n   |   Child       |\n   |   this  ------+--> own fields/methods\n   |   super ------+--> parent fields/methods\n   +---------------+",
         example: "class Animal {\n  String name = \"Animal\";\n  Animal() { System.out.println(\"Animal ctor\"); }\n}\nclass Dog extends Animal {\n  String name = \"Dog\";\n  Dog() {\n    super();                      // call parent constructor\n    System.out.println(\"Dog ctor\");\n    System.out.println(\"super.name = \" + super.name);\n  }\n}",
-        conclusion: "super is vital for controlling inheritance behavior in Java. It enables constructor chaining, explicit access to parent members, and clean override-then-extend patterns."
+        conclusion: "super is vital for controlling inheritance behavior in Java. It enables constructor chaining, explicit access to parent members, and clean override-then-extend patterns.",
+        types: [
+          {
+            name: "super.field",
+            definition: "super.field is a reference to a field of the immediate parent class, used to disambiguate when the subclass hides a parent field with the same name.",
+            diagram: "A.n\n   ^\nB.n  hides A.n\n   |\nsuper.n  refers to A.n",
+            code: {
+              language: "java",
+              code: `class A { int n = 1; }\nclass B extends A { int n = 2; void show() { System.out.println(super.n); } }\npublic class Demo {\n  public static void main(String[] a) {\n    new B().show();\n  }\n}`,
+            },
+            notes: [
+              "Field access is by reference type, so 'n' alone follows the static type.",
+              "super.n forces access to the parent's field.",
+              "Useful for accessing public or protected hidden members.",
+            ],
+            exampleOutput: "1",
+          },
+          {
+            name: "super.method()",
+            definition: "super.method() invokes the parent's version of a method, commonly used to extend rather than replace the parent's behavior.",
+            diagram: "A.f()\n   ^\nB.f() extends:\n   super.f()\n   + extra work",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override void f() { super.f(); System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().f();\n  }\n}`,
+            },
+            notes: [
+              "Bypasses dynamic dispatch to call the parent version.",
+              "Common in template-method designs.",
+              "Cannot be used inside a static context.",
+            ],
+            exampleOutput: "A\nB",
+          },
+          {
+            name: "super() Constructor Call",
+            definition: "super() is a call to a constructor of the immediate parent class, used as the first statement of a subclass constructor to initialize inherited state.",
+            diagram: "new B()\n   |\n   v\nsuper(args)  --->  A(args)\n                       |\n                  rest of B runs",
+            code: {
+              language: "java",
+              code: `class A {\n  A(String s) { System.out.println("A " + s); }\n}\nclass B extends A {\n  B() { super("ok"); System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B();\n  }\n}`,
+            },
+            notes: [
+              "Must be the first statement in the subclass constructor.",
+              "The compiler auto-inserts super() if no this() or super() is written.",
+              "Cannot coexist with this() in the same constructor.",
+            ],
+            exampleOutput: "A ok\nB",
+          },
+        ],
       },
       sixteenMark: {
         intro: "super provides controlled access to parent class members from a subclass. It is the bridge between child and parent.",
@@ -858,7 +1880,85 @@ class B extends A {
           "Field hiding — accessing parent field via super.field",
           "Method overriding that extends the parent's behavior (super.method() inside override)"
         ],
-        conclusion: "super is a key part of inheritance, providing controlled access to parent functionality. It is the bridge that lets subclasses reuse and extend — not blindly replace — parent behavior."
+        conclusion: "super is a key part of inheritance, providing controlled access to parent functionality. It is the bridge that lets subclasses reuse and extend — not blindly replace — parent behavior.",
+        types: [
+          {
+            name: "super.field",
+            definition: "super.field is a reference to a field of the immediate parent class, used to disambiguate when the subclass hides a parent field with the same name.",
+            diagram: "A.n\n   ^\nB.n  hides A.n\n   |\nsuper.n  refers to A.n",
+            code: {
+              language: "java",
+              code: `class A { int n = 1; }\nclass B extends A { int n = 2; void show() { System.out.println(super.n); } }\npublic class Demo {\n  public static void main(String[] a) {\n    new B().show();\n  }\n}`,
+            },
+            notes: [
+              "Field access is by reference type, so 'n' alone follows the static type.",
+              "super.n forces access to the parent's field.",
+              "Useful for accessing public or protected hidden members.",
+            ],
+            exampleOutput: "1",
+          },
+          {
+            name: "super.method()",
+            definition: "super.method() invokes the parent's version of a method, commonly used to extend rather than replace the parent's behavior.",
+            diagram: "A.f()\n   ^\nB.f() extends:\n   super.f()\n   + extra work",
+            code: {
+              language: "java",
+              code: `class A { void f() { System.out.println("A"); } }\nclass B extends A {\n  @Override void f() { super.f(); System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().f();\n  }\n}`,
+            },
+            notes: [
+              "Bypasses dynamic dispatch to call the parent version.",
+              "Common in template-method designs.",
+              "Cannot be used inside a static context.",
+            ],
+            exampleOutput: "A\nB",
+          },
+          {
+            name: "super() Constructor Call",
+            definition: "super() is a call to a constructor of the immediate parent class, used as the first statement of a subclass constructor to initialize inherited state.",
+            diagram: "new B()\n   |\n   v\nsuper(args)  --->  A(args)\n                       |\n                  rest of B runs",
+            code: {
+              language: "java",
+              code: `class A {\n  A(String s) { System.out.println("A " + s); }\n}\nclass B extends A {\n  B() { super("ok"); System.out.println("B"); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B();\n  }\n}`,
+            },
+            notes: [
+              "Must be the first statement in the subclass constructor.",
+              "The compiler auto-inserts super() if no this() or super() is written.",
+              "Cannot coexist with this() in the same constructor.",
+              "If the parent has no no-arg constructor, an explicit super(args) is required.",
+            ],
+            exampleOutput: "A ok\nB",
+          },
+          {
+            name: "super in Interface (Java 9+)",
+            definition: "Since Java 9, super in an interface can refer to a specific super-interface to disambiguate a default method inherited from more than one parent.",
+            diagram: "I1.f  default\nI2.f  default\n   ^\n   C must pick:\n   I1.super.f() or I2.super.f()",
+            code: {
+              language: "java",
+              code: `interface I1 { default void f() { System.out.println("I1"); } }\ninterface I2 { default void f() { System.out.println("I2"); } }\nclass C implements I1, I2 {\n  public void f() { I1.super.f(); }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new C().f();\n  }\n}`,
+            },
+            notes: [
+              "Available since Java 9 for default methods only.",
+              "Used when a class inherits two conflicting defaults.",
+              "Syntax is InterfaceName.super.methodName().",
+            ],
+            exampleOutput: "I1",
+          },
+          {
+            name: "super vs this",
+            definition: "this refers to the current object instance, while super refers to the parent portion of that instance; both are implicit references, never null on a constructed object.",
+            diagram: "this --> current object\nsuper --> parent portion of it",
+            code: {
+              language: "java",
+              code: `class A { int n = 1; }\nclass B extends A {\n  int n = 2;\n  void show() {\n    System.out.println(this.n);\n    System.out.println(super.n);\n  }\n}\npublic class Demo {\n  public static void main(String[] a) {\n    new B().show();\n  }\n}`,
+            },
+            notes: [
+              "this() calls another constructor in the same class; super() calls the parent.",
+              "this() and super() cannot both appear in the same constructor.",
+              "Both are unavailable in static methods.",
+            ],
+            exampleOutput: "2\n1",
+          },
+        ]
       }
     },
     viva: [
@@ -927,7 +2027,39 @@ public class Helper { /* ... */ }`,
         explanation: "Use 'package' to declare; 'import' to use. Packages map to directory structure — the package name corresponds to folder path on disk. They prevent name conflicts and provide access control (default = package-private). The fully qualified name is packageName.className. The java.lang package is auto-imported, so classes like String, Object, Math need no import. Static import (Java 5+) lets you import static members of a class, so you can write sqrt(2) instead of Math.sqrt(2).",
         diagram: "java.lang  -> String, Object, Math, System\njava.util  -> List, Map, Collections, ArrayList\njava.io    -> File, InputStream, BufferedReader\njava.sql   -> Connection, Statement, ResultSet\n\nUser packages:\ncom.example.util  -> Helper, StringUtils\ncom.example.app   -> Main, AppConfig",
         example: "// File: com/example/util/Helper.java\npackage com.example.util;\npublic class Helper {\n  public static int square(int x) { return x * x; }\n}\n\n// File: com/example/app/Main.java\npackage com.example.app;\nimport com.example.util.Helper;\npublic class Main {\n  public static void main(String[] args) {\n    System.out.println(Helper.square(5));   // 25\n  }\n}",
-        conclusion: "Packages are fundamental for large-scale Java development, providing namespace management, access control, and code organization."
+        conclusion: "Packages are fundamental for large-scale Java development, providing namespace management, access control, and code organization.",
+        types: [
+          {
+            name: "Built-in Packages",
+            definition: "Built-in packages are the standard library namespaces provided by the JDK, such as java.lang, java.util, and java.io.",
+            diagram: "java.lang\njava.util\njava.io\n   ...\n(implicitly available)",
+            code: {
+              language: "java",
+              code: `import java.util.ArrayList;\npublic class Demo {\n  public static void main(String[] a) {\n    ArrayList<String> list = new ArrayList<>();\n    list.add("hi");\n    System.out.println(list.get(0));\n  }\n}`,
+            },
+            notes: [
+              "java.lang is auto-imported into every Java source file.",
+              "Use import statements to bring other packages into scope.",
+              "Wildcard imports (java.util.*) are allowed but discouraged in production.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "User-defined Packages",
+            definition: "A user-defined package is a namespace you create to group related classes and interfaces, declared with the package keyword at the top of a source file.",
+            diagram: "package com.app.util\n   |\n   +-- Helper\n   +-- Utils",
+            code: {
+              language: "java",
+              code: `package myapp;\npublic class Greeter {\n  public static void hi() { System.out.println("hi"); }\n}\nclass Demo {\n  public static void main(String[] a) { Greeter.hi(); }\n}`,
+            },
+            notes: [
+              "Declared with package at the top of the file.",
+              "Folder structure must match the package name.",
+              "Enables access protection and namespace isolation.",
+            ],
+            exampleOutput: "hi",
+          },
+        ],
       },
       sixteenMark: {
         intro: "Packages provide modularity, namespace management, and access control in Java. They are the basis of Java's modular code organization.",
@@ -951,7 +2083,69 @@ public class Helper { /* ... */ }`,
           "Enterprise projects — typically use reverse-domain naming (com.company.project.*)",
           "Module system (Java 9+) for stronger encapsulation"
         ],
-        conclusion: "Packages are a foundational concept for building maintainable, large-scale Java applications. They provide namespace, organization, and access control — the building blocks of modular Java code."
+        conclusion: "Packages are a foundational concept for building maintainable, large-scale Java applications. They provide namespace, organization, and access control — the building blocks of modular Java code.",
+        types: [
+          {
+            name: "Built-in Packages",
+            definition: "Built-in packages are the standard library namespaces provided by the JDK, such as java.lang, java.util, and java.io.",
+            diagram: "java.lang\njava.util\njava.io\n   ...\n(implicitly available)",
+            code: {
+              language: "java",
+              code: `import java.util.ArrayList;\npublic class Demo {\n  public static void main(String[] a) {\n    ArrayList<String> list = new ArrayList<>();\n    list.add("hi");\n    System.out.println(list.get(0));\n  }\n}`,
+            },
+            notes: [
+              "java.lang is auto-imported into every Java source file.",
+              "Use import statements to bring other packages into scope.",
+              "Wildcard imports (java.util.*) are allowed but discouraged in production.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "User-defined Packages",
+            definition: "A user-defined package is a namespace you create to group related classes and interfaces, declared with the package keyword at the top of a source file.",
+            diagram: "package com.app.util\n   |\n   +-- Helper\n   +-- Utils",
+            code: {
+              language: "java",
+              code: `package myapp;\npublic class Greeter {\n  public static void hi() { System.out.println("hi"); }\n}\nclass Demo {\n  public static void main(String[] a) { Greeter.hi(); }\n}`,
+            },
+            notes: [
+              "Declared with package at the top of the file.",
+              "Folder structure must match the package name.",
+              "Enables access protection and namespace isolation.",
+            ],
+            exampleOutput: "hi",
+          },
+          {
+            name: "Access Protection in Packages",
+            definition: "Access protection uses the default (package-private) modifier so a class member is visible only to other classes in the same package.",
+            diagram: "pkg\n  A.f()  default  <-- visible to B\n  A.g()  public   <-- visible everywhere",
+            code: {
+              language: "java",
+              code: `package myapp;\nclass Secret {\n  static String word = "shh";\n}\npublic class Demo {\n  public static void main(String[] a) {\n    System.out.println(Secret.word);\n  }\n}`,
+            },
+            notes: [
+              "Default access means no access modifier is written.",
+              "Visible to every class in the same package, not to subclasses in other packages.",
+              "Use protected for subclass access across packages.",
+            ],
+            exampleOutput: "shh",
+          },
+          {
+            name: "CLASSPATH and Import",
+            definition: "CLASSPATH is the list of roots (folders and JARs) the JVM and compiler search to locate classes, while import brings fully qualified names into local scope.",
+            diagram: "CLASSPATH\n  +-- /lib\n  +-- /app.jar\nimport pkg.Foo;",
+            code: {
+              language: "java",
+              code: `import java.util.HashMap;\npublic class Demo {\n  public static void main(String[] a) {\n    HashMap<String, Integer> m = new HashMap<>();\n    m.put("k", 1);\n    System.out.println(m.get("k"));\n  }\n}`,
+            },
+            notes: [
+              "Set via -cp on the command line or the CLASSPATH environment variable.",
+              "import is a compile-time convenience; bytecode still uses fully qualified names.",
+              "Modern build tools (Maven, Gradle) manage classpath automatically.",
+            ],
+            exampleOutput: "1",
+          },
+        ]
       }
     },
     viva: [

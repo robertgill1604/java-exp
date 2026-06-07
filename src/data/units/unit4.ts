@@ -41,7 +41,54 @@ System.out.println(s.substring(1,4));`,
         explanation: "String literals are interned: identical literals point to the same pooled object. == compares references; .equals() compares values. The new String(\"x\") constructor forces a new heap object. Strings are thread-safe due to immutability. Heavy concatenation inside loops should use StringBuilder. Methods like concat(), replace(), toUpperCase() return new String instances. The hash code is cached after first computation, making String excellent as a HashMap key.",
         diagram: "          +-----------------+\n          |   String Pool   |\n          |   (in Heap)     |\n          +-----------------+\n                |  \"Hello\"  (shared)\n                v\nStack ref s -+--- t --------+\n                                |\nHeap      new String(\"Hello\") <-+ u (separate object)\n\nAfter s.concat(\"x\"):  s unchanged, new String returned",
         example: "String s = \"Hi\";\nString t = s.concat(\" there\");\nSystem.out.println(s); // Hi (unchanged)\nSystem.out.println(t); // Hi there (new String)",
-        conclusion: "Mastering String requires understanding immutability, the String Constant Pool, the difference between == and .equals(), and when to switch to StringBuilder for performance."
+        conclusion: "Mastering String requires understanding immutability, the String Constant Pool, the difference between == and .equals(), and when to switch to StringBuilder for performance.",
+        types: [
+          {
+            name: "String (Immutable Class)",
+            definition: "A final class in java.lang representing an immutable character sequence stored in the String Constant Pool in the heap.",
+            diagram: "+-- String Pool (Heap, Java 7+) --+\n|  \"Hi\"  \"Hello\"  \"abc\" ...  |\n+-----------^-----------+\n            |\n        s --+",
+            code: { language: "java", code: `String s = "Hello";
+String t = s.concat(" World");
+System.out.println(s);
+System.out.println(t);`, caption: "concat returns a new String; s is unchanged." },
+            notes: [
+              "Final class; cannot be subclassed.",
+              "Internal char[] (Java 8) or byte[] + coder (Java 9+) is final and never reassigned.",
+              "String literals are interned in the String Constant Pool in the heap since Java 7."
+            ],
+            exampleOutput: "Hello\nHello World"
+          },
+          {
+            name: "StringBuilder (Mutable, Non-synchronized)",
+            definition: "A mutable, non-synchronized character sequence class added in Java 5 for high-performance single-threaded string building.",
+            diagram: "+-- StringBuilder --+\n| mutable char[]     |\n| append / insert    |\n+------------------->+ (in-place mutation, no lock)",
+            code: { language: "java", code: `StringBuilder sb = new StringBuilder("Hi");
+sb.append(" there");
+sb.insert(0, "Hey! ");
+System.out.println(sb);`, caption: "StringBuilder mutates its internal buffer in place." },
+            notes: [
+              "Non-synchronized; faster than StringBuffer in single-threaded code.",
+              "Default capacity 16, grows to (oldCapacity * 2) + 2 on overflow.",
+              "Preferred for heavy string building in loops to avoid intermediate String objects."
+            ],
+            exampleOutput: "Hey! Hi there"
+          },
+          {
+            name: "StringBuffer (Mutable, Synchronized)",
+            definition: "A mutable, thread-safe character sequence class whose public mutating methods are all synchronized on `this`.",
+            diagram: "+-- StringBuffer --+\n| mutable char[]     |\n| synchronized ops   |\n+------------------->+ (atomic across threads)",
+            code: { language: "java", code: `StringBuffer sb = new StringBuffer("Hi");
+sb.append(" there");
+sb.reverse();
+System.out.println(sb);`, caption: "StringBuffer mutations are atomic across threads." },
+            notes: [
+              "Every public mutating method is synchronized on `this`.",
+              "Thread-safe but slower than StringBuilder when there is no contention.",
+              "Pre-dates StringBuilder (Java 1.0); retained for backward compatibility."
+            ],
+            exampleOutput: "ereht iH"
+          }
+        ]
       },
       sixteenMark: {
         intro: "String is Java's built-in immutable character-sequence class, foundational to language design, security, and the Collections framework.",
@@ -65,7 +112,95 @@ System.out.println(s.substring(1,4));`,
           "Network I/O and protocols",
           "Reflection and class loading"
         ],
-        conclusion: "String is a fundamental and carefully designed class. Always remember: it is immutable, interned, thread-safe, and concatenation produces a new object — use StringBuilder for performance-critical loops."
+        conclusion: "String is a fundamental and carefully designed class. Always remember: it is immutable, interned, thread-safe, and concatenation produces a new object — use StringBuilder for performance-critical loops.",
+        types: [
+          {
+            name: "String (Immutable, Pooled)",
+            definition: "A final class in java.lang representing an immutable character sequence, with literals automatically interned in the String Constant Pool in the heap.",
+            diagram: "+-- String Pool (Heap, Java 7+) --+\n|  \"Hi\"  \"Hello\"  \"abc\" ...  |\n+-----------^-----------+\n            |\n        s --+",
+            code: { language: "java", code: `String a = "Hi";
+String b = "Hi";
+System.out.println(a == b);
+System.out.println(a.equals(b));
+System.out.println(a.length());
+System.out.println(a.charAt(0));`, caption: "Identical literals share one pooled reference; == is true." },
+            notes: [
+              "Final class; cannot be subclassed; all instance fields are final.",
+              "Internal storage is char[] (Java 8) or byte[] + coder (Java 9+ Compact Strings).",
+              "String literals are interned automatically; == compares references, .equals() compares content.",
+              "Caches its hashCode() after the first call, making it an excellent HashMap/HashSet key."
+            ],
+            exampleOutput: "true\ntrue\n2\nH"
+          },
+          {
+            name: "StringBuilder (Mutable, Non-synchronized)",
+            definition: "A mutable, non-synchronized character sequence added in Java 5 for high-performance single-threaded string manipulation.",
+            diagram: "+-- StringBuilder --+\n| mutable char[]     |\n| + append / insert  |\n+------------------->+ (in-place, no monitor)",
+            code: { language: "java", code: `StringBuilder sb = new StringBuilder("Hi");
+sb.append(" there");
+sb.insert(0, "Hey! ");
+System.out.println(sb);
+System.out.println(sb.length());
+System.out.println(sb.capacity());`, caption: "StringBuilder mutates its internal buffer in place; no synchronization overhead." },
+            notes: [
+              "Non-synchronized; faster than StringBuffer in single-threaded code.",
+              "Default capacity 16; grows to (oldCapacity * 2) + 2 on overflow.",
+              "append(), insert(), delete(), reverse(), setCharAt() return the same builder for chaining.",
+              "Use it inside loops to avoid allocating many intermediate immutable String objects."
+            ],
+            exampleOutput: "Hey! Hi there\n13\n34"
+          },
+          {
+            name: "StringBuffer (Mutable, Synchronized)",
+            definition: "A mutable, thread-safe character sequence whose public mutating methods are all synchronized on `this`.",
+            diagram: "+-- StringBuffer --+\n| mutable char[]     |\n| synchronized ops   |\n+------------------->+ (atomic across threads)",
+            code: { language: "java", code: `StringBuffer sb = new StringBuffer("Hi");
+sb.append(" there");
+sb.reverse();
+System.out.println(sb);
+System.out.println(sb.length());`, caption: "Each mutating call holds the monitor, so threads cannot interleave steps." },
+            notes: [
+              "Every public mutating method is declared synchronized on `this`.",
+              "Thread-safe; slower than StringBuilder under no contention because of monitor enter/exit.",
+              "Default capacity 16; grows to (oldCapacity * 2) + 2 on overflow.",
+              "toString() snapshots the buffer into a new immutable String and does not share state."
+            ],
+            exampleOutput: "ereht iH\n8"
+          },
+          {
+            name: "String Literal (Interned)",
+            definition: "A string value written directly in source code is automatically interned; identical literals share a single pooled object.",
+            diagram: "Source:  String s = \"Hi\";\n         String t = \"Hi\";\n  |             |\n  v             v\nString Pool:  [\"Hi\"] <-- s and t point here (== true)",
+            code: { language: "java", code: `String a = "Hi";
+String b = "Hi";
+System.out.println(a == b);
+System.out.println(a.hashCode() == b.hashCode());`, caption: "Two identical literals refer to the same pooled instance." },
+            notes: [
+              "Interning happens at class loading when the JVM resolves the constant pool entry.",
+              "Two identical literals always refer to the same pooled object; == is true.",
+              "The String Constant Pool lives in the heap since Java 7 (was in PermGen before).",
+              "Saves memory by deduplicating common strings like keys, headers, and tags."
+            ],
+            exampleOutput: "true\ntrue"
+          },
+          {
+            name: "new String() (Heap Object)",
+            definition: "The new String(literal) constructor always allocates a new object on the heap, outside the pool unless intern() is called.",
+            diagram: "Source:  String s = new String(\"Hi\");\n  |\n  v\nHeap:  [\"Hi\"] (s points here, separate from pool copy)\nPool:  [\"Hi\"] (interned canonical version)",
+            code: { language: "java", code: `String a = "Hi";
+String b = new String("Hi");
+System.out.println(a == b);
+System.out.println(a.equals(b));
+System.out.println(a == b.intern());`, caption: "new String creates a new object; intern() returns the pooled reference." },
+            notes: [
+              "Each `new String(x)` call allocates a fresh object on the heap.",
+              "== against a literal with the same content returns false.",
+              "Call `.intern()` to get the canonical pooled reference and enable == equality.",
+              "Rarely needed; prefer literals unless you must decouple from the pool."
+            ],
+            exampleOutput: "false\ntrue\ntrue"
+          }
+        ]
       }
     },
     viva: [
@@ -129,7 +264,54 @@ System.out.println(sb);`,
         explanation: "Key methods: append() (adds to end), insert(offset, value), delete(start, end), deleteCharAt(index), reverse(), setCharAt(index, ch), replace(start, end, str), setLength(n). All public mutating methods are synchronized on `this`, making StringBuffer safe for concurrent use. Default initial capacity is 16; when the buffer is too small, it grows to (oldCapacity * 2) + 2. toString() creates a new String snapshot. For single-threaded code, prefer StringBuilder for better performance.",
         diagram: "StringBuffer sb (initial capacity 16)\n |--> append(x) --> buffer mutated in place\n |--> insert(i,x) --> shifts chars right of i\n |--> toString() --> new immutable String\n\nBuffer layout:\n  [H][e][l][l][o][ ][W][o][r][l][d][?][?][?][?][?]\n  ^ length=11     ^ capacity=16 (grows when full)",
         example: "StringBuffer sb = new StringBuffer();\nfor (int i = 0; i < 10; i++) {\n    sb.append(i).append(' ');\n}\nSystem.out.println(sb); // 0 1 2 3 4 5 6 7 8 9",
-        conclusion: "StringBuffer is the right choice when multiple threads will modify the same string concurrently. For single-threaded heavy string building, StringBuilder is significantly faster."
+        conclusion: "StringBuffer is the right choice when multiple threads will modify the same string concurrently. For single-threaded heavy string building, StringBuilder is significantly faster.",
+        types: [
+          {
+            name: "StringBuffer (Synchronized)",
+            definition: "A mutable, thread-safe character sequence class whose public mutating methods are all synchronized on the instance.",
+            diagram: "+-- StringBuffer --+\n| mutable char[]     |\n| synchronized ops   |\n+------------------->+ (atomic across threads)",
+            code: { language: "java", code: `StringBuffer sb = new StringBuffer("Hi");
+sb.append(" there");
+sb.reverse();
+System.out.println(sb);`, caption: "StringBuffer mutations are atomic across threads." },
+            notes: [
+              "Every public mutating method is declared synchronized on `this`.",
+              "Thread-safe but slower than StringBuilder when there is no contention.",
+              "Pre-dates StringBuilder (Java 1.0); retained for backward compatibility."
+            ],
+            exampleOutput: "ereht iH"
+          },
+          {
+            name: "StringBuilder (Non-synchronized, Faster)",
+            definition: "A mutable, non-synchronized character sequence added in Java 5 for high-performance single-threaded string manipulation.",
+            diagram: "+-- StringBuilder --+\n| mutable char[]     |\n| + append / insert  |\n+------------------->+ (in-place, no monitor)",
+            code: { language: "java", code: `StringBuilder sb = new StringBuilder("Hi");
+sb.append(" there");
+sb.insert(0, "Hey! ");
+System.out.println(sb);`, caption: "StringBuilder mutates its internal buffer in place; no synchronization overhead." },
+            notes: [
+              "Non-synchronized; faster than StringBuffer in single-threaded code.",
+              "Default capacity 16; grows to (oldCapacity * 2) + 2 on overflow.",
+              "Preferred for heavy string building in loops to avoid intermediate String objects."
+            ],
+            exampleOutput: "Hey! Hi there"
+          },
+          {
+            name: "String (Immutable)",
+            definition: "A final, immutable character sequence class in java.lang stored in the String Constant Pool.",
+            diagram: "+-- String Pool (Heap) --+\n| \"Hi\"  \"Hello\"  ...    |\n+-----------^-----------+\n            |\n        s --+",
+            code: { language: "java", code: `String s = "Hello";
+String t = s.concat(" World");
+System.out.println(s);
+System.out.println(t);`, caption: "concat returns a new String; the original is unchanged." },
+            notes: [
+              "Immutable: every 'modifying' method returns a new String.",
+              "Literals are interned automatically in the String Constant Pool.",
+              "Use StringBuffer/Builder when you need many in-place modifications."
+            ],
+            exampleOutput: "Hello\nHello World"
+          }
+        ]
       },
       sixteenMark: {
         intro: "StringBuffer provides thread-safe mutable string operations, ideal when a string is shared between threads.",
@@ -151,7 +333,100 @@ System.out.println(sb);`,
           "JSON / XML building where the buffer is shared",
           "Legacy code maintenance"
         ],
-        conclusion: "Use StringBuffer only when thread safety is required. In single-threaded hot paths, StringBuilder is preferred for its lower overhead."
+        conclusion: "Use StringBuffer only when thread safety is required. In single-threaded hot paths, StringBuilder is preferred for its lower overhead.",
+        types: [
+          {
+            name: "String (Immutable)",
+            definition: "A final class in java.lang representing an immutable character sequence with literals interned in the String Constant Pool.",
+            diagram: "+-- String Pool (Heap) --+\n| \"Hi\"  \"Hello\"  ...    |\n+-----------^-----------+\n            |\n        s --+",
+            code: { language: "java", code: `String s = "Hello";
+String t = s.concat(" World");
+System.out.println(s);
+System.out.println(t);`, caption: "concat returns a new String; the original is unchanged." },
+            notes: [
+              "Immutable: every 'modifying' method returns a brand new String.",
+              "Literals are interned automatically in the String Constant Pool.",
+              "Thread-safe by design; cached hashCode makes it a great map key.",
+              "Use StringBuffer/Builder when you need many in-place modifications."
+            ],
+            exampleOutput: "Hello\nHello World"
+          },
+          {
+            name: "StringBuffer (Synchronized)",
+            definition: "A mutable, thread-safe character sequence whose public mutating methods are all synchronized on the instance.",
+            diagram: "+-- StringBuffer --+\n| mutable char[]     |\n| synchronized ops   |\n+------------------->+ (atomic across threads)",
+            code: { language: "java", code: `StringBuffer sb = new StringBuffer("Hi");
+sb.append(" there");
+sb.reverse();
+System.out.println(sb);
+System.out.println(sb.length());`, caption: "Each mutating call holds the monitor, so threads cannot interleave steps." },
+            notes: [
+              "Every public mutating method is declared synchronized on `this`.",
+              "Thread-safe; slower than StringBuilder under no contention because of monitor enter/exit.",
+              "Default capacity 16; grows to (oldCapacity * 2) + 2 on overflow.",
+              "toString() snapshots the buffer into a new immutable String."
+            ],
+            exampleOutput: "ereht iH\n8"
+          },
+          {
+            name: "StringBuilder (Non-synchronized, Fast)",
+            definition: "A mutable, non-synchronized character sequence added in Java 5 for high-performance single-threaded string manipulation.",
+            diagram: "+-- StringBuilder --+\n| mutable char[]     |\n| + append / insert  |\n+------------------->+ (in-place, no monitor)",
+            code: { language: "java", code: `StringBuilder sb = new StringBuilder("Hi");
+sb.append(" there");
+sb.insert(0, "Hey! ");
+System.out.println(sb);
+System.out.println(sb.length());`, caption: "StringBuilder mutates its internal buffer in place; no synchronization overhead." },
+            notes: [
+              "Non-synchronized; faster than StringBuffer in single-threaded code.",
+              "Default capacity 16; grows to (oldCapacity * 2) + 2 on overflow.",
+              "append(), insert(), delete(), reverse(), setCharAt() return the same builder for chaining.",
+              "The recommended choice inside loops to avoid many intermediate String allocations."
+            ],
+            exampleOutput: "Hey! Hi there\n13"
+          },
+          {
+            name: "Buffer Growth (old * 2 + 2)",
+            definition: "When the internal char[] is full, StringBuffer/Builder allocate a new array of size (oldCapacity * 2) + 2 and copy the contents.",
+            diagram: "Old:  [..........]  cap=10, count=10  (full)\n              |\n              v  grow to cap = 10*2 + 2 = 22\nNew:  [..........          ]  cap=22, count=10",
+            code: { language: "java", code: `StringBuffer sb = new StringBuffer("Hi");
+System.out.println(sb.capacity());
+for (int i = 0; i < 20; i++) sb.append('x');
+System.out.println(sb.length());
+System.out.println(sb.capacity());`, caption: "Capacity grows automatically when the internal buffer is exceeded." },
+            notes: [
+              "Default initial capacity is 16 (or argument length + 16).",
+              "Growth formula on overflow: newCapacity = (oldCapacity * 2) + 2.",
+              "Use ensureCapacity(n) to pre-allocate when the final size is known.",
+              "The old array becomes eligible for garbage collection after the copy."
+            ],
+            exampleOutput: "18\n22\n34"
+          },
+          {
+            name: "StringBuffer vs StringBuilder (Performance)",
+            definition: "StringBuilder is the same as StringBuffer minus the synchronized keyword, making it measurably faster in single-threaded code.",
+            diagram: "Single thread:    StringBuilder >> StringBuffer >> String\nMulti-thread:      StringBuffer  >  StringBuilder (needs external sync)",
+            code: { language: "java", code: `long t1 = System.nanoTime();
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < 10000; i++) sb.append(i);
+long t2 = System.nanoTime();
+
+long t3 = System.nanoTime();
+StringBuffer sbf = new StringBuffer();
+for (int i = 0; i < 10000; i++) sbf.append(i);
+long t4 = System.nanoTime();
+
+System.out.println("Builder: " + (t2 - t1));
+System.out.println("Buffer:  " + (t4 - t3));`, caption: "StringBuilder is typically faster because it skips monitor enter/exit." },
+            notes: [
+              "Difference is the `synchronized` keyword on every mutating method.",
+              "Use StringBuilder in single-threaded code; switch to StringBuffer only when threads share the buffer.",
+              "Both have the same API: append, insert, delete, reverse, setCharAt, setLength, toString.",
+              "Both implement CharSequence and Serializable."
+            ],
+            exampleOutput: "Builder: <small number>\nBuffer:  <larger number>"
+          }
+        ]
       }
     },
     viva: [
@@ -212,7 +487,55 @@ System.out.println(sb);`,
         explanation: "java.io.File represents a file/directory path (legacy). Streams provide byte/character I/O: InputStream/OutputStream (bytes), Reader/Writer (characters). Buffered streams improve performance by reading/writing in chunks. try-with-resources (Java 7+) auto-closes streams. NIO.2 (java.nio.file) provides Path (a path object), Files (utility methods), Paths (factory), Channels, and Buffers — offering better performance and more features. Scanner is convenient for parsing text. RandomAccessFile allows non-sequential access.",
         diagram: "java.io.File (path) --> FileInputStream / FileReader --> BufferedReader / Scanner --> Consumer\n                                       (raw bytes/chars)         (buffered)            (program)\n\njava.nio.file.Path --> Files.newBufferedReader() --> BufferedReader (NIO backed)",
         example: "Path p = Path.of(\"a.txt\");\nFiles.writeString(p, \"Hello\");\nString content = Files.readString(p);\nSystem.out.println(content);",
-        conclusion: "Prefer NIO.2 (java.nio.file) for new code; use java.io streams when working with classic APIs or sockets. Always use try-with-resources."
+        conclusion: "Prefer NIO.2 (java.nio.file) for new code; use java.io streams when working with classic APIs or sockets. Always use try-with-resources.",
+        types: [
+          {
+            name: "java.io Streams (Classic)",
+            definition: "Stream-based I/O from java.io using InputStream/OutputStream (bytes) and Reader/Writer (chars) wrapped around a File.",
+            diagram: "File --> FileInputStream --> BufferedInputStream --> Program\n                                              (read in chunks)",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
+  String line;
+  while ((line = br.readLine()) != null) {
+    System.out.println(line);
+  }
+}`, caption: "BufferedReader over FileReader, auto-closed by try-with-resources." },
+            notes: [
+              "InputStream/OutputStream handle raw 8-bit binary data.",
+              "Reader/Writer handle 16-bit text with a Charset.",
+              "try-with-resources (Java 7+) calls close() even on exceptions."
+            ],
+            exampleOutput: "(prints each line of data.txt)"
+          },
+          {
+            name: "java.nio.file (NIO.2)",
+            definition: "Path-based I/O introduced in Java 7 via java.nio.file.Path, java.nio.file.Files, and java.nio.file.Paths.",
+            diagram: "Path p = Path.of(\"data.txt\");\nFiles.readString(p)   <-- one call, Java 11+\nFiles.readAllLines(p) <-- Java 7+",
+            code: { language: "java", code: `Path p = Path.of("data.txt");
+Files.writeString(p, "Hello");
+String content = Files.readString(p);
+System.out.println(content);`, caption: "NIO.2 reads/writes the whole file in a single call." },
+            notes: [
+              "Path is an immutable handle to a file or directory on the file system.",
+              "Files is a utility class: readString, writeString, readAllLines, copy, move, delete.",
+              "Better performance, charset control, and atomic operations vs java.io."
+            ],
+            exampleOutput: "Hello"
+          },
+          {
+            name: "try-with-resources (AutoCloseable)",
+            definition: "A try statement (Java 7+) that automatically calls close() on every resource implementing AutoCloseable, in reverse order of declaration.",
+            diagram: "try (ResourceA a = ...; ResourceB b = ...) {\n   use a, b;\n}\n  --> close(b), then close(a);  even on exception",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(new FileReader("a.txt"))) {
+  System.out.println(br.readLine());
+}  // br.close() called automatically here`, caption: "try-with-resources guarantees close() even on exception." },
+            notes: [
+              "Resource must implement java.lang.AutoCloseable (FileInputStream, BufferedReader, etc. all do).",
+              "close() is called in reverse order of resource declaration.",
+              "Replaces verbose try/finally blocks for cleanup."
+            ],
+            exampleOutput: "(first line of a.txt, then file closed automatically)"
+          }
+        ]
       },
       sixteenMark: {
         intro: "File handling in Java is provided by two complementary APIs: java.io (classic streams) and java.nio.file (NIO.2, since Java 7).",
@@ -236,7 +559,105 @@ System.out.println(sb);`,
           "Caching computed results",
           "Source code processing (compilers, linters)"
         ],
-        conclusion: "File handling is a basic but critical capability. Use NIO.2 (java.nio.file) for new code, wrap streams in buffered variants, and always close with try-with-resources."
+        conclusion: "File handling is a basic but critical capability. Use NIO.2 (java.nio.file) for new code, wrap streams in buffered variants, and always close with try-with-resources.",
+        types: [
+          {
+            name: "Byte Streams (InputStream / OutputStream)",
+            definition: "Streams that read and write raw 8-bit bytes — used for binary data such as images, audio, PDFs, and serialized objects.",
+            diagram: "File --> FileInputStream --> Program (read bytes)\nProgram --> FileOutputStream --> File (write bytes)",
+            code: { language: "java", code: `try (FileInputStream in = new FileInputStream("a.bin");
+     FileOutputStream out = new FileOutputStream("b.bin")) {
+  byte[] buf = new byte[1024];
+  int n;
+  while ((n = in.read(buf)) != -1) {
+    out.write(buf, 0, n);
+  }
+}`, caption: "Byte stream file copy using a 1 KB buffer." },
+            notes: [
+              "Work on raw 8-bit bytes — no charset conversion.",
+              "FileInputStream, FileOutputStream, ByteArrayInputStream, ByteArrayOutputStream.",
+              "PipedInputStream/PipedOutputStream for in-process pipe between threads.",
+              "SequenceInputStream concatenates multiple input streams."
+            ],
+            exampleOutput: "(copies a.bin to b.bin byte-for-byte)"
+          },
+          {
+            name: "Character Streams (Reader / Writer)",
+            definition: "Streams that read and write 16-bit characters decoded with a Charset — used for text files and internationalized I/O.",
+            diagram: "File --> FileReader --> Program (read chars via Charset)\nProgram --> FileWriter --> File (write chars via Charset)",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(new FileReader("a.txt"))) {
+  String line;
+  while ((line = br.readLine()) != null) {
+    System.out.println(line);
+  }
+}`, caption: "Character stream reading line by line with a default charset." },
+            notes: [
+              "Read 16-bit chars; charset conversion happens inside.",
+              "Default charset was platform-dependent before Java 18; UTF-8 since Java 18.",
+              "Specify StandardCharsets.UTF_8 explicitly for portability.",
+              "FileReader, CharArrayReader, StringReader are common subclasses."
+            ],
+            exampleOutput: "(prints each line of a.txt)"
+          },
+          {
+            name: "Buffered Streams (Performance Wrapper)",
+            definition: "Filter streams that wrap an existing stream to read or write in larger chunks, drastically reducing expensive OS-level calls.",
+            diagram: "Source --> BufferedInputStream --> Program\n                (reads 8 KB at a time, not 1 byte)",
+            code: { language: "java", code: `try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("a.bin"));
+     BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("b.bin"))) {
+  byte[] buf = new byte[1024];
+  int n;
+  while ((n = bis.read(buf)) != -1) bos.write(buf, 0, n);
+}`, caption: "Buffered streams read/write in 8 KB chunks by default." },
+            notes: [
+              "Default buffer is 8 KB; tune with the constructor argument.",
+              "Wrap any byte stream (BufferedInputStream/BufferedOutputStream).",
+              "Wrap any char stream (BufferedReader/BufferedWriter) for line-based reads.",
+              "Always flush() a writer before close() to avoid losing buffered output."
+            ],
+            exampleOutput: "(copies a.bin to b.bin with one read per 1024 bytes instead of one per byte)"
+          },
+          {
+            name: "Data Streams (Typed Primitives)",
+            definition: "Filter streams that read and write Java primitive types (int, double, boolean, etc.) in a portable binary format.",
+            diagram: "File <--> DataInputStream / DataOutputStream (typed read/write)\n                (readInt, readDouble, writeUTF, ...)",
+            code: { language: "java", code: `try (DataOutputStream out = new DataOutputStream(new FileOutputStream("d.bin"))) {
+  out.writeInt(42);
+  out.writeDouble(3.14);
+  out.writeUTF("Hello");
+}
+try (DataInputStream in = new DataInputStream(new FileInputStream("d.bin"))) {
+  System.out.println(in.readInt());
+  System.out.println(in.readDouble());
+  System.out.println(in.readUTF());
+}`, caption: "Data streams write/read primitives in a portable binary encoding." },
+            notes: [
+              "Methods: readInt, readLong, readDouble, readBoolean, readUTF, writeInt, ...",
+              "writeUTF uses a modified UTF-8 (length-prefixed, not standard UTF-8).",
+              "Reads must match the order and types of the writes.",
+              "Useful for compact binary logs and simple file formats."
+            ],
+            exampleOutput: "42\n3.14\nHello"
+          },
+          {
+            name: "NIO.2 Path / Files (Modern API)",
+            definition: "java.nio.file.Path and java.nio.file.Files provide a Path-based, charset-aware API for file and directory operations since Java 7.",
+            diagram: "Path p = Path.of(\"a.txt\");\nFiles.readString(p)        <-- one call, Java 11+\nFiles.writeString(p, s)    <-- one call, Java 11+\nFiles.copy(src, dest, REPLACE_EXISTING)",
+            code: { language: "java", code: `Path src  = Path.of("hello.txt");
+Path dest = Path.of("backup.txt");
+Files.writeString(src, "Hello World");
+Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+System.out.println(Files.readString(src));
+Files.delete(dest);`, caption: "NIO.2 handles open, read, write, copy, and delete with simple factory calls." },
+            notes: [
+              "Path is an immutable handle to a file/directory location.",
+              "Files.readString / writeString were added in Java 11.",
+              "Files.readAllLines / write were added in Java 7.",
+              "Use StandardCopyOption.REPLACE_EXISTING to overwrite on copy."
+            ],
+            exampleOutput: "Hello World"
+          }
+        ]
       }
     },
     viva: [
@@ -299,7 +720,59 @@ System.out.println(sb);`,
         explanation: "Byte streams: InputStream, OutputStream, FileInputStream, FileOutputStream, BufferedInputStream, BufferedOutputStream, DataInputStream, DataOutputStream, ObjectInputStream, ObjectOutputStream, ByteArrayInputStream, ByteArrayOutputStream, PrintStream. Character streams: Reader, Writer, FileReader, FileWriter, BufferedReader, BufferedWriter, PrintWriter, CharArrayReader, CharArrayWriter, StringReader, StringWriter. Bridge: InputStreamReader (byte -> char), OutputStreamWriter (char -> byte). Buffered variants reduce system calls and improve performance dramatically.",
         diagram: "                +-------------------+\n                |    InputStream    |   (bytes)\n                +-------------------+\n                          ^\n        FileInputStream, ByteArrayInputStream,\n        BufferedInputStream, ObjectInputStream,\n        DataInputStream, PipedInputStream\n\n                +-------------------+\n                |      Reader       |   (chars, charset)\n                +-------------------+\n                          ^\n        FileReader, BufferedReader, CharArrayReader,\n        StringReader, InputStreamReader (bridge)",
         example: "try (InputStreamReader isr = new InputStreamReader(\n        new FileInputStream(\"f.txt\"), StandardCharsets.UTF_8);\n     BufferedReader br = new BufferedReader(isr)) {\n    System.out.println(br.readLine());\n}",
-        conclusion: "Use byte streams for binary data, character streams for text. Use InputStreamReader / OutputStreamWriter to bridge the two worlds."
+        conclusion: "Use byte streams for binary data, character streams for text. Use InputStreamReader / OutputStreamWriter to bridge the two worlds.",
+        types: [
+          {
+            name: "Byte Streams (InputStream / OutputStream)",
+            definition: "Abstract classes in java.io for reading and writing raw 8-bit binary data — used for images, audio, serialized objects.",
+            diagram: "+-- InputStream --+        +-- OutputStream --+\n| read(byte[])    |        | write(byte[],off,len) |\n+----------------+        +----------------------+",
+            code: { language: "java", code: `try (FileInputStream in = new FileInputStream("a.bin");
+     FileOutputStream out = new FileOutputStream("b.bin")) {
+  byte[] buf = new byte[1024];
+  int n;
+  while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+}`, caption: "Byte stream file copy using a 1 KB buffer." },
+            notes: [
+              "Operate on raw 8-bit bytes; no charset conversion.",
+              "FileInputStream / FileOutputStream are the workhorses for binary files.",
+              "read() returns -1 at end of stream; close via try-with-resources."
+            ],
+            exampleOutput: "(copies a.bin to b.bin byte-for-byte)"
+          },
+          {
+            name: "Character Streams (Reader / Writer)",
+            definition: "Abstract classes in java.io for reading and writing 16-bit characters using a Charset — used for text files and internationalized I/O.",
+            diagram: "+-- Reader --+              +-- Writer --+\n| read(char[]) |            | write(char[],off,len) |\n+------------- +             +----------------------+",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(new FileReader("a.txt"))) {
+  String line;
+  while ((line = br.readLine()) != null) {
+    System.out.println(line);
+  }
+}`, caption: "BufferedReader reads a text file line by line." },
+            notes: [
+              "16-bit chars with charset conversion (UTF-8 default since Java 18).",
+              "FileReader, CharArrayReader, StringReader are common Reader subclasses.",
+              "FileWriter, PrintWriter, OutputStreamWriter are common Writer subclasses."
+            ],
+            exampleOutput: "(prints each line of a.txt)"
+          },
+          {
+            name: "Bridge (InputStreamReader / OutputStreamWriter)",
+            definition: "Adapter classes that connect a byte stream to a character stream by decoding/encoding bytes through a specified Charset.",
+            diagram: "bytes --> InputStreamReader --> chars  (Charset.decode)\nchars --> OutputStreamWriter --> bytes (Charset.encode)",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(
+    new InputStreamReader(
+        new FileInputStream("a.txt"), StandardCharsets.UTF_8))) {
+  System.out.println(br.readLine());
+}`, caption: "Bridge a FileInputStream into a BufferedReader via InputStreamReader." },
+            notes: [
+              "InputStreamReader wraps an InputStream and decodes bytes to chars.",
+              "OutputStreamWriter wraps an OutputStream and encodes chars to bytes.",
+              "Always pass an explicit Charset (StandardCharsets.UTF_8) for portability."
+            ],
+            exampleOutput: "(first line of a.txt decoded as UTF-8)"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Streams are categorized into byte and character streams, each suited to a different data domain.",
@@ -322,7 +795,108 @@ System.out.println(sb);`,
           "Serialization (Object streams)",
           "Reading HTTP responses"
         ],
-        conclusion: "Understanding byte vs character streams and the filter (decorator) pattern is essential for correct, efficient I/O in Java. Always close streams and prefer buffered variants."
+        conclusion: "Understanding byte vs character streams and the filter (decorator) pattern is essential for correct, efficient I/O in Java. Always close streams and prefer buffered variants.",
+        types: [
+          {
+            name: "Byte Streams (InputStream / OutputStream)",
+            definition: "Abstract classes in java.io for reading and writing raw 8-bit binary data — used for images, audio, PDFs, and serialized objects.",
+            diagram: "+-- InputStream --+        +-- OutputStream --+\n| read(byte[])     |        | write(byte[],off,len)|\n+-----------------+        +---------------------+",
+            code: { language: "java", code: `try (FileInputStream in = new FileInputStream("a.bin");
+     FileOutputStream out = new FileOutputStream("b.bin")) {
+  byte[] buf = new byte[1024];
+  int n;
+  while ((n = in.read(buf)) != -1) out.write(buf, 0, n);
+}`, caption: "Byte stream file copy using a 1 KB buffer." },
+            notes: [
+              "Operate on raw 8-bit bytes; no charset conversion.",
+              "FileInputStream / FileOutputStream are the workhorses for binary files.",
+              "ByteArrayInputStream / ByteArrayOutputStream for in-memory byte buffers.",
+              "PipedInputStream / PipedOutputStream connect two threads in the same process."
+            ],
+            exampleOutput: "(copies a.bin to b.bin byte-for-byte)"
+          },
+          {
+            name: "Character Streams (Reader / Writer)",
+            definition: "Abstract classes in java.io for reading and writing 16-bit characters using a Charset — used for text files and internationalized I/O.",
+            diagram: "+-- Reader --+              +-- Writer --+\n| read(char[]) |            | write(char[],off,len)|\n+--------------+             +----------------------+",
+            code: { language: "java", code: `try (BufferedReader br = new BufferedReader(new FileReader("a.txt"))) {
+  String line;
+  while ((line = br.readLine()) != null) System.out.println(line);
+}`, caption: "BufferedReader reads a text file line by line." },
+            notes: [
+              "16-bit chars with charset conversion (UTF-8 default since Java 18).",
+              "FileReader, CharArrayReader, StringReader are common Reader subclasses.",
+              "FileWriter, PrintWriter, OutputStreamWriter are common Writer subclasses.",
+              "PrintWriter offers convenient println, printf, and format methods."
+            ],
+            exampleOutput: "(prints each line of a.txt)"
+          },
+          {
+            name: "Buffered Streams (Performance Wrapper)",
+            definition: "Filter streams that wrap an existing stream to read or write in larger chunks, drastically reducing expensive OS-level calls.",
+            diagram: "Source --> BufferedInputStream (8 KB) --> Program\n                one OS call per 8 KB, not per byte",
+            code: { language: "java", code: `try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("a.bin"));
+     BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream("b.bin"))) {
+  byte[] buf = new byte[1024];
+  int n;
+  while ((n = bis.read(buf)) != -1) bos.write(buf, 0, n);
+}`, caption: "Buffered streams read/write in 8 KB chunks by default." },
+            notes: [
+              "Default buffer is 8 KB; tune with the constructor argument.",
+              "Wrap any byte stream (BufferedInputStream / BufferedOutputStream).",
+              "Wrap any char stream (BufferedReader / BufferedWriter) for line-based reads.",
+              "Always flush() a writer before close() to avoid losing buffered output."
+            ],
+            exampleOutput: "(copies a.bin to b.bin with one read per 1024 bytes instead of one per byte)"
+          },
+          {
+            name: "Data Streams (Typed Primitives)",
+            definition: "Filter streams that read and write Java primitive types (int, double, boolean, etc.) in a portable binary format.",
+            diagram: "File <--> DataInputStream / DataOutputStream\n        (readInt, readDouble, readUTF, writeInt, ...)",
+            code: { language: "java", code: `try (DataOutputStream out = new DataOutputStream(new FileOutputStream("d.bin"))) {
+  out.writeInt(42);
+  out.writeDouble(3.14);
+  out.writeUTF("Hello");
+}
+try (DataInputStream in = new DataInputStream(new FileInputStream("d.bin"))) {
+  System.out.println(in.readInt());
+  System.out.println(in.readDouble());
+  System.out.println(in.readUTF());
+}`, caption: "Data streams write/read primitives in a portable binary encoding." },
+            notes: [
+              "Methods: readInt, readLong, readDouble, readBoolean, readUTF, writeInt, ...",
+              "writeUTF uses a modified UTF-8 (length-prefixed, not standard UTF-8).",
+              "Reads must match the order and types of the writes.",
+              "Useful for compact binary logs and simple file formats."
+            ],
+            exampleOutput: "42\n3.14\nHello"
+          },
+          {
+            name: "Object Streams (Serialization)",
+            definition: "Filter streams that write and read entire Java objects by serializing them to and from a byte stream (Serializable contract).",
+            diagram: "Object --writeObject--> ObjectOutputStream --> File\nFile --> ObjectInputStream --readObject--> Object",
+            code: { language: "java", code: `class Point implements java.io.Serializable {
+  int x, y;
+  Point(int x, int y) { this.x = x; this.y = y; }
+}
+
+Point p = new Point(3, 4);
+try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("p.bin"))) {
+  out.writeObject(p);
+}
+try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("p.bin"))) {
+  Point q = (Point) in.readObject();
+  System.out.println(q.x + "," + q.y);
+}`, caption: "ObjectOutputStream / ObjectInputStream persist Serializable objects." },
+            notes: [
+              "The object class must implement java.io.Serializable (marker interface).",
+              "Fields marked `transient` are skipped; static fields are not serialized.",
+              "serialVersionUID guards compatibility across compiled versions.",
+              "Prefer JSON or Protocol Buffers for cross-language serialization."
+            ],
+            exampleOutput: "3,4"
+          }
+        ]
       }
     },
     viva: [
@@ -381,7 +955,60 @@ Optional<String> opt = Optional.of(\"x\");`,
         explanation: "Type parameters are declared in angle brackets: <T>, <K, V>, <E> (element), <N> (number). They can be bounded: <T extends Number>. Wildcards: ? (any type), ? extends T (upper bound), ? super T (lower bound, used in PECS). Generics are implemented via type erasure at runtime: after compilation, type parameters are removed and raw types are used. This means primitives cannot be type arguments (use wrappers), and instanceof with type parameters is not allowed.",
         diagram: "class Box<T>        <-- type parameter T\nBox<Integer> b1;    <-- compile time: Box of Integer\nBox<String>  b2;    <-- compile time: Box of String\n\nAfter erasure (runtime):\nBox (raw) b1;       <-- both become plain Box",
         example: "public static <T> void printArray(T[] arr) {\n    for (T t : arr) System.out.println(t);\n}\nprintArray(new Integer[]{1, 2, 3});\nprintArray(new String[]{\"a\", \"b\"});",
-        conclusion: "Generics are essential for modern, type-safe Java code. The Collections framework, Stream API, and Optional are all built on them."
+        conclusion: "Generics are essential for modern, type-safe Java code. The Collections framework, Stream API, and Optional are all built on them.",
+        types: [
+          {
+            name: "Generic Class (class Box<T>)",
+            definition: "A class declared with one or more type parameters in angle brackets, allowing it to be instantiated for any reference type with compile-time type safety.",
+            diagram: "class Box<T> { T value; }\n           ^---- type parameter T\nBox<Integer> b1;  // T = Integer\nBox<String>  b2;  // T = String",
+            code: { language: "java", code: `class Box<T> {
+  private T value;
+  Box(T v) { value = v; }
+  T get()  { return value; }
+}
+Box<Integer> ib = new Box<>(10);
+Box<String>  sb = new Box<>("Hi");
+System.out.println(ib.get() + " " + sb.get());`, caption: "Generic Box class with one type parameter." },
+            notes: [
+              "Type parameter declared after the class name: <T>, <K, V>, <E>.",
+              "Static members cannot use the class's type parameter.",
+              "After compilation, the type parameter is erased to its bound (or Object)."
+            ],
+            exampleOutput: "10 Hi"
+          },
+          {
+            name: "Generic Method (<T> void print(T))",
+            definition: "A method that declares its own type parameter(s) before the return type, independent of any enclosing generic class.",
+            diagram: "<T> ReturnType methodName(T arg) { ... }\n^---- own type parameter",
+            code: { language: "java", code: `static <T> void print(T[] arr) {
+  for (T t : arr) System.out.println(t);
+}
+print(new Integer[]{1, 2, 3});
+print(new String[]{"a", "b"});`, caption: "Generic print method with type inference." },
+            notes: [
+              "Type parameter placed before the return type.",
+              "Compiler infers the type from the actual arguments (target typing).",
+              "Can live in a non-generic class; can be static or instance."
+            ],
+            exampleOutput: "1\n2\n3\na\nb"
+          },
+          {
+            name: "Bounded Type (<T extends X>)",
+            definition: "A type parameter constrained to subtypes of a specific class or interface, allowing calls to that bound's methods on T.",
+            diagram: "<T extends Number>      T can be Integer, Double, Long, ...\n<T extends Comparable<T>> T must implement compareTo",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Bounded type parameter calling compareTo on T." },
+            notes: [
+              "Upper bound: <T extends X> — X is a class or interface.",
+              "Multiple bounds: <T extends A & B> — first class, then interfaces.",
+              "Without an explicit bound, the implicit bound is Object."
+            ],
+            exampleOutput: "5\nbanana"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Generics provide type parameters for classes, interfaces, and methods, enabling type-safe code that can be reused across types.",
@@ -405,7 +1032,100 @@ Optional<String> opt = Optional.of(\"x\");`,
           "Spring and Hibernate generic containers",
           "Custom data structures and utilities"
         ],
-        conclusion: "Generics are foundational to modern Java. They are used in every major library and are essential for type safety, readability, and reusability."
+        conclusion: "Generics are foundational to modern Java. They are used in every major library and are essential for type safety, readability, and reusability.",
+        types: [
+          {
+            name: "Generic Class (class Box<T>)",
+            definition: "A class declared with one or more type parameters in angle brackets, allowing it to be instantiated for any reference type with compile-time type safety.",
+            diagram: "class Box<T> { T value; }\n           ^---- type parameter T\nBox<Integer> b1;  // T = Integer\nBox<String>  b2;  // T = String",
+            code: { language: "java", code: `class Box<T> {
+  private T value;
+  Box(T v) { value = v; }
+  T get()  { return value; }
+}
+Box<Integer> ib = new Box<>(10);
+Box<String>  sb = new Box<>("Hi");
+System.out.println(ib.get() + " " + sb.get());`, caption: "Generic Box class with one type parameter." },
+            notes: [
+              "Type parameter declared after the class name: <T>, <K, V>, <E>.",
+              "Static members cannot use the class's type parameter (they belong to the raw class).",
+              "Diamond operator <> (Java 7+) infers the type at instantiation.",
+              "Type parameter is erased to its bound (or Object) at runtime."
+            ],
+            exampleOutput: "10 Hi"
+          },
+          {
+            name: "Generic Method (<T> void print(T))",
+            definition: "A method that declares its own type parameter(s) before the return type, independent of any enclosing generic class.",
+            diagram: "<T> ReturnType methodName(T arg) { ... }\n^---- own type parameter",
+            code: { language: "java", code: `static <T> void print(T[] arr) {
+  for (T t : arr) System.out.println(t);
+}
+print(new Integer[]{1, 2, 3});
+print(new String[]{"a", "b"});`, caption: "Generic print method with type inference." },
+            notes: [
+              "Type parameter placed before the return type.",
+              "Compiler infers the type from the actual arguments (target typing).",
+              "Can live in a non-generic class; can be static or instance.",
+              "Explicit type args allowed: Util.<String>method(arg)."
+            ],
+            exampleOutput: "1\n2\n3\na\nb"
+          },
+          {
+            name: "Bounded Type (<T extends X>)",
+            definition: "A type parameter constrained to subtypes of a specific class or interface, allowing calls to that bound's methods on T.",
+            diagram: "<T extends Number>           T can be Integer, Double, Long, ...\n<T extends Comparable<T> & Serializable>   multi-bound",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Bounded type parameter calling compareTo on T." },
+            notes: [
+              "Upper bound: <T extends X> — X is a class or interface.",
+              "Multiple bounds: <T extends A & B> — first class, then interfaces.",
+              "Without an explicit bound, the implicit bound is Object.",
+              "Required when the generic code must call methods on T."
+            ],
+            exampleOutput: "5\nbanana"
+          },
+          {
+            name: "Wildcard Upper Bound (? extends T)",
+            definition: "A wildcard with an upper bound — the actual type is some unknown subtype of T; suitable for reading (producer) but not writing.",
+            diagram: "List<? extends Number>  read Number,  cannot add\n                  ^---- upper bound",
+            code: { language: "java", code: `static double sum(List<? extends Number> list) {
+  double s = 0;
+  for (Number n : list) s += n.doubleValue();
+  return s;
+}
+System.out.println(sum(java.util.List.of(1, 2, 3.5)));`, caption: "? extends T lets you read elements as T, but you cannot add." },
+            notes: [
+              "? extends T = 'some unknown subtype of T'.",
+              "Read-only: you can take elements out, you cannot add (except null).",
+              "PECS: Producer Extends — use it when the structure only produces values."
+            ],
+            exampleOutput: "6.5"
+          },
+          {
+            name: "Wildcard Lower Bound (? super T)",
+            definition: "A wildcard with a lower bound — the actual type is some unknown supertype of T; suitable for writing (consumer) but reads return Object.",
+            diagram: "List<? super Integer>   add Integer,  reads as Object\n                  ^---- lower bound",
+            code: { language: "java", code: `static void addInts(List<? super Integer> list) {
+  list.add(1);
+  list.add(2);
+  list.add(3);
+}
+java.util.List<Number> out = new java.util.ArrayList<>();
+addInts(out);
+System.out.println(out);`, caption: "? super T lets you add T, but reads come back as Object." },
+            notes: [
+              "? super T = 'some unknown supertype of T'.",
+              "Write-friendly: you can add T (or subtypes of T).",
+              "Reads come back as Object, not T.",
+              "PECS: Consumer Super — use it when the structure only consumes values."
+            ],
+            exampleOutput: "[1, 2, 3]"
+          }
+        ]
       }
     },
     viva: [
@@ -467,7 +1187,62 @@ System.out.println(ib.get() + sb.get());`,
         explanation: "Type parameters can be single (T) or multiple (K, V, E, T). They can be bounded: <T extends Number>. Cannot use primitive types as type arguments (use wrappers). Multiple bounds: <T extends A & B> (the first bound is a class, the rest are interfaces). The diamond operator <> lets the compiler infer the type at instantiation. Static fields and methods cannot reference the enclosing generic class's type parameter (they belong to the raw class).",
         diagram: "class Pair<A, B> {\n   A first;\n   B second;\n}\n\nPair<String, Integer> p = new Pair<>();\np.first  = \"age\";\np.second = 25;",
         example: "class Triple<A, B, C> {\n    A a; B b; C c;\n    Triple(A a, B b, C c) { this.a = a; this.b = b; this.c = c; }\n}\nTriple<String, Integer, Boolean> t =\n    new Triple<>(\"x\", 1, true);",
-        conclusion: "Generic classes enable reusable, type-safe data structures. They are the building blocks of the Java Collections framework."
+        conclusion: "Generic classes enable reusable, type-safe data structures. They are the building blocks of the Java Collections framework.",
+        types: [
+          {
+            name: "Single Type Parameter (class Box<T>)",
+            definition: "A generic class with one type parameter, holding or operating on a single value of an arbitrary reference type.",
+            diagram: "class Box<T> { T value; }\n           ^---- single type parameter",
+            code: { language: "java", code: `class Box<T> {
+  private T value;
+  Box(T v) { value = v; }
+  T get()  { return value; }
+}
+Box<Integer> ib = new Box<>(10);
+System.out.println(ib.get());`, caption: "Generic Box class with one type parameter." },
+            notes: [
+              "Type parameter placed after the class name: <T>.",
+              "The diamond operator <> (Java 7+) infers the type at instantiation.",
+              "Static fields cannot use T because they belong to the raw class."
+            ],
+            exampleOutput: "10"
+          },
+          {
+            name: "Multiple Type Parameters (class Pair<K, V>)",
+            definition: "A generic class with two or more type parameters, typically used to model key-value or coordinate-like structures.",
+            diagram: "class Pair<K, V> { K first; V second; }\n           ^--^----- two type parameters",
+            code: { language: "java", code: `class Pair<K, V> {
+  K first; V second;
+  Pair(K k, V v) { first = k; second = v; }
+}
+Pair<String, Integer> p = new Pair<>("age", 25);
+System.out.println(p.first + " = " + p.second);`, caption: "Generic Pair class with two type parameters." },
+            notes: [
+              "Common conventions: T (type), E (element), K (key), V (value), N (number).",
+              "HashMap<K, V>, LinkedHashMap<K, V>, TreeMap<K, V> all use two parameters.",
+              "Triple<A, B, C> extends the same idea to three values."
+            ],
+            exampleOutput: "age = 25"
+          },
+          {
+            name: "Bounded Type Parameter (class NumBox<T extends Number>)",
+            definition: "A generic class whose type parameter is restricted to a specific upper bound, allowing calls to that bound's methods on T.",
+            diagram: "class NumBox<T extends Number> { T v; }\n                    ^------------------- upper bound",
+            code: { language: "java", code: `class NumBox<T extends Number> {
+  private T v;
+  NumBox(T v) { this.v = v; }
+  double asDouble() { return v.doubleValue(); }
+}
+System.out.println(new NumBox<Integer>(42).asDouble());
+System.out.println(new NumBox<Double>(3.14).asDouble());`, caption: "Bounded type parameter enables calling Number methods on T." },
+            notes: [
+              "<T extends X> restricts T to X or its subclasses.",
+              "Inside the class, T is treated as X, so X's methods are accessible.",
+              "Multiple bounds: <T extends A & B> — first is class, then interfaces."
+            ],
+            exampleOutput: "42.0\n3.14"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Generic classes parameterize class definitions with one or more types, providing type safety and reusability.",
@@ -489,7 +1264,100 @@ System.out.println(ib.get() + sb.get());`,
           "Wrapper / Holder types",
           "Generic result containers (Pair, Triple, Result)"
         ],
-        conclusion: "Generic classes are the building blocks of type-safe, reusable Java libraries. Use the diamond operator, prefer bounded types when you need to call methods on T, and remember the static-field limitation."
+        conclusion: "Generic classes are the building blocks of type-safe, reusable Java libraries. Use the diamond operator, prefer bounded types when you need to call methods on T, and remember the static-field limitation.",
+        types: [
+          {
+            name: "Single Type Parameter (class Box<T>)",
+            definition: "A generic class with one type parameter, holding or operating on a single value of an arbitrary reference type.",
+            diagram: "class Box<T> { T value; }\n           ^---- single type parameter",
+            code: { language: "java", code: `class Box<T> {
+  private T value;
+  Box(T v) { value = v; }
+  T get()  { return value; }
+}
+Box<Integer> ib = new Box<>(10);
+System.out.println(ib.get());`, caption: "Generic Box class with one type parameter." },
+            notes: [
+              "Type parameter placed after the class name: <T>.",
+              "The diamond operator <> (Java 7+) infers the type at instantiation.",
+              "Static fields cannot use T because they belong to the raw class.",
+              "Inner non-static classes can use the enclosing class's type parameter."
+            ],
+            exampleOutput: "10"
+          },
+          {
+            name: "Multiple Type Parameters (class Pair<K, V>)",
+            definition: "A generic class with two or more type parameters, typically used to model key-value or coordinate-like structures.",
+            diagram: "class Pair<K, V> { K first; V second; }\n           ^--^----- two type parameters",
+            code: { language: "java", code: `class Pair<K, V> {
+  K first; V second;
+  Pair(K k, V v) { first = k; second = v; }
+}
+Pair<String, Integer> p = new Pair<>("age", 25);
+System.out.println(p.first + " = " + p.second);`, caption: "Generic Pair class with two type parameters." },
+            notes: [
+              "Common conventions: T (type), E (element), K (key), V (value), N (number).",
+              "HashMap<K, V>, LinkedHashMap<K, V>, TreeMap<K, V> all use two parameters.",
+              "Triple<A, B, C> extends the same idea to three values.",
+              "Order of type arguments matters: Pair<String, Integer> != Pair<Integer, String>."
+            ],
+            exampleOutput: "age = 25"
+          },
+          {
+            name: "Bounded Type Parameter (class NumBox<T extends Number>)",
+            definition: "A generic class whose type parameter is restricted to a specific upper bound, allowing calls to that bound's methods on T.",
+            diagram: "class NumBox<T extends Number> { T v; }\n                    ^------------------- upper bound",
+            code: { language: "java", code: `class NumBox<T extends Number> {
+  private T v;
+  NumBox(T v) { this.v = v; }
+  double asDouble() { return v.doubleValue(); }
+}
+System.out.println(new NumBox<Integer>(42).asDouble());
+System.out.println(new NumBox<Double>(3.14).asDouble());`, caption: "Bounded type parameter enables calling Number methods on T." },
+            notes: [
+              "<T extends X> restricts T to X or its subclasses.",
+              "Inside the class, T is treated as X, so X's methods are accessible.",
+              "Multiple bounds: <T extends A & B> — first is class, then interfaces.",
+              "Without an explicit bound, the implicit upper bound is Object."
+            ],
+            exampleOutput: "42.0\n3.14"
+          },
+          {
+            name: "Diamond Operator (<>)",
+            definition: "A pair of angle brackets appended to a constructor call (Java 7+) so the compiler infers the type arguments from the assignment target.",
+            diagram: "Box<Integer> b = new Box<Integer>(10);   // verbose\nBox<Integer> b = new Box<>(10);            // diamond",
+            code: { language: "java", code: `java.util.List<String> list = new java.util.ArrayList<>();
+list.add("Hi");
+System.out.println(list);`, caption: "Diamond operator avoids repeating the type on the right side." },
+            notes: [
+              "Type is inferred from the left-hand side of the assignment.",
+              "Works in method calls too: List.of() infers from the argument types.",
+              "Cannot be used when the target type is missing (e.g., in an anonymous context)."
+            ],
+            exampleOutput: "[Hi]"
+          },
+          {
+            name: "Raw Type (Box instead of Box<Integer>)",
+            definition: "Using a generic class without supplying type arguments — disables compile-time type checks and generates unchecked warnings.",
+            diagram: "Box b = new Box();      // raw — unchecked warning\nBox<Integer> b = new Box<>(); // parameterized",
+            code: { language: "java", code: `class Box<T> {
+  private T value;
+  void set(T v) { value = v; }
+  T get()       { return value; }
+}
+@SuppressWarnings("rawtypes")
+Box b = new Box();
+b.set("Hi");
+String s = (String) b.get();
+System.out.println(s);`, caption: "Raw types compile but require explicit casts and produce unchecked warnings." },
+            notes: [
+              "Exists only for backward compatibility with pre-Java 5 code.",
+              "Mixing raw and parameterized types produces unchecked warnings.",
+              "Modern code should always supply type arguments; use @SuppressWarnings only at the boundary."
+            ],
+            exampleOutput: "Hi"
+          }
+        ]
       }
     },
     viva: [
@@ -546,7 +1414,58 @@ print(new String[]{"a", "b", "c"});`,
         explanation: "Type parameters are declared in angle brackets before the return type. They can be bounded: <T extends Comparable<T>>. The compiler infers the type from arguments (target typing). Generic methods are ideal for static utility methods and methods that operate on types independent of the class. They can be used in non-generic classes as well. The diamond-like type inference can be overridden by specifying explicit type arguments: Util.<String>method(arg).",
         diagram: "<T> ReturnType methodName(T arg) { ... }\n\nExamples:\n  <T> void   print(T x)\n  <T> T[]    reverse(T[] arr)\n  <T extends Comparable<T>> T max(T a, T b)",
         example: "static <T extends Comparable<T>> T max(T a, T b) {\n    return a.compareTo(b) > 0 ? a : b;\n}\nSystem.out.println(max(3, 5));        // 5\nSystem.out.println(max(\"a\", \"b\"));    // b",
-        conclusion: "Generic methods are the workhorse of reusable utility code. Master type inference and bounded type parameters to write expressive, safe APIs."
+        conclusion: "Generic methods are the workhorse of reusable utility code. Master type inference and bounded type parameters to write expressive, safe APIs.",
+        types: [
+          {
+            name: "Simple Generic Method (<T> void print(T))",
+            definition: "A method that declares its own type parameter before the return type, working on any reference type the caller provides.",
+            diagram: "<T> ReturnType methodName(T arg) { ... }\n^---- own type parameter",
+            code: { language: "java", code: `static <T> void print(T[] arr) {
+  for (T t : arr) System.out.println(t);
+}
+print(new Integer[]{1, 2, 3});
+print(new String[]{"a", "b"});`, caption: "Generic print method with type inference." },
+            notes: [
+              "Type parameter placed before the return type.",
+              "Compiler infers the type from the actual arguments.",
+              "Can live in a non-generic class; can be static or instance."
+            ],
+            exampleOutput: "1\n2\n3\na\nb"
+          },
+          {
+            name: "Bounded Generic Method (<T extends Comparable<T>>)",
+            definition: "A generic method whose type parameter is bounded, so the method body can call methods on the bound.",
+            diagram: "<T extends Comparable<T>> T max(T a, T b)\n                    ^------------------- upper bound",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Bounded method calling compareTo on T." },
+            notes: [
+              "Required when the method body needs to call methods on T.",
+              "Multiple bounds: <T extends A & B> — first class, then interfaces.",
+              "Used heavily in Collections.sort, max, min, binarySearch."
+            ],
+            exampleOutput: "5\nbanana"
+          },
+          {
+            name: "Static Generic Method",
+            definition: "A generic method declared static, ideal for utility functions that work on any type without holding instance state.",
+            diagram: "static <T> ReturnType util(T arg) { ... }\n  ^---- shared across all T",
+            code: { language: "java", code: `static <T> boolean contains(T[] arr, T key) {
+  for (T t : arr) if (t.equals(key)) return true;
+  return false;
+}
+System.out.println(contains(new String[]{"a", "b", "c"}, "b"));
+System.out.println(contains(new Integer[]{1, 2, 3}, 4));`, caption: "Static generic utility method with type inference." },
+            notes: [
+              "The workhorse of utility classes (Collections, Arrays, Objects).",
+              "The type parameter is method-scoped; it does not depend on a class type parameter.",
+              "Can be invoked without specifying the type — the compiler infers it."
+            ],
+            exampleOutput: "true\nfalse"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Generic methods bring type parameters to methods, decoupled from the enclosing class.",
@@ -568,7 +1487,92 @@ print(new String[]{"a", "b", "c"});`,
           "Comparator.comparing / thenComparing",
           "Apache Commons, Guava, Spring utilities"
         ],
-        conclusion: "Generic methods are a powerful tool for writing flexible, type-safe utility code. Combine them with bounded types, wildcards, and @SafeVarargs to express powerful, reusable APIs."
+        conclusion: "Generic methods are a powerful tool for writing flexible, type-safe utility code. Combine them with bounded types, wildcards, and @SafeVarargs to express powerful, reusable APIs.",
+        types: [
+          {
+            name: "Simple Generic Method (<T> void print(T))",
+            definition: "A method that declares its own type parameter before the return type, working on any reference type the caller provides.",
+            diagram: "<T> ReturnType methodName(T arg) { ... }\n^---- own type parameter",
+            code: { language: "java", code: `static <T> void print(T[] arr) {
+  for (T t : arr) System.out.println(t);
+}
+print(new Integer[]{1, 2, 3});
+print(new String[]{"a", "b"});`, caption: "Generic print method with type inference." },
+            notes: [
+              "Type parameter placed before the return type.",
+              "Compiler infers the type from the actual arguments (target typing, Java 8+).",
+              "Can live in a non-generic class; can be static or instance.",
+              "Explicit type args allowed: Util.<String>method(arg)."
+            ],
+            exampleOutput: "1\n2\n3\na\nb"
+          },
+          {
+            name: "Bounded Generic Method (<T extends Comparable<T>>)",
+            definition: "A generic method whose type parameter is bounded, so the method body can call methods on the bound.",
+            diagram: "<T extends Comparable<T>> T max(T a, T b)\n                    ^------------------- upper bound",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Bounded method calling compareTo on T." },
+            notes: [
+              "Required when the method body needs to call methods on T.",
+              "Multiple bounds: <T extends A & B> — first class, then interfaces.",
+              "Used heavily in Collections.sort, max, min, binarySearch.",
+              "Without an explicit bound, the implicit upper bound is Object."
+            ],
+            exampleOutput: "5\nbanana"
+          },
+          {
+            name: "Static Generic Method",
+            definition: "A generic method declared static, ideal for utility functions that work on any type without holding instance state.",
+            diagram: "static <T> ReturnType util(T arg) { ... }\n  ^---- shared across all T",
+            code: { language: "java", code: `static <T> boolean contains(T[] arr, T key) {
+  for (T t : arr) if (t.equals(key)) return true;
+  return false;
+}
+System.out.println(contains(new String[]{"a", "b", "c"}, "b"));
+System.out.println(contains(new Integer[]{1, 2, 3}, 4));`, caption: "Static generic utility method with type inference." },
+            notes: [
+              "The workhorse of utility classes (Collections, Arrays, Objects).",
+              "The type parameter is method-scoped; it does not depend on a class type parameter.",
+              "Can be invoked without specifying the type — the compiler infers it.",
+              "Static context has no enclosing generic class to inherit from."
+            ],
+            exampleOutput: "true\nfalse"
+          },
+          {
+            name: "Type Inference (Target Typing)",
+            definition: "The compiler determines the type argument at the call site from the actual arguments or the assignment target, so callers rarely write the type explicitly.",
+            diagram: "List<String> list = List.of(\"a\", \"b\");\n              ^--- target type       ^--- inferred",
+            code: { language: "java", code: `static <T> T pick(T a, T b) { return a; }
+String  s = pick("hi", "there");        // T inferred as String
+Integer n = pick(1, 2);                 // T inferred as Integer
+System.out.println(s);
+System.out.println(n);`, caption: "Type inference picks the most specific common type from the arguments." },
+            notes: [
+              "Inference was improved in Java 8 (target typing) and further in later releases.",
+              "Falls back to the most specific common type among the arguments.",
+              "Explicit type arguments override inference: Util.<Integer>method(...).",
+              "Inference failure produces a helpful compiler error with the candidate types."
+            ],
+            exampleOutput: "hi\n1"
+          },
+          {
+            name: "Explicit Type Argument",
+            definition: "A syntax that lets the caller force a specific type argument for a generic method or constructor, overriding inference.",
+            diagram: "ClassName.<Type>method(args)\n          ^----- explicit type",
+            code: { language: "java", code: `static <T> T id(T x) { return x; }
+Integer n = GenericMethods.<Integer>id(42);
+System.out.println(n);`, caption: "Explicit type argument forces the compiler to use Integer." },
+            notes: [
+              "Useful when inference picks a wider type than you intended.",
+              "Often required when arguments are null and inference has no information.",
+              "Same syntax applies to generic constructors: new <String>Box<>(\"Hi\")."
+            ],
+            exampleOutput: "42"
+          }
+        ]
       }
     },
     viva: [
@@ -627,7 +1631,59 @@ System.out.println(Collections.max(nums));`,
         explanation: "Upper bound: <T extends Number> — T must be Number or a subclass; you can call Number's methods on T. Multiple bounds: <T extends A & B> (first is class, rest are interfaces). Wildcards: ? extends T (upper bound, read-only), ? super T (lower bound, write-friendly). Use the PECS rule: Producer Extends, Consumer Super. If no bound is given, the implicit bound is Object.",
         diagram: "Upper bound:  <T extends Number>           accepts Integer, Double, Long, ...\nMulti-bound:   <T extends Comparable<T>        accepts types that implement both interfaces\n                & Serializable>\nWildcard up:   List<? extends Number>          read-only list of Numbers\nWildcard low:  List<? super Integer>            list that can hold Integer or supertypes",
         example: "public static <T extends Number> double sum(T[] arr) {\n    double s = 0;\n    for (T t : arr) s += t.doubleValue();\n    return s;\n}\nSystem.out.println(sum(new Integer[]{1, 2, 3}));   // 6.0",
-        conclusion: "Bounded types let you write generic code that uses specific operations of a known super-type. Combine upper bounds, multi-bounds, and wildcards for expressive APIs."
+        conclusion: "Bounded types let you write generic code that uses specific operations of a known super-type. Combine upper bounds, multi-bounds, and wildcards for expressive APIs.",
+        types: [
+          {
+            name: "Upper Bound (<T extends X>)",
+            definition: "A type parameter constrained to a specific class or interface; the bound's methods become accessible on T inside the generic code.",
+            diagram: "<T extends Number>        T can be Integer, Double, Long, ...\n                 ^------ upper bound",
+            code: { language: "java", code: `static <T extends Number> double sum(T[] arr) {
+  double s = 0;
+  for (T t : arr) s += t.doubleValue();
+  return s;
+}
+System.out.println(sum(new Integer[]{1, 2, 3}));`, caption: "Upper bound lets the method call Number's doubleValue() on T." },
+            notes: [
+              "Upper bound only; lower bounds are not allowed on type parameters.",
+              "Without an explicit bound, the implicit upper bound is Object.",
+              "Bound's methods are accessible inside the generic code on T."
+            ],
+            exampleOutput: "6.0"
+          },
+          {
+            name: "Multiple Bounds (<T extends A & B>)",
+            definition: "A type parameter constrained to a class plus one or more interfaces, written in ampersand-separated form.",
+            diagram: "<T extends Comparable<T> & Serializable>\n   ^--- class first, then interfaces",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Comparable bound enables calling compareTo on T." },
+            notes: [
+              "First bound must be a class (or another type parameter); remaining bounds are interfaces.",
+              "T inherits methods from every bound in the list.",
+              "Without an explicit bound, the implicit upper bound is Object."
+            ],
+            exampleOutput: "5\nbanana"
+          },
+          {
+            name: "Wildcard Upper Bound (? extends T)",
+            definition: "A wildcard 'some unknown subtype of T' — read-only: you can take elements out as T, but you cannot add (except null).",
+            diagram: "List<? extends Number>  read Number,  cannot add\n                  ^---- upper-bound wildcard",
+            code: { language: "java", code: `static double sum(java.util.List<? extends Number> list) {
+  double s = 0;
+  for (Number n : list) s += n.doubleValue();
+  return s;
+}
+System.out.println(sum(java.util.List.of(1, 2, 3.5)));`, caption: "? extends T is read-only; you can iterate but not add." },
+            notes: [
+              "? extends T = 'some unknown subtype of T'.",
+              "Reads come out as T; writes (except null) are rejected for type safety.",
+              "PECS: Producer Extends — use when the structure only produces values."
+            ],
+            exampleOutput: "6.5"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Bounded types constrain type parameters to subtypes of a class or types implementing one or more interfaces, allowing method calls on the bound.",
@@ -650,7 +1706,104 @@ System.out.println(Collections.max(nums));`,
           "Stream pipelines (Function<? super T, ? extends R>)",
           "Custom numeric algorithms"
         ],
-        conclusion: "Bounded types are essential for expressive, type-safe generic code. Use upper bounds for compile-time capability checks, multi-bounds for combined contracts, and wildcards (PECS) for flexible API inputs and outputs."
+        conclusion: "Bounded types are essential for expressive, type-safe generic code. Use upper bounds for compile-time capability checks, multi-bounds for combined contracts, and wildcards (PECS) for flexible API inputs and outputs.",
+        types: [
+          {
+            name: "Upper Bound (<T extends X>)",
+            definition: "A type parameter constrained to a specific class or interface; the bound's methods become accessible on T inside the generic code.",
+            diagram: "<T extends Number>        T can be Integer, Double, Long, ...\n                 ^------ upper bound",
+            code: { language: "java", code: `static <T extends Number> double sum(T[] arr) {
+  double s = 0;
+  for (T t : arr) s += t.doubleValue();
+  return s;
+}
+System.out.println(sum(new Integer[]{1, 2, 3}));`, caption: "Upper bound lets the method call Number's doubleValue() on T." },
+            notes: [
+              "Upper bound only; lower bounds are not allowed on type parameters.",
+              "Without an explicit bound, the implicit upper bound is Object.",
+              "Bound's methods are accessible inside the generic code on T.",
+              "The compiler verifies at the use site that the actual type argument satisfies the bound."
+            ],
+            exampleOutput: "6.0"
+          },
+          {
+            name: "Multiple Bounds (<T extends A & B>)",
+            definition: "A type parameter constrained to a class plus one or more interfaces, written in ampersand-separated form.",
+            diagram: "<T extends Comparable<T> & Serializable>\n   ^--- class first, then interfaces",
+            code: { language: "java", code: `static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+System.out.println(max(3, 5));
+System.out.println(max("apple", "banana"));`, caption: "Comparable bound enables calling compareTo on T." },
+            notes: [
+              "First bound must be a class (or another type parameter); remaining bounds are interfaces.",
+              "T inherits methods from every bound in the list.",
+              "Without an explicit bound, the implicit upper bound is Object.",
+              "Useful when a type must satisfy several contracts (e.g., Comparable + Serializable)."
+            ],
+            exampleOutput: "5\nbanana"
+          },
+          {
+            name: "Wildcard Upper Bound (? extends T)",
+            definition: "A wildcard 'some unknown subtype of T' — read-only: you can take elements out as T, but you cannot add (except null).",
+            diagram: "List<? extends Number>  read Number,  cannot add\n                  ^---- upper-bound wildcard",
+            code: { language: "java", code: `static double sum(java.util.List<? extends Number> list) {
+  double s = 0;
+  for (Number n : list) s += n.doubleValue();
+  return s;
+}
+System.out.println(sum(java.util.List.of(1, 2, 3.5)));`, caption: "? extends T is read-only; you can iterate but not add." },
+            notes: [
+              "? extends T = 'some unknown subtype of T'.",
+              "Reads come out as T; writes (except null) are rejected for type safety.",
+              "PECS: Producer Extends — use when the structure only produces values.",
+              "Used heavily in Stream and Collections APIs: Function<? super T, ? extends R>."
+            ],
+            exampleOutput: "6.5"
+          },
+          {
+            name: "Wildcard Lower Bound (? super T)",
+            definition: "A wildcard 'some unknown supertype of T' — write-friendly: you can add T (or subtypes), but reads come back as Object.",
+            diagram: "List<? super Integer>   add Integer,  reads as Object\n                  ^---- lower-bound wildcard",
+            code: { language: "java", code: `static void addInts(java.util.List<? super Integer> list) {
+  list.add(1);
+  list.add(2);
+  list.add(3);
+}
+java.util.List<Number> out = new java.util.ArrayList<>();
+addInts(out);
+System.out.println(out);`, caption: "? super T lets you add T; reads come back as Object." },
+            notes: [
+              "? super T = 'some unknown supertype of T'.",
+              "Write-friendly: you can add T (or subtypes) safely.",
+              "Reads come back as Object, not T — you lose the specific type at read time.",
+              "PECS: Consumer Super — use when the structure only consumes values."
+            ],
+            exampleOutput: "[1, 2, 3]"
+          },
+          {
+            name: "PECS (Producer Extends, Consumer Super)",
+            definition: "A mnemonic for choosing wildcards: use ? extends T when the structure produces values, ? super T when it consumes them.",
+            diagram: "Producer (out)   -->  ? extends T    (read)\nConsumer (in)    -->  ? super T      (write)",
+            code: { language: "java", code: `static <T> void copy(
+    java.util.List<? super T> dest,
+    java.util.List<? extends T> src) {
+  for (T t : src) dest.add(t);
+}
+
+java.util.List<Integer> src   = java.util.List.of(1, 2, 3);
+java.util.List<Number>  dest  = new java.util.ArrayList<>();
+copy(dest, src);
+System.out.println(dest);`, caption: "Collections.copy uses ? super T for dest (consumer) and ? extends T for src (producer)." },
+            notes: [
+              "Producer Extends: structure supplies T to your code (out).",
+              "Consumer Super: structure accepts T from your code (in).",
+              "Applies in Stream and Collections APIs: Function<? super T, ? extends R>.",
+              "PECS gives maximum input flexibility with full type safety."
+            ],
+            exampleOutput: "[1, 2, 3]"
+          }
+        ]
       }
     },
     viva: [
@@ -713,7 +1866,60 @@ System.out.println(Arrays.toString(parts));`,
         explanation: "Inspection: length(), isEmpty(), isBlank() (Java 11+), charAt(int). Comparison: equals(Object), equalsIgnoreCase(String), compareTo(String), compareToIgnoreCase(String), startsWith, endsWith, regionMatches. Search: indexOf(int/String, from), lastIndexOf, contains(CharSequence). Modification: substring(begin, end), concat, replace(target, replacement), replaceAll(regex, repl), toLowerCase, toUpperCase, trim, strip, stripLeading, stripTrailing. Splitting/joining: split(String regex), join(CharSequence delimiter, CharSequence... elements). Conversion: valueOf(...), format(String, args...). All return new Strings.",
         diagram: "String s = \"Hello\";\ns.length()         = 5\ns.charAt(1)        = 'e'\ns.indexOf('l')     = 2\ns.lastIndexOf('l') = 3\ns.substring(1, 4)  = \"ell\"\ns.startsWith(\"He\") = true\ns.equals(\"hello\")  = false\ns.equalsIgnoreCase(\"hello\") = true",
         example: "String s = \"Java is fun\";\nString[] words = s.split(\" \");    // [Java, is, fun]\nString csv    = String.join(\",\", words); // Java,is,fun",
-        conclusion: "Mastering String methods is a must for Java programming. Group them by purpose: inspect, compare, search, modify, split/join, convert."
+        conclusion: "Mastering String methods is a must for Java programming. Group them by purpose: inspect, compare, search, modify, split/join, convert.",
+        types: [
+          {
+            name: "Inspection (length, charAt, isEmpty)",
+            definition: "Methods that read structural information about a String without producing a new one — length, character at index, emptiness.",
+            diagram: "String s = \"Hello\";\n s.length()   = 5\n s.charAt(1)  = 'e'\n s.isEmpty()  = false",
+            code: { language: "java", code: `String s = "Hello";
+System.out.println(s.length());
+System.out.println(s.charAt(1));
+System.out.println(s.isEmpty());
+System.out.println("".isEmpty());`, caption: "Inspection methods read structure without allocating a new String." },
+            notes: [
+              "length() returns the number of UTF-16 code units (not code points).",
+              "charAt(i) throws IndexOutOfBoundsException for i < 0 or i >= length().",
+              "isEmpty() checks length() == 0; isBlank() (Java 11+) checks for whitespace-only."
+            ],
+            exampleOutput: "5\ne\nfalse\ntrue"
+          },
+          {
+            name: "Comparison (equals, compareTo, equalsIgnoreCase)",
+            definition: "Methods that compare two Strings by content and return a boolean (equals) or an int ordering (compareTo).",
+            diagram: "a.equals(b)       -> boolean\na.compareTo(b)    -> int (<0, 0, >0)\na.equalsIgnoreCase(b) -> boolean (case-insensitive)",
+            code: { language: "java", code: `String a = "Hello";
+String b = "hello";
+System.out.println(a.equals(b));
+System.out.println(a.equalsIgnoreCase(b));
+System.out.println("abc".compareTo("abd"));`, caption: "equals compares content; compareTo returns the lexicographic ordering." },
+            notes: [
+              "equals() does a character-by-character content comparison.",
+              "compareTo() returns <0, 0, or >0 based on Unicode code-point order.",
+              "equalsIgnoreCase is locale-unaware; use compareToIgnoreCase with a Locale for full i18n."
+            ],
+            exampleOutput: "false\ntrue\n-1"
+          },
+          {
+            name: "Modification (substring, replace, toUpperCase)",
+            definition: "Methods that look like they mutate the String but actually return a brand new String, because String is immutable.",
+            diagram: "s = \"Hello\"\n s.substring(1,4)  = \"ell\"   (new)\n s.toUpperCase()   = \"HELLO\" (new)\n s.replace('l','L')= \"HeLLo\" (new)\n s                = \"Hello\" (unchanged)",
+            code: { language: "java", code: `String s = "Hello";
+String a = s.substring(1, 4);
+String b = s.toUpperCase();
+String c = s.replace('l', 'L');
+System.out.println(a);
+System.out.println(b);
+System.out.println(c);
+System.out.println(s);`, caption: "Every 'modifying' call returns a new String; the original is unchanged." },
+            notes: [
+              "All mod methods return a brand new String (immutability).",
+              "replace(char, char) is literal, not regex; replaceAll uses a regex.",
+              "toLowerCase/toUpperCase are locale-sensitive if a Locale is passed."
+            ],
+            exampleOutput: "ell\nHELLO\nHeLLo\nHello"
+          }
+        ]
       },
       sixteenMark: {
         intro: "String methods cover inspection, comparison, search, modification, splitting/joining, and conversion — all returning new Strings because String is immutable.",
@@ -736,7 +1942,104 @@ System.out.println(Arrays.toString(parts));`,
           "Searching and replacing text",
           "Trimming and normalizing user input"
         ],
-        conclusion: "String methods are an essential part of the Java developer's toolkit. Group them mentally: inspect, compare, search, modify, split/join, convert — and remember that every method returns a new String."
+        conclusion: "String methods are an essential part of the Java developer's toolkit. Group them mentally: inspect, compare, search, modify, split/join, convert — and remember that every method returns a new String.",
+        types: [
+          {
+            name: "Inspection (length, charAt, isEmpty, isBlank)",
+            definition: "Methods that read structural information about a String without producing a new one — length, character at index, emptiness, blankness.",
+            diagram: "String s = \"Hello\";\n s.length()   = 5\n s.charAt(1)  = 'e'\n s.isEmpty()  = false\n s.isBlank()  = false",
+            code: { language: "java", code: `String s = "Hello";
+System.out.println(s.length());
+System.out.println(s.charAt(1));
+System.out.println(s.isEmpty());
+System.out.println(s.isBlank());
+System.out.println("   ".isBlank());`, caption: "Inspection methods read structure without allocating a new String." },
+            notes: [
+              "length() returns the number of UTF-16 code units (not code points).",
+              "charAt(i) throws IndexOutOfBoundsException for i < 0 or i >= length().",
+              "isEmpty() checks length() == 0; isBlank() (Java 11+) checks for whitespace-only.",
+              "Use codePointAt(i) when you need real Unicode code points, not code units."
+            ],
+            exampleOutput: "5\ne\nfalse\nfalse\ntrue"
+          },
+          {
+            name: "Comparison (equals, equalsIgnoreCase, compareTo)",
+            definition: "Methods that compare two Strings by content and return a boolean (equals) or an int ordering (compareTo).",
+            diagram: "a.equals(b)            -> boolean\na.compareTo(b)         -> int (<0, 0, >0)\na.equalsIgnoreCase(b)  -> boolean (case-insensitive)\na.startsWith(b)         -> boolean",
+            code: { language: "java", code: `String a = "Hello";
+String b = "hello";
+System.out.println(a.equals(b));
+System.out.println(a.equalsIgnoreCase(b));
+System.out.println("abc".compareTo("abd"));
+System.out.println("Hello".startsWith("He"));`, caption: "equals compares content; compareTo returns the lexicographic ordering." },
+            notes: [
+              "equals() does a character-by-character content comparison.",
+              "compareTo() returns <0, 0, or >0 based on Unicode code-point order.",
+              "equalsIgnoreCase is locale-unaware; use compareToIgnoreCase with a Locale for i18n.",
+              "startsWith/endsWith check prefixes and suffixes; regionMatches checks substrings."
+            ],
+            exampleOutput: "false\ntrue\n-1\ntrue"
+          },
+          {
+            name: "Search (indexOf, lastIndexOf, contains)",
+            definition: "Methods that locate a character or substring inside the String and return the index (or -1 if not found), or a boolean for contains.",
+            diagram: "s = \"Hello World\"\n s.indexOf('o')      = 4\n s.lastIndexOf('o')  = 7\n s.indexOf(\"World\")  = 6\n s.contains(\"World\") = true",
+            code: { language: "java", code: `String s = "Hello World";
+System.out.println(s.indexOf('o'));
+System.out.println(s.lastIndexOf('o'));
+System.out.println(s.indexOf("World"));
+System.out.println(s.contains("World"));
+System.out.println(s.indexOf("xyz"));`, caption: "Search methods return indices; contains returns a boolean." },
+            notes: [
+              "indexOf returns -1 when the substring/char is not found.",
+              "An optional fromIndex skips ahead: s.indexOf(c, from).",
+              "contains(CharSequence) is shorthand for indexOf(seq) != -1.",
+              "All search methods are O(n*m) in the worst case."
+            ],
+            exampleOutput: "4\n7\n6\ntrue\n-1"
+          },
+          {
+            name: "Modification (substring, replace, toLowerCase, trim, strip)",
+            definition: "Methods that look like they mutate the String but actually return a brand new String, because String is immutable.",
+            diagram: "s = \"  Hi  \"\n s.substring(0,2)  = \"  \"   (new)\n s.toUpperCase()   = \"  HI  \" (new)\n s.trim()          = \"Hi\"   (new)\n s.strip()         = \"Hi\"   (new, Unicode-aware)",
+            code: { language: "java", code: `String s = "  Hello  ";
+String a = s.substring(2, 7);
+String b = s.toUpperCase();
+String c = s.replace('l', 'L');
+String d = s.trim();
+String e = s.strip();
+System.out.println(a);
+System.out.println(b);
+System.out.println(c);
+System.out.println(d);
+System.out.println(e);`, caption: "Every 'modifying' call returns a new String; the original is unchanged." },
+            notes: [
+              "All mod methods return a brand new String (immutability).",
+              "replace(char, char) is literal, not regex; replaceAll uses a regex.",
+              "trim() removes only chars <= 0x20; strip() (Java 11+) is Unicode-aware.",
+              "toLowerCase/toUpperCase accept a Locale for locale-sensitive casing."
+            ],
+            exampleOutput: "Hello\n  HELLO  \n  HeLLo  \nHello\nHello"
+          },
+          {
+            name: "Split / Join / Format (split, join, format)",
+            definition: "Methods that break a String apart by a delimiter, glue multiple Strings together, or produce a formatted string with placeholders.",
+            diagram: "split  :  \"a,b,c\".split(\",\")    -> [\"a\", \"b\", \"c\"]\njoin   :  String.join(\"-\", \"a\",\"b\") -> \"a-b\"\nformat :  String.format(\"%s=%d\", \"x\", 1) -> \"x=1\"",
+            code: { language: "java", code: `String csv = "a,b,c";
+String[] parts = csv.split(",");
+System.out.println(java.util.Arrays.toString(parts));
+System.out.println(String.join("-", parts));
+String fmt = String.format("%s=%d", "x", 1);
+System.out.println(fmt);`, caption: "split uses a regex; join and format are static helpers." },
+            notes: [
+              "split takes a regular expression — Pattern.quote() escapes literal characters.",
+              "String.join(delim, elements) concatenates with the given separator (Java 8+).",
+              "String.format and System.out.printf use the same Formatter syntax.",
+              "split has a limit argument to control the resulting array size."
+            ],
+            exampleOutput: "[a, b, c]\na-b-c\nx=1"
+          }
+        ]
       }
     },
     viva: [

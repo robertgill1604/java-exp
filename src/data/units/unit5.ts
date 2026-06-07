@@ -43,7 +43,48 @@ lbl.textProperty().addListener((obs, oldV, newV) -> System.out.println(newV));`,
         explanation: "EventHandler<ActionEvent> is a functional interface with a single void handle(T event) method, so lambdas can be used since Java 8. Nodes expose convenience setters like setOnAction, setOnMouseClicked, setOnKeyPressed, setOnMouseEntered, setOnScroll, etc., each replacing any previous handler. For multiple listeners on the same event, use addEventHandler or addEventFilter. The event object carries source, target, type, and event-specific data (mouse coords, key code, modifiers). Events can be consumed to stop propagation.",
         diagram: "Source → Event → Filter (capture) → Target → Handler (bubble)\n\n  CAPTURE phase        TARGET        BUBBLING phase\n   (root → target)    (handlers)    (target → root)\n  +---------------+   +-------+   +---------------+\n  | filter1       |   | h1    |   | h2            |\n  | filter2       |   | h3    |   | h4            |\n  +---------------+   +-------+   +---------------+",
         example: "Button b = new Button(\"Go\"); Label l = new Label(\"...\"); b.setOnAction(e -> l.setText(\"Clicked!\"));",
-        conclusion: "JavaFX event handling is clean, lambda-friendly, and provides both capture and bubble phases for fine-grained control over event flow."
+        conclusion: "JavaFX event handling is clean, lambda-friendly, and provides both capture and bubble phases for fine-grained control over event flow.",
+        types: [
+          {
+            name: "ActionEvent",
+            definition: "ActionEvent is fired by controls such as Button, MenuItem, Hyperlink, and TextField (on Enter) when the user activates them.",
+            diagram: "  Button click\n  +-------+   +------------+   +---------+\n  | btn   |-->| ActionEvent|-->| handler |\n  +-------+   +------------+   +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(e -> System.out.println("clicked"));
+btn.fire();`,
+              caption: "Registering and firing an ActionEvent handler."
+            },
+            notes: [
+              "Fired by Button, MenuItem, Hyperlink, and TextField (on Enter).",
+              "Convenience setter setOnAction replaces any previously installed handler.",
+              "Use addEventHandler(ActionEvent.ACTION, ...) to attach multiple listeners to the same event.",
+              "getSource() returns the originating Node; getTarget() returns the dispatch target."
+            ],
+            exampleOutput: "clicked"
+          },
+          {
+            name: "MouseEvent",
+            definition: "MouseEvent is fired for mouse interactions including clicks, presses, releases, enters, exits, moves, and drags on a Node.",
+            diagram: "  Click/move/enter\n  +-----+   +-----------+   +---------+\n  | node|<--| MouseEvent|<--| handler |\n  +-----+   +-----------+   +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("OK");
+btn.setOnMouseClicked(e -> {
+  System.out.println("x=" + e.getX() + " y=" + e.getY());
+});`,
+              caption: "Reading click coordinates from a MouseEvent."
+            },
+            notes: [
+              "getX() and getY() return coordinates relative to the source node.",
+              "getButton() returns MouseButton.PRIMARY, SECONDARY, or MIDDLE.",
+              "getClickCount() distinguishes single-click from double-click handlers.",
+              "setOnMouseEntered and setOnMouseExited fire when the cursor crosses node boundaries."
+            ],
+            exampleOutput: "x=42 y=18"
+          }
+        ]
       },
       sixteenMark: {
         intro: "JavaFX event handling uses a delegation model with filters, handlers, and a two-phase (capture + bubble) dispatch along the scene graph.",
@@ -68,7 +109,88 @@ lbl.textProperty().addListener((obs, oldV, newV) -> System.out.println(newV));`,
           "Touch gestures on touch screens",
           "Custom events (Event.fireEvent)"
         ],
-        conclusion: "Mastering JavaFX event handling — including the capture/bubble model, lambda handlers, filters, and event consumption — is essential for building interactive, responsive applications."
+        conclusion: "Mastering JavaFX event handling — including the capture/bubble model, lambda handlers, filters, and event consumption — is essential for building interactive, responsive applications.",
+        types: [
+          {
+            name: "ActionEvent",
+            definition: "ActionEvent is fired by controls such as Button, MenuItem, Hyperlink, and TextField (on Enter) when the user activates them.",
+            diagram: "  Button click\n  +-------+   +------------+   +---------+\n  | btn   |-->| ActionEvent|-->| handler |\n  +-------+   +------------+   +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(e -> System.out.println("clicked"));
+btn.fire();`,
+              caption: "ActionEvent fired by Button click."
+            },
+            notes: [
+              "Fired by Button, MenuItem, Hyperlink, and TextField (on Enter).",
+              "setOnAction replaces any previously installed handler on the node.",
+              "Use addEventHandler(ActionEvent.ACTION, ...) for multiple subscribers.",
+              "getSource() returns the originating Node; the event type is ActionEvent.ACTION."
+            ],
+            exampleOutput: "clicked"
+          },
+          {
+            name: "MouseEvent",
+            definition: "MouseEvent is fired for mouse interactions including clicks, presses, releases, enters, exits, moves, and drags on a Node.",
+            diagram: "  Click/move/enter\n  +-----+   +-----------+   +---------+\n  | node|<--| MouseEvent|<--| handler |\n  +-----+   +-----------+   +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("OK");
+btn.setOnMouseClicked(e -> {
+  System.out.println("x=" + e.getX() + " y=" + e.getY());
+});`,
+              caption: "Reading click coordinates from a MouseEvent."
+            },
+            notes: [
+              "getX() and getY() return coordinates relative to the source node.",
+              "getButton() returns MouseButton.PRIMARY, SECONDARY, or MIDDLE.",
+              "getClickCount() distinguishes single-click from double-click handlers.",
+              "setOnMouseEntered and setOnMouseExited fire on hover boundary crossings."
+            ],
+            exampleOutput: "x=42 y=18"
+          },
+          {
+            name: "KeyEvent",
+            definition: "KeyEvent is fired on keyboard input via three subtypes — KEY_PRESSED, KEY_RELEASED, and KEY_TYPED (character input only).",
+            diagram: "  Press/release/typed\n  +-----+   +---------+   +---------+\n  |node |<--| KeyEvent|<--| handler |\n  +-----+   +---------+   +---------+",
+            code: {
+              language: "java",
+              code: `TextField tf = new TextField();
+tf.setOnKeyPressed(e -> {
+  if (e.getCode() == KeyCode.ENTER)
+    System.out.println("Enter pressed");
+});`,
+              caption: "KeyEvent handler reacting to the Enter key."
+            },
+            notes: [
+              "getCode() returns the KeyCode (e.g., ENTER, ESCAPE, A, F1).",
+              "getCharacter() returns the typed character and is valid only on KEY_TYPED.",
+              "KEY_TYPED does not fire for non-character keys like Shift or F1.",
+              "isShiftDown(), isControlDown(), and isAltDown() inspect modifier state."
+            ],
+            exampleOutput: "Enter pressed"
+          },
+          {
+            name: "WindowEvent",
+            definition: "WindowEvent is fired by Stage and Window for window-level lifecycle changes such as close, hide, show, and resize.",
+            diagram: "  Stage close/hide\n  +------+   +------------+   +---------+\n  |stage |<--| WindowEvent|<--| handler |\n  +------+   +------------+   +---------+",
+            code: {
+              language: "java",
+              code: `Stage stage = new Stage();
+stage.setOnCloseRequest(e -> System.out.println("closing"));
+stage.show();`,
+              caption: "WindowEvent handler intercepting a stage close request."
+            },
+            notes: [
+              "setOnCloseRequest fires when the user clicks the OS close button.",
+              "Calling event.consume() inside the handler prevents the window from closing.",
+              "Other hooks: setOnHiding, setOnHidden, setOnShowing, setOnShown.",
+              "getSource() returns the Stage that originated the event."
+            ],
+            exampleOutput: "closing"
+          }
+        ]
       }
     },
     viva: [
@@ -129,7 +251,49 @@ slider.valueProperty().addListener((obs, oldV, newV) -> label.setText("Vol: " + 
         explanation: "In JavaFX, EventHandler<T extends Event> is a functional interface with handle(T event). It can be implemented as a lambda, an anonymous class, or a method reference. setOn* methods (setOnAction, setOnMouseClicked, ...) install/replace a single handler; addEventHandler allows multiple listeners. Listeners receive the event and can read source, target, type, and event-specific data (e.g., MouseEvent.getX(), KeyEvent.getCode()).",
         diagram: "Source (Button)\n   |\n   |-- listeners: [EventHandler#1, EventHandler#2, ...]\n   |\n   '--- on event --> listener.handle(e) for each",
         example: "btn.setOnMouseClicked(e -> System.out.println(\"x=\" + e.getX() + \" y=\" + e.getY()));",
-        conclusion: "Listeners decouple event generation from response and form the foundation of JavaFX's interaction model."
+        conclusion: "Listeners decouple event generation from response and form the foundation of JavaFX's interaction model.",
+        types: [
+          {
+            name: "Lambda Listener",
+            definition: "A lambda listener is a concise lambda expression implementing EventHandler<T>, possible because EventHandler is a functional interface with a single handle(T) method.",
+            diagram: "  e -> body  ==  handle(e)\n  +-------+   +---------------+\n  | source|-->| lambda handler|\n  +-------+   +---------------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(e -> System.out.println("clicked"));`,
+              caption: "Lambda used as an EventHandler<ActionEvent>."
+            },
+            notes: [
+              "Requires Java 8+ because lambdas are the language feature that enables this.",
+              "Cannot be removed by removeEventHandler unless the lambda is stored in a variable first.",
+              "Most concise form of listener and the idiomatic choice in modern JavaFX code.",
+              "Compiled to an invokedynamic call site, not a synthetic anonymous class."
+            ],
+            exampleOutput: "clicked"
+          },
+          {
+            name: "Anonymous Class Listener",
+            definition: "An anonymous class listener is an inline subclass of EventHandler<T> implementing handle(T) — verbose but useful when extra state or methods are needed.",
+            diagram: "  new EventHandler<T>(){ handle... }\n  +--------+   +--------------------+\n  | source |-->| anonymous instance |\n  +--------+   +--------------------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(new EventHandler<ActionEvent>() {
+  @Override public void handle(ActionEvent e) {
+    System.out.println("handled");
+  }
+});`,
+              caption: "Anonymous class implementing EventHandler<ActionEvent>."
+            },
+            notes: [
+              "Always carries a stable reference, so it can be passed to removeEventHandler.",
+              "Useful when the listener needs fields, helper methods, or constructor arguments.",
+              "Slightly more boilerplate than the equivalent lambda.",
+              "Required pre-Java 8 for inline listener definitions."
+            ],
+            exampleOutput: "handled"
+          }
+        ]
       },
       sixteenMark: {
         intro: "Event listeners are a core part of GUI programming and follow the Observer pattern.",
@@ -152,7 +316,89 @@ slider.valueProperty().addListener((obs, oldV, newV) -> label.setText("Vol: " + 
           "Observable property change tracking",
           "Custom domain events with EventType"
         ],
-        conclusion: "Listeners are foundational to event-driven Java applications, enabling loosely coupled, reactive UIs that respond cleanly to user input and state changes."
+        conclusion: "Listeners are foundational to event-driven Java applications, enabling loosely coupled, reactive UIs that respond cleanly to user input and state changes.",
+        types: [
+          {
+            name: "Lambda Listener",
+            definition: "A lambda listener is a concise lambda expression implementing EventHandler<T>, possible because EventHandler is a functional interface with a single handle(T) method.",
+            diagram: "  e -> body  ==  handle(e)\n  +-------+   +---------------+\n  | source|-->| lambda handler|\n  +-------+   +---------------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(e -> System.out.println("clicked"));`,
+              caption: "Lambda used as an EventHandler<ActionEvent>."
+            },
+            notes: [
+              "Requires Java 8+ because lambdas are the language feature that enables this.",
+              "Cannot be removed by removeEventHandler unless the lambda is stored in a variable first.",
+              "Most concise form of listener and the idiomatic choice in modern JavaFX code.",
+              "Compiled to an invokedynamic call site, not a synthetic anonymous class."
+            ],
+            exampleOutput: "clicked"
+          },
+          {
+            name: "Anonymous Class Listener",
+            definition: "An anonymous class listener is an inline subclass of EventHandler<T> implementing handle(T) — verbose but useful when extra state or methods are needed.",
+            diagram: "  new EventHandler<T>(){ handle... }\n  +--------+   +--------------------+\n  | source |-->| anonymous instance |\n  +--------+   +--------------------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(new EventHandler<ActionEvent>() {
+  @Override public void handle(ActionEvent e) {
+    System.out.println("handled");
+  }
+});`,
+              caption: "Anonymous class implementing EventHandler<ActionEvent>."
+            },
+            notes: [
+              "Always carries a stable reference, so it can be passed to removeEventHandler.",
+              "Useful when the listener needs fields, helper methods, or constructor arguments.",
+              "Slightly more boilerplate than the equivalent lambda.",
+              "Required pre-Java 8 for inline listener definitions."
+            ],
+            exampleOutput: "handled"
+          },
+          {
+            name: "Property ChangeListener",
+            definition: "A Property ChangeListener observes changes to an ObservableValue property such as text, value, or selected — fired whenever the wrapped value changes.",
+            diagram: "  prop  -->  ChangeListener\n  +-----+   +----------------+\n  |value|-->| (o,old,new) -> |\n  +-----+   +----------------+",
+            code: {
+              language: "java",
+              code: `Slider s = new Slider();
+s.valueProperty().addListener((obs, oldV, newV) ->
+  System.out.println("v=" + newV.doubleValue())
+);`,
+              caption: "ChangeListener on a Slider's valueProperty."
+            },
+            notes: [
+              "Added via property.addListener(ChangeListener) on any ObservableValue.",
+              "Receives (observable, oldValue, newValue) on every committed change.",
+              "An InvalidationListener is a cheaper alternative when the new value is not needed.",
+              "Useful for two-way binding UI updates without polling."
+            ],
+            exampleOutput: "v=0.0\nv=12.5\nv=47.0"
+          },
+          {
+            name: "Custom Event Listener",
+            definition: "A custom event listener handles user-defined EventType events dispatched via Event.fireEvent(target, customEvent), enabling in-app pub/sub semantics.",
+            diagram: "  fireEvent(target, e)\n  +--------+   +----------+   +--------+\n  | source |-->| customEv |-->|listener|\n  +--------+   +----------+   +--------+",
+            code: {
+              language: "java",
+              code: `EventType<Event> MY_TYPE = new EventType<>(Event.ANY, "MY_EVENT");
+Node node = new Button("X");
+node.addEventHandler(MY_TYPE, e -> System.out.println("got it"));
+Event.fireEvent(node, new Event(MY_TYPE));`,
+              caption: "Firing and handling a custom EventType."
+            },
+            notes: [
+              "Subclass Event or use Event directly with a custom EventType.",
+              "Dispatched manually with Event.fireEvent(target, customEvent).",
+              "Traverses the same capture/bubble phases as built-in events.",
+              "Useful for decoupled inter-component communication in larger apps."
+            ],
+            exampleOutput: "got it"
+          }
+        ]
       }
     },
     viva: [
@@ -220,7 +466,48 @@ slider.valueProperty().addListener((obs, oldV, newV) -> label.setText("Vol: " + 
         explanation: "Stage methods: setTitle, setScene, show, hide, close, setResizable, setFullScreen, setMaximized, initStyle (DECORATED/UNDECORATED/TRANSPARENT/UTILITY), initModality (NONE/MODAL), centerOnScreen. Scene methods: setRoot, getRoot, getStylesheets (for CSS), getWidth/getHeight, setFill, setCursor. Only one scene is shown at a time per stage, but you can switch with setScene(). The primary stage is created by the Application's start(Stage) method; additional stages can be created with new Stage().",
         diagram: "Stage (window)\n  +-- title bar\n  +-- Scene\n        +-- root (e.g., VBox)\n              +-- Button\n              +-- Label",
         example: "VBox root = new VBox(new Label(\"Hi\"), new Button(\"OK\"));\nStage s = new Stage();\ns.setScene(new Scene(root, 320, 200));\ns.setTitle(\"Demo\");\ns.show();",
-        conclusion: "Stage and Scene are essential to JavaFX's structure, providing clear window/content separation, scene swapping, and CSS integration."
+        conclusion: "Stage and Scene are essential to JavaFX's structure, providing clear window/content separation, scene swapping, and CSS integration.",
+        types: [
+          {
+            name: "Stage",
+            definition: "A Stage is the top-level JavaFX window (an OS window), created by the platform as the primary stage or by the application via new Stage().",
+            diagram: "  Stage (window)\n  +--------+\n  | title  |\n  | scene  |\n  +--------+",
+            code: {
+              language: "java",
+              code: `Stage s = new Stage();
+s.setTitle("Demo");
+s.setScene(new Scene(new VBox(), 200, 100));
+s.show();`,
+              caption: "Creating a secondary Stage."
+            },
+            notes: [
+              "Extends Window, adding public API for setScene, show, initStyle, initModality.",
+              "setScene replaces the currently attached scene; only one is visible at a time.",
+              "initStyle accepts DECORATED, UNDECORATED, TRANSPARENT, or UTILITY.",
+              "setOnCloseRequest lets the app intercept and even cancel the close."
+            ],
+            exampleOutput: "A new OS window titled 'Demo' is shown."
+          },
+          {
+            name: "Scene",
+            definition: "A Scene is the content of a stage — a tree of nodes (the scene graph) with a width, height, fill, and an optional CSS stylesheet.",
+            diagram: "  Scene\n  +-- root: Pane\n        +-- child nodes",
+            code: {
+              language: "java",
+              code: `Scene scene = new Scene(new VBox(), 300, 200);
+scene.getStylesheets().add("file:style.css");
+scene.setFill(Color.LIGHTBLUE);`,
+              caption: "Building a Scene with CSS and a fill color."
+            },
+            notes: [
+              "Constructed as new Scene(root, width, height) or new Scene(root).",
+              "getStylesheets() returns the list of CSS URLs applied to the scene.",
+              "setFill paints the background behind all nodes (default white).",
+              "getWidth() and getHeight() reflect the current size of the scene."
+            ],
+            exampleOutput: "Scene rendered with a light blue background, 300x200 in size."
+          }
+        ]
       },
       sixteenMark: {
         intro: "JavaFX apps use Stage and Scene to organize UI hierarchy and lifecycle.",
@@ -243,7 +530,91 @@ slider.valueProperty().addListener((obs, oldV, newV) -> label.setText("Vol: " + 
           "Games and visualizations",
           "Multi-window dialogs (modal Stages)"
         ],
-        conclusion: "Stage and Scene form the foundation of any JavaFX application. Mastering their lifecycle, styling, and scene switching is essential for building robust, polished desktop UIs."
+        conclusion: "Stage and Scene form the foundation of any JavaFX application. Mastering their lifecycle, styling, and scene switching is essential for building robust, polished desktop UIs.",
+        types: [
+          {
+            name: "Stage",
+            definition: "A Stage is the top-level JavaFX window (an OS window), created by the platform as the primary stage or by the application via new Stage().",
+            diagram: "  Stage (window)\n  +--------+\n  | title  |\n  | scene  |\n  +--------+",
+            code: {
+              language: "java",
+              code: `Stage s = new Stage();
+s.setTitle("Demo");
+s.setScene(new Scene(new VBox(), 200, 100));
+s.show();`,
+              caption: "Creating a secondary Stage."
+            },
+            notes: [
+              "Extends Window, adding public API for setScene, show, initStyle, initModality.",
+              "setScene replaces the currently attached scene; only one is visible at a time.",
+              "initStyle accepts DECORATED, UNDECORATED, TRANSPARENT, or UTILITY.",
+              "setOnCloseRequest lets the app intercept and even cancel the close."
+            ],
+            exampleOutput: "A new OS window titled 'Demo' is shown."
+          },
+          {
+            name: "Scene",
+            definition: "A Scene is the content of a stage — a tree of nodes (the scene graph) with a width, height, fill, and an optional CSS stylesheet.",
+            diagram: "  Scene\n  +-- root: Pane\n        +-- child nodes",
+            code: {
+              language: "java",
+              code: `Scene scene = new Scene(new VBox(), 300, 200);
+scene.getStylesheets().add("file:style.css");
+scene.setFill(Color.LIGHTBLUE);`,
+              caption: "Building a Scene with CSS and a fill color."
+            },
+            notes: [
+              "Constructed as new Scene(root, width, height) or new Scene(root).",
+              "getStylesheets() returns the list of CSS URLs applied to the scene.",
+              "setFill paints the background behind all nodes (default white).",
+              "getWidth() and getHeight() reflect the current size of the scene."
+            ],
+            exampleOutput: "Scene rendered with a light blue background, 300x200 in size."
+          },
+          {
+            name: "Application Lifecycle",
+            definition: "The Application lifecycle has three overridable hooks: init() (one-time setup before UI), start(Stage) (build and show UI), and stop() (cleanup before JVM exit).",
+            diagram: "  init() --> start(Stage) --> ... --> stop()\n   ^                              |\n   +--- JavaFX Application Thread -+",
+            code: {
+              language: "java",
+              code: `public class MyApp extends Application {
+  @Override public void init() { System.out.println("init"); }
+  @Override public void start(Stage s) { System.out.println("start"); s.show(); }
+  @Override public void stop()  { System.out.println("stop"); }
+  public static void main(String[] a) { launch(a); }
+}`,
+              caption: "Overriding the three Application lifecycle methods."
+            },
+            notes: [
+              "init() runs before start() and is good for non-UI setup like loading config.",
+              "start(Stage) receives the primary stage and is where the UI is built.",
+              "stop() fires when the last window closes — good for releasing resources.",
+              "launch(args) is the entry point that must be called from main()."
+            ],
+            exampleOutput: "init\nstart\nstop"
+          },
+          {
+            name: "Modal Stage",
+            definition: "A modal Stage blocks input to its owner window until it is closed, configured via initModality(Modality.APPLICATION_MODAL or WINDOW_MODAL).",
+            diagram: "  owner Stage\n  +-------+\n  | modal |--> blocks owner\n  +-------+",
+            code: {
+              language: "java",
+              code: `Stage dialog = new Stage();
+dialog.initModality(Modality.APPLICATION_MODAL);
+dialog.setScene(new Scene(new Label("Wait..."), 200, 100));
+dialog.showAndWait();
+System.out.println("dialog closed");`,
+              caption: "Showing a modal stage and waiting for it to close."
+            },
+            notes: [
+              "APPLICATION_MODAL blocks all windows of the same Application.",
+              "WINDOW_MODAL blocks only the window passed to initOwner(stage).",
+              "showAndWait() blocks the caller until the modal stage is closed.",
+              "Useful for confirmations, login prompts, and progress dialogs."
+            ],
+            exampleOutput: "dialog closed"
+          }
+        ]
       }
     },
     viva: [
@@ -305,7 +676,47 @@ row.getChildren().add(b);`,
         explanation: "Children are added in order via the constructor or getChildren().add(). spacing sets the gap between consecutive children. setPadding(new Insets(...)) adds inner padding on all four sides. setAlignment(Pos.CENTER) (or Pos.CENTER_LEFT, TOP_RIGHT, BASELINE_CENTER, etc.) controls how children are aligned within the pane. HBox.setHgrow(child, Priority.ALWAYS) and VBox.setVgrow(child, Priority.ALWAYS) make a child expand to fill extra space. HBox.fillWidth (boolean) controls whether children share the available width equally when they don't have Hgrow. Per-child margins can be set with HBox.setMargin(child, new Insets(...)).",
         diagram: "HBox: [A] - [B] - [C]   (left → right)\nVBox: [A]\n       [B]\n       [C]   (top → bottom)\n\nNesting: VBox containing HBoxes is a very common form layout.",
         example: "HBox h = new HBox(5, new Button(\"OK\"), new Button(\"Cancel\"));\nh.setAlignment(Pos.CENTER);",
-        conclusion: "HBox and VBox are the simplest, most-used layout containers in JavaFX, and nesting them gives powerful form-like layouts with minimal code."
+        conclusion: "HBox and VBox are the simplest, most-used layout containers in JavaFX, and nesting them gives powerful form-like layouts with minimal code.",
+        types: [
+          {
+            name: "HBox",
+            definition: "HBox lays out its children in a single horizontal row from left to right, with configurable spacing, padding, and alignment.",
+            diagram: "  HBox  -->  [A] [B] [C]\n        left ---> right",
+            code: {
+              language: "java",
+              code: `HBox row = new HBox(10, new Button("A"), new Button("B"));
+row.setPadding(new Insets(8));
+row.setAlignment(Pos.CENTER);`,
+              caption: "HBox with spacing, padding, and center alignment."
+            },
+            notes: [
+              "Children are added in order via the constructor or getChildren().add().",
+              "setSpacing(double) sets the gap in pixels between consecutive children.",
+              "setAlignment(Pos) accepts Pos.CENTER, TOP_RIGHT, BASELINE_CENTER, etc.",
+              "fillWidth = true makes children share the available width equally by default."
+            ],
+            exampleOutput: "Row of two buttons centered horizontally with 10 px gaps."
+          },
+          {
+            name: "VBox",
+            definition: "VBox lays out its children in a single vertical column from top to bottom, with configurable spacing, padding, and alignment.",
+            diagram: "  VBox\n  +-- [A]\n  +-- [B]\n  +-- [C]\n        top ---> bottom",
+            code: {
+              language: "java",
+              code: `VBox col = new VBox(5, new Label("Top"), new TextField(), new Button("Go"));
+col.setSpacing(5);
+col.setAlignment(Pos.CENTER);`,
+              caption: "VBox with three stacked controls."
+            },
+            notes: [
+              "Children are added in order via the constructor or getChildren().add().",
+              "setSpacing(double) controls the vertical gap between consecutive children.",
+              "setAlignment(Pos) sets horizontal alignment within the column.",
+              "VBox.fillWidth makes children stretch to the column width when no Vgrow is set."
+            ],
+            exampleOutput: "Vertical column of label, text field, and button with 5 px gaps."
+          }
+        ]
       },
       sixteenMark: {
         intro: "HBox and VBox are linear layout panes for horizontal and vertical child arrangement, with rich options for spacing, padding, alignment, and growth.",
@@ -329,7 +740,106 @@ row.getChildren().add(b);`,
           "Login/registration screens",
           "Card layouts and dialog bodies"
         ],
-        conclusion: "HBox and VBox are the workhorses of JavaFX layout. Mastering spacing, padding, alignment, and growth priorities enables building clean, responsive UIs with very little code."
+        conclusion: "HBox and VBox are the workhorses of JavaFX layout. Mastering spacing, padding, alignment, and growth priorities enables building clean, responsive UIs with very little code.",
+        types: [
+          {
+            name: "HBox",
+            definition: "HBox lays out its children in a single horizontal row from left to right, with configurable spacing, padding, and alignment.",
+            diagram: "  HBox  -->  [A] [B] [C]\n        left ---> right",
+            code: {
+              language: "java",
+              code: `HBox row = new HBox(10, new Button("A"), new Button("B"));
+row.setPadding(new Insets(8));
+row.setAlignment(Pos.CENTER);`,
+              caption: "HBox with spacing, padding, and center alignment."
+            },
+            notes: [
+              "Children are added in order via the constructor or getChildren().add().",
+              "setSpacing(double) sets the gap in pixels between consecutive children.",
+              "setAlignment(Pos) accepts Pos.CENTER, TOP_RIGHT, BASELINE_CENTER, etc.",
+              "fillWidth = true makes children share the available width equally by default."
+            ],
+            exampleOutput: "Row of two buttons centered horizontally with 10 px gaps."
+          },
+          {
+            name: "VBox",
+            definition: "VBox lays out its children in a single vertical column from top to bottom, with configurable spacing, padding, and alignment.",
+            diagram: "  VBox\n  +-- [A]\n  +-- [B]\n  +-- [C]\n        top ---> bottom",
+            code: {
+              language: "java",
+              code: `VBox col = new VBox(5, new Label("Top"), new TextField(), new Button("Go"));
+col.setSpacing(5);
+col.setAlignment(Pos.CENTER);`,
+              caption: "VBox with three stacked controls."
+            },
+            notes: [
+              "Children are added in order via the constructor or getChildren().add().",
+              "setSpacing(double) controls the vertical gap between consecutive children.",
+              "setAlignment(Pos) sets horizontal alignment within the column.",
+              "VBox.fillWidth makes children stretch to the column width when no Vgrow is set."
+            ],
+            exampleOutput: "Vertical column of label, text field, and button with 5 px gaps."
+          },
+          {
+            name: "HBox with Hgrow",
+            definition: "An HBox with Hgrow marks specific children with Priority.ALWAYS so they expand to absorb any extra horizontal space.",
+            diagram: "  HBox\n  [A] [B ......(grows)...... ]",
+            code: {
+              language: "java",
+              code: `HBox row = new HBox(10, new Button("A"), new Button("B"));
+Button spacer = new Button("stretch");
+HBox.setHgrow(spacer, Priority.ALWAYS);
+row.getChildren().add(spacer);`,
+              caption: "Using HBox.setHgrow to make a child absorb extra width."
+            },
+            notes: [
+              "Static helper HBox.setHgrow(child, Priority.ALWAYS) enables growth on a child.",
+              "Children without ALWAYS keep their preferred width; extra space goes to ALWAYS children.",
+              "Multiple ALWAYS children share the extra width proportionally.",
+              "Useful for toolbars with a flexible 'spacer' or search field."
+            ],
+            exampleOutput: "Two fixed-width buttons, then a third button that stretches to fill the row."
+          },
+          {
+            name: "VBox with Vgrow",
+            definition: "A VBox with Vgrow marks specific children with Priority.ALWAYS so they expand to absorb any extra vertical space.",
+            diagram: "  VBox\n  [A]\n  [B ......(grows)...... ]",
+            code: {
+              language: "java",
+              code: `VBox col = new VBox(5, new Label("Top"), new TextArea(), new Button("Go"));
+VBox.setVgrow(col.getChildren().get(1), Priority.ALWAYS);`,
+              caption: "VBox.setVgrow making the middle TextArea fill the column."
+            },
+            notes: [
+              "Static helper VBox.setVgrow(child, Priority.ALWAYS) enables vertical growth.",
+              "Without Vgrow, the child keeps its preferred height; the column may have unused space.",
+              "Common for forms where a multiline field should expand to use remaining height.",
+              "Combine with VBox.setAlignment(Pos.CENTER) for centered labels above a growing area."
+            ],
+            exampleOutput: "Stacked label, growing TextArea, and button — TextArea fills remaining height."
+          },
+          {
+            name: "Nested HBox/VBox",
+            definition: "Nested HBox/VBox means placing HBoxes inside a VBox (or vice versa) to build complex form-like layouts without absolute positioning.",
+            diagram: "  VBox\n    HBox [L][F]\n    HBox [L][F]\n    Button",
+            code: {
+              language: "java",
+              code: `VBox form = new VBox(8,
+  new HBox(5, new Label("Name:"),  new TextField()),
+  new HBox(5, new Label("Email:"), new TextField()),
+  new Button("Submit")
+);`,
+              caption: "A canonical VBox-of-HBoxes form layout."
+            },
+            notes: [
+              "The canonical JavaFX form pattern is a VBox of HBox rows (label + field).",
+              "Each HBox can have its own alignment, spacing, and Hgrow rules.",
+              "Avoids manual x/y positioning — the layout engine handles resizing.",
+              "Can be further wrapped in ScrollPane for long forms."
+            ],
+            exampleOutput: "Two label-plus-field rows followed by a Submit button, all neatly aligned."
+          }
+        ]
       }
     },
     viva: [
@@ -392,7 +902,49 @@ lv.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> System.
         explanation: "Use getItems() to access the underlying ObservableList<T> (so add/remove updates UI automatically). setValue/getValue works on ComboBox; ListView uses getSelectionModel().getSelectedItem() and selectedItemProperty(). A CellFactory (setCellFactory) customizes how each item is rendered (text, graphics). Both can fire change events via selection property listeners. ComboBox.setEditable(true) allows free-text input (with completion from items).",
         diagram: "ComboBox (collapsed):  [ Red         ▼ ]\n              (expanded):   [ Red         ▲ ]\n                            +---------+\n                            | Red     |\n                            | Green   |\n                            | Blue    |\n                            +---------+\nListView:        +---------+\n                | Apple   |\n                | Banana  |\n                | Cherry  |\n                +---------+",
         example: "ComboBox<String> cb = new ComboBox<>();\ncb.getItems().addAll(\"A\", \"B\", \"C\");\ncb.setValue(\"A\");",
-        conclusion: "Both are essential for choice input; ComboBox for compactness, ListView for visibility and multi-selection."
+        conclusion: "Both are essential for choice input; ComboBox for compactness, ListView for visibility and multi-selection.",
+        types: [
+          {
+            name: "ComboBox",
+            definition: "A ComboBox<T> is a collapsed drop-down that expands on click to reveal a list of T items, holding one selected value at a time.",
+            diagram: "  collapsed [ v ] --> expanded list\n  +-------+   +-----+ +----+\n  | value |   |item1| |item|\n  +-------+   |item2| +----+",
+            code: {
+              language: "java",
+              code: `ComboBox<String> cb = new ComboBox<>();
+cb.getItems().addAll("Red", "Green", "Blue");
+cb.setValue("Red");
+cb.setOnAction(e -> System.out.println(cb.getValue()));`,
+              caption: "Basic ComboBox with items and a selection handler."
+            },
+            notes: [
+              "getItems() returns the backing ObservableList<T> — auto-updates UI on changes.",
+              "setValue / getValue work on ComboBox (unlike ListView's SelectionModel).",
+              "setPromptText shows placeholder when no value is set.",
+              "setOnAction fires when the user picks a value from the drop-down."
+            ],
+            exampleOutput: "Red"
+          },
+          {
+            name: "ListView",
+            definition: "A ListView<T> displays T items in a vertical, scrollable list with built-in single or multiple selection via a SelectionModel.",
+            diagram: "  ListView\n  +---------+\n  | Apple   |\n  | Banana  |\n  | Cherry  |\n  +---------+",
+            code: {
+              language: "java",
+              code: `ListView<String> lv = new ListView<>(
+  FXCollections.observableArrayList("Apple", "Banana", "Cherry"));
+lv.getSelectionModel().selectedItemProperty()
+  .addListener((o, ov, nv) -> System.out.println(nv));`,
+              caption: "ListView with a selection change listener."
+            },
+            notes: [
+              "getSelectionModel() returns a MultipleSelectionModel<T> with select/clear APIs.",
+              "selectedItemProperty is observable — ideal for reactive UI updates.",
+              "setCellFactory allows custom rendering of each row (icons, two-line layout).",
+              "setOrientation(javafx.geometry.Orientation.HORIZONTAL) makes it a horizontal list."
+            ],
+            exampleOutput: "Optional[Banana]"
+          }
+        ]
       },
       sixteenMark: {
         intro: "ComboBox and ListView provide selection from a list of items with rich customization and observable data binding.",
@@ -416,7 +968,90 @@ lv.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> System.
           "Tag/keyword pickers",
           "Reorderable lists (with drag/drop extension)"
         ],
-        conclusion: "ComboBox and ListView are versatile selection controls for JavaFX. Understanding ObservableList, SelectionModel, and CellFactory unlocks powerful, reactive list UIs."
+        conclusion: "ComboBox and ListView are versatile selection controls for JavaFX. Understanding ObservableList, SelectionModel, and CellFactory unlocks powerful, reactive list UIs.",
+        types: [
+          {
+            name: "ComboBox",
+            definition: "A ComboBox<T> is a collapsed drop-down that expands on click to reveal a list of T items, holding one selected value at a time.",
+            diagram: "  collapsed [ v ] --> expanded list\n  +-------+   +-----+ +----+\n  | value |   |item1| |item|\n  +-------+   |item2| +----+",
+            code: {
+              language: "java",
+              code: `ComboBox<String> cb = new ComboBox<>();
+cb.getItems().addAll("Red", "Green", "Blue");
+cb.setValue("Red");
+cb.setOnAction(e -> System.out.println(cb.getValue()));`,
+              caption: "Basic ComboBox with items and a selection handler."
+            },
+            notes: [
+              "getItems() returns the backing ObservableList<T> — auto-updates UI on changes.",
+              "setValue / getValue work on ComboBox (unlike ListView's SelectionModel).",
+              "setPromptText shows placeholder when no value is set.",
+              "setOnAction fires when the user picks a value from the drop-down."
+            ],
+            exampleOutput: "Red"
+          },
+          {
+            name: "ListView",
+            definition: "A ListView<T> displays T items in a vertical, scrollable list with built-in single or multiple selection via a SelectionModel.",
+            diagram: "  ListView\n  +---------+\n  | Apple   |\n  | Banana  |\n  | Cherry  |\n  +---------+",
+            code: {
+              language: "java",
+              code: `ListView<String> lv = new ListView<>(
+  FXCollections.observableArrayList("Apple", "Banana", "Cherry"));
+lv.getSelectionModel().selectedItemProperty()
+  .addListener((o, ov, nv) -> System.out.println(nv));`,
+              caption: "ListView with a selection change listener."
+            },
+            notes: [
+              "getSelectionModel() returns a MultipleSelectionModel<T> with select/clear APIs.",
+              "selectedItemProperty is observable — ideal for reactive UI updates.",
+              "setCellFactory allows custom rendering of each row (icons, two-line layout).",
+              "setOrientation(javafx.geometry.Orientation.HORIZONTAL) makes it a horizontal list."
+            ],
+            exampleOutput: "Optional[Banana]"
+          },
+          {
+            name: "Editable ComboBox",
+            definition: "An editable ComboBox (setEditable(true)) adds a TextField above the drop-down, letting users type a custom value in addition to picking from items.",
+            diagram: "  Editable ComboBox\n  +-----------+ v\n  | <type or> |\n  +-----------+\n  | Red       |\n  | Green     |\n  +-----------+",
+            code: {
+              language: "java",
+              code: `ComboBox<String> cb = new ComboBox<>();
+cb.getItems().addAll("Red", "Green", "Blue");
+cb.setEditable(true);
+cb.setOnAction(e -> System.out.println("got=" + cb.getValue()));`,
+              caption: "Editable ComboBox accepting typed values."
+            },
+            notes: [
+              "setEditable(true) installs a TextField editor on top of the drop-down.",
+              "Typing a value not in the list sets getValue() to the typed string.",
+              "setConverter(StringConverter) maps between displayed text and T for custom types.",
+              "Useful for autocomplete and 'recent values' features."
+            ],
+            exampleOutput: "got=Red"
+          },
+          {
+            name: "Multi-Select ListView",
+            definition: "A multi-select ListView uses SelectionMode.MULTIPLE so the user can pick several items at once via Ctrl/Shift clicks, exposed via getSelectedItems().",
+            diagram: "  ListView (multi)\n  +---------+\n  | Apple   |  <-- sel\n  | Banana  |\n  | Cherry  |  <-- sel\n  +---------+",
+            code: {
+              language: "java",
+              code: `ListView<String> lv = new ListView<>(
+  FXCollections.observableArrayList("A", "B", "C"));
+lv.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+lv.getSelectionModel().getSelectedItems()
+  .forEach(s -> System.out.println("picked: " + s));`,
+              caption: "ListView with SelectionMode.MULTIPLE."
+            },
+            notes: [
+              "setSelectionMode(SelectionMode.MULTIPLE) enables multi-selection.",
+              "SelectionMode.SINGLE is the default and limits selection to one item.",
+              "getSelectedItems() returns an ObservableList<T> of all current selections.",
+              "Hold Ctrl or Shift while clicking to extend the selection."
+            ],
+            exampleOutput: "picked: A\npicked: C"
+          }
+        ]
       }
     },
     viva: [
@@ -480,7 +1115,47 @@ tf.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) btn.fire(); });`,
         explanation: "TextField: getText(), setText(), setPromptText(\"...\") for placeholder, setPrefColumnCount(n) for width hint. PasswordField: same as TextField, but displays dots. Button: setText, setOnAction, setGraphic(Node), setDisable. Label: setText, setGraphic, setWrapText(true). They are typically arranged in HBox/VBox/GridPane.",
         diagram: "Label: \"Name:\"\nTextField: [_________________]\nPasswordField: [*****]\nButton: [Submit 🖫]",
         example: "TextField tf = new TextField(); Button b = new Button(\"OK\"); Label l = new Label(\"Status\"); b.setOnAction(e -> l.setText(\"Hi \" + tf.getText()));",
-        conclusion: "These four controls are the building blocks of any JavaFX form, and together enable simple, complete input/output interactions."
+        conclusion: "These four controls are the building blocks of any JavaFX form, and together enable simple, complete input/output interactions.",
+        types: [
+          {
+            name: "TextField",
+            definition: "A TextField is a single-line text input control exposing an observable text property, prompt text, and column-count sizing.",
+            diagram: "  TextField\n  +-------------+\n  | <text here> |\n  +-------------+",
+            code: {
+              language: "java",
+              code: `TextField tf = new TextField();
+tf.setPromptText("Your name");
+tf.setPrefColumnCount(20);
+System.out.println(tf.getText());`,
+              caption: "Creating a TextField and reading its text."
+            },
+            notes: [
+              "getText()/setText() read or write the current value as a String.",
+              "setPromptText(\"...\") shows placeholder text when the field is empty.",
+              "setPrefColumnCount(n) hints the width in average character columns.",
+              "setOnAction fires when the user presses Enter inside the field."
+            ],
+            exampleOutput: "(empty line if user typed nothing)"
+          },
+          {
+            name: "Button",
+            definition: "A Button is a clickable control that fires an ActionEvent when activated, optionally displaying text and a graphic.",
+            diagram: "  Button\n  +---------+\n  | Submit  |\n  +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setOnAction(e -> System.out.println("clicked"));`,
+              caption: "Button with a lambda ActionEvent handler."
+            },
+            notes: [
+              "setOnAction accepts an EventHandler<ActionEvent> (lambda-friendly).",
+              "setGraphic(node) attaches an icon such as an ImageView.",
+              "setDisable(true) greys the button out and blocks clicks.",
+              "btn.fire() programmatically triggers the action handler."
+            ],
+            exampleOutput: "clicked"
+          }
+        ]
       },
       sixteenMark: {
         intro: "TextField, PasswordField, Button, and Label are basic input/output controls in JavaFX with rich text, graphic, and event features.",
@@ -503,7 +1178,86 @@ tf.setOnKeyPressed(e -> { if (e.getCode() == KeyCode.ENTER) btn.fire(); });`,
           "Toolbars and command bars",
           "Status bars and captions"
         ],
-        conclusion: "TextField, PasswordField, Button, and Label are essential to any JavaFX form. Master their text properties, events, and CSS styling to build polished, interactive UIs."
+        conclusion: "TextField, PasswordField, Button, and Label are essential to any JavaFX form. Master their text properties, events, and CSS styling to build polished, interactive UIs.",
+        types: [
+          {
+            name: "TextField",
+            definition: "A TextField is a single-line text input control exposing an observable text property, prompt text, and column-count sizing.",
+            diagram: "  TextField\n  +-------------+\n  | <text here> |\n  +-------------+",
+            code: {
+              language: "java",
+              code: `TextField tf = new TextField();
+tf.setPromptText("Your name");
+tf.setPrefColumnCount(20);
+tf.textProperty().addListener((o, ov, nv) -> System.out.println(nv));`,
+              caption: "TextField with prompt text and a text-change listener."
+            },
+            notes: [
+              "getText()/setText() read or write the current value as a String.",
+              "setPromptText(\"...\") shows placeholder text when the field is empty.",
+              "setPrefColumnCount(n) hints the width in average character columns.",
+              "setOnAction fires when the user presses Enter inside the field."
+            ],
+            exampleOutput: "(prints the latest text on each change)"
+          },
+          {
+            name: "PasswordField",
+            definition: "A PasswordField is a TextField subclass that masks each character with a bullet for safe entry of secrets like passwords.",
+            diagram: "  PasswordField\n  +-------------+\n  | * * * * * * |\n  +-------------+",
+            code: {
+              language: "java",
+              code: `PasswordField pf = new PasswordField();
+pf.setPromptText("Password");
+pf.setOnAction(e -> System.out.println("len=" + pf.getText().length()));`,
+              caption: "PasswordField reading length (never printing the value)."
+            },
+            notes: [
+              "Extends TextField and overrides the skin to render bullets instead of characters.",
+              "getText() still returns the actual entered string — handle it carefully.",
+              "Useful for login and registration forms.",
+              "Combine with a length validator in the submit handler."
+            ],
+            exampleOutput: "len=8"
+          },
+          {
+            name: "Button",
+            definition: "A Button is a clickable control that fires an ActionEvent when activated by mouse, keyboard, or programmatic fire().",
+            diagram: "  Button\n  +---------+\n  | Submit  |\n  +---------+",
+            code: {
+              language: "java",
+              code: `Button btn = new Button("Go");
+btn.setGraphic(new ImageView(new Image("file:go.png")));
+btn.setOnAction(e -> System.out.println("clicked"));`,
+              caption: "Button with text, an icon, and a lambda handler."
+            },
+            notes: [
+              "setOnAction accepts an EventHandler<ActionEvent> (lambda-friendly).",
+              "setGraphic(node) attaches an icon such as an ImageView to the left of the text.",
+              "setDisable(true) greys the button out and blocks clicks.",
+              "btn.fire() programmatically triggers the action handler."
+            ],
+            exampleOutput: "clicked"
+          },
+          {
+            name: "Label",
+            definition: "A Label is a non-editable text display that can also host a graphic and wrap text, used for captions and form labels.",
+            diagram: "  Label\n  +-------------+\n  | 🖼  Status  |\n  +-------------+",
+            code: {
+              language: "java",
+              code: `Label lbl = new Label("Status: ready");
+lbl.setGraphic(new ImageView(new Image("file:ok.png")));
+lbl.setText("Status: done");`,
+              caption: "Label with a graphic, then updated via setText."
+            },
+            notes: [
+              "setText(String) updates the displayed text; textProperty() is observable.",
+              "setGraphic(node) places an icon next to the text.",
+              "setWrapText(true) wraps long text across multiple lines.",
+              "Commonly used to label fields in forms and to show live status messages."
+            ],
+            exampleOutput: "Status: done (next to the icon)"
+          }
+        ]
       }
     },
     viva: [
@@ -574,7 +1328,52 @@ submit.setOnAction(e -> {
         explanation: "Use GridPane for clean label/field alignment. Combine TextField (name, email), PasswordField (password, masked), ComboBox (country, role), DatePicker (DOB), ToggleGroup with RadioButton (gender), CheckBox (terms), and Button (submit). Validate input in the submit handler: non-empty checks, regex for email, minimum password length, terms accepted. Show feedback via Alert (information/error) or by updating a status Label. Use HBox to group related controls (gender radios, action buttons).",
         diagram: "GridPane form (label : value):\n  Name    [______________]\n  Email   [______________]\n  Pass    [**************]\n  Country [▼ India     ]\n  DOB     [📅 2000-01-01]\n  Gender  (•) Male  ( ) Female\n  ☐ I agree to the terms\n  [ Register ]",
         example: "See the multi-line code block above: a GridPane with all common controls, validation in submit handler, and Alert feedback.",
-        conclusion: "Registration forms are a comprehensive demonstration of JavaFX: layouts, controls, events, validation, and user feedback in a single, cohesive app."
+        conclusion: "Registration forms are a comprehensive demonstration of JavaFX: layouts, controls, events, validation, and user feedback in a single, cohesive app.",
+        types: [
+          {
+            name: "Form Controls",
+            definition: "Form controls are the input widgets used to capture data — TextField, PasswordField, ComboBox, DatePicker, RadioButton (in ToggleGroup), and CheckBox.",
+            diagram: "  Form controls\n  [Text] [Pass] [Combo] [Date] [(o)] [x]",
+            code: {
+              language: "java",
+              code: `TextField name = new TextField();
+PasswordField pw = new PasswordField();
+ComboBox<String> country = new ComboBox<>();
+DatePicker dob = new DatePicker();
+ToggleGroup g = new ToggleGroup();
+RadioButton male = new RadioButton("M"); male.setToggleGroup(g);
+CheckBox terms = new CheckBox("OK");`,
+              caption: "The typical input controls used in a registration form."
+            },
+            notes: [
+              "Each control exposes a typed getter for its value (getText, getValue, isSelected).",
+              "RadioButtons must share a ToggleGroup to be mutually exclusive.",
+              "PasswordField masks input; DatePicker.getValue() returns a LocalDate.",
+              "Wrap the group of controls in a layout (GridPane, VBox, HBox) for alignment."
+            ],
+            exampleOutput: "Form is laid out with one row per control."
+          },
+          {
+            name: "Layout Structure",
+            definition: "Layout structure organises form controls in a grid (GridPane) with label/value rows, an outer VBox, and HBox groupings for related controls.",
+            diagram: "  VBox\n    GridPane rows (label : value)\n    HBox (Submit, Reset)",
+            code: {
+              language: "java",
+              code: `GridPane gp = new GridPane();
+gp.setHgap(8); gp.setVgap(8);
+gp.addRow(0, new Label("Name"), new TextField());
+VBox root = new VBox(gp, new HBox(10, new Button("OK")));`,
+              caption: "GridPane with a label/value row, wrapped in a VBox."
+            },
+            notes: [
+              "GridPane is the canonical container for label/value alignment.",
+              "addRow(rowIndex, node...) appends a complete row in one call.",
+              "Outer VBox stacks the form grid and an action button row.",
+              "HBox groups related controls like gender radios or action buttons."
+            ],
+            exampleOutput: "Two-column form: labels on the left, inputs on the right."
+          }
+        ]
       },
       sixteenMark: {
         intro: "Registration forms showcase the integration of JavaFX layouts, multiple controls, validation logic, and user feedback via Alerts — a holistic demo of desktop UI development.",
@@ -598,7 +1397,97 @@ submit.setOnAction(e -> {
           "Admin onboarding",
           "Kiosk data entry"
         ],
-        conclusion: "Building a registration form is the best single exercise to master JavaFX layouts, controls, event handling, validation, and user feedback — a complete mini-application that touches every key concept in the framework."
+        conclusion: "Building a registration form is the best single exercise to master JavaFX layouts, controls, event handling, validation, and user feedback — a complete mini-application that touches every key concept in the framework.",
+        types: [
+          {
+            name: "Form Controls",
+            definition: "Form controls are the input widgets used to capture data — TextField, PasswordField, ComboBox, DatePicker, RadioButton (in ToggleGroup), and CheckBox.",
+            diagram: "  Form controls\n  [Text] [Pass] [Combo] [Date] [(o)] [x]",
+            code: {
+              language: "java",
+              code: `TextField name = new TextField();
+PasswordField pw = new PasswordField();
+ComboBox<String> country = new ComboBox<>();
+DatePicker dob = new DatePicker();
+ToggleGroup g = new ToggleGroup();
+RadioButton male = new RadioButton("M"); male.setToggleGroup(g);
+CheckBox terms = new CheckBox("OK");`,
+              caption: "The typical input controls used in a registration form."
+            },
+            notes: [
+              "Each control exposes a typed getter for its value (getText, getValue, isSelected).",
+              "RadioButtons must share a ToggleGroup to be mutually exclusive.",
+              "PasswordField masks input; DatePicker.getValue() returns a LocalDate.",
+              "Wrap the group of controls in a layout (GridPane, VBox, HBox) for alignment."
+            ],
+            exampleOutput: "Form is laid out with one row per control."
+          },
+          {
+            name: "Layout Structure",
+            definition: "Layout structure organises form controls in a grid (GridPane) with label/value rows, an outer VBox, and HBox groupings for related controls.",
+            diagram: "  VBox\n    GridPane rows (label : value)\n    HBox (Submit, Reset)",
+            code: {
+              language: "java",
+              code: `GridPane gp = new GridPane();
+gp.setHgap(8); gp.setVgap(8);
+gp.addRow(0, new Label("Name"), new TextField());
+VBox root = new VBox(gp, new HBox(10, new Button("OK")));`,
+              caption: "GridPane with a label/value row, wrapped in a VBox."
+            },
+            notes: [
+              "GridPane is the canonical container for label/value alignment.",
+              "addRow(rowIndex, node...) appends a complete row in one call.",
+              "Outer VBox stacks the form grid and an action button row.",
+              "HBox groups related controls like gender radios or action buttons."
+            ],
+            exampleOutput: "Two-column form: labels on the left, inputs on the right."
+          },
+          {
+            name: "Event Handling",
+            definition: "Event handling in a form wires the Submit button's setOnAction handler to read every control's value, run validation, and trigger feedback.",
+            diagram: "  Submit click --> handler\n  --> read fields\n  --> validate\n  --> Alert.show()",
+            code: {
+              language: "java",
+              code: `Button submit = new Button("Register");
+submit.setOnAction(e -> {
+  String name = nameF.getText();
+  LocalDate d  = dob.getValue();
+  RadioButton sel = (RadioButton) g.getSelectedToggle();
+  System.out.println(name + " | " + d + " | " + sel.getText());
+});`,
+              caption: "Submit handler reading all form values."
+            },
+            notes: [
+              "setOnAction is the natural hook for the form's Submit button.",
+              "getSelectedToggle() returns the chosen RadioButton in the ToggleGroup (or null).",
+              "Always wrap handler logic in try-catch to avoid crashing the FX Application Thread.",
+              "Property listeners can also be used for live validation as fields change."
+            ],
+            exampleOutput: "Alice | 2000-05-12 | M"
+          },
+          {
+            name: "Validation & Feedback",
+            definition: "Validation and feedback check the captured values against rules (non-empty, regex, min length) and inform the user via Alert or an inline status Label.",
+            diagram: "  Validate\n  +-- name != \"\"\n  +-- email matches .+@.+\\..+\n  +-- password length >= 6\n  +-- terms.isSelected()\n  --> Alert.show()",
+            code: {
+              language: "java",
+              code: `if (name.isEmpty() || !email.matches(".+@.+\\\\..+")
+    || pw.length() < 6 || !terms.isSelected()) {
+  new Alert(Alert.AlertType.ERROR, "Fix errors").show();
+} else {
+  new Alert(Alert.AlertType.INFORMATION, "OK").show();
+}`,
+              caption: "Validating form values and showing an Alert."
+            },
+            notes: [
+              "Common rules: non-empty text, email regex, minimum password length, terms accepted.",
+              "Alert is modal and blocks input to its owner; use Label for inline non-blocking messages.",
+              "Always validate on the FX thread to avoid races with UI updates.",
+              "For multi-step forms, persist the validated data to a model object before navigating."
+            ],
+            exampleOutput: "An Alert dialog with the success or error message."
+          }
+        ]
       }
     },
     viva: [

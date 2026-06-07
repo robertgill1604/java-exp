@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap, FileText, BookOpen } from "lucide-react";
 import type { ExamAnswer } from "@/data/types";
+import { TypeSectionList } from "./type-card";
 
 export function ExamAnswerCard({ examAnswer, title }: { examAnswer: ExamAnswer; title: string }) {
   return (
@@ -44,6 +45,9 @@ export function ExamAnswerCard({ examAnswer, title }: { examAnswer: ExamAnswer; 
             <h4 className="text-sm font-semibold text-primary mb-1.5">Explanation</h4>
             <p className="text-sm leading-relaxed">{examAnswer.thirteenMark.explanation}</p>
           </section>
+          {examAnswer.thirteenMark.types && examAnswer.thirteenMark.types.length > 0 && (
+            <TypeSectionList types={examAnswer.thirteenMark.types} title="Types / Classification" />
+          )}
           {examAnswer.thirteenMark.diagram && (
             <section>
               <h4 className="text-sm font-semibold text-primary mb-1.5">Diagram</h4>
@@ -77,6 +81,9 @@ export function ExamAnswerCard({ examAnswer, title }: { examAnswer: ExamAnswer; 
             <h4 className="text-sm font-semibold text-primary mb-1.5">Explanation</h4>
             <p className="text-sm leading-relaxed">{examAnswer.sixteenMark.explanation}</p>
           </section>
+          {examAnswer.sixteenMark.types && examAnswer.sixteenMark.types.length > 0 && (
+            <TypeSectionList types={examAnswer.sixteenMark.types} title="Types / Classification" />
+          )}
           <section>
             <h4 className="text-sm font-semibold text-primary mb-1.5">Working</h4>
             <p className="text-sm leading-relaxed whitespace-pre-wrap font-mono text-xs bg-muted/40 p-3 rounded-md border border-border/40">
