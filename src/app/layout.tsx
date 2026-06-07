@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/ui/toaster";
 import { ProgressTracker } from "@/components/progress-tracker";
 import { SiteHeader } from "@/components/layout/site-header";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Java Exam Master — Master Java for University Exams",
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
